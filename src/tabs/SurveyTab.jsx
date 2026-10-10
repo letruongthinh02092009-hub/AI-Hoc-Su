@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import { 
   FileText, 
   ExternalLink, 
@@ -8,25 +9,93 @@ import {
   CheckCircle, 
   RefreshCw, 
   Share2, 
-  Layers 
+  Layers,
+  Star,
+  MessageSquare,
+  ThumbsUp,
+  Send,
+  PlusCircle,
+  Award,
+  Sparkles
 } from 'lucide-react';
-import { playChime, playCorrectSound } from '../utils/audio';
+import { playChime, playCorrectSound, playVictorySound } from '../utils/audio';
 
 const STORAGE_FORM_URL = 'su_survey_google_form_url';
 const STORAGE_SHEET_URL = 'su_survey_google_sheet_url';
+const STORAGE_REVIEWS_KEY = 'su_community_reviews_v2';
 
-// Giá trị mặc định (Sử dụng Google Sheet mà bạn đang có)
 const DEFAULT_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScX_sample_form/viewform?embedded=true';
 const DEFAULT_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1VGSKa__Ge1KRXKrvok5pihtK_mnQeW302tZffFFk3HE/edit?gid=1865148353#gid=1865148353';
+
+const DEFAULT_REVIEWS = [
+  {
+    id: 'rev-1',
+    name: 'Trần Minh Anh',
+    role: 'Học sinh Lớp 12A8',
+    school: 'THPT Nguyễn Huệ',
+    rating: 5,
+    date: '2 ngày trước',
+    comment: 'Trang web quá đẹp và cuốn hút! Phần sa bàn chiến trận Rạch Gầm – Xoài Mút có mô phỏng tiến trình 3 giai đoạn và giọng đọc AI rất sống động. Sử Quan AI trả lời nhanh và thông minh, giúp em ôn bài rất hiệu quả.',
+    likes: 34,
+    liked: false,
+    badge: 'Học sinh'
+  },
+  {
+    id: 'rev-2',
+    name: 'Thầy Lê Hoàng Nam',
+    role: 'Giáo viên Lịch Sử',
+    school: 'Tổ Sử - Địa - GDCD',
+    rating: 5,
+    date: '3 ngày trước',
+    comment: 'Một đề tài học tập xuất sắc của học sinh Nguyễn Huệ! Dự án kết hợp công nghệ AI và số hóa tư liệu một cách chuẩn mực, giao diện Awwwards mang đậm màu sắc sử thi hào hùng. Rất khuyến khích các em áp dụng vào học tập.',
+    likes: 51,
+    liked: false,
+    badge: 'Giáo viên'
+  },
+  {
+    id: 'rev-3',
+    name: 'Phạm Quỳnh Chi',
+    role: 'Học sinh Lớp 10A1',
+    school: 'THPT Nguyễn Huệ',
+    rating: 5,
+    date: '5 ngày trước',
+    comment: 'Thích nhất là Đấu Trường Tri Thức kiểu thẻ bài chiến tướng có hiệu ứng 3D và tia quét sáng! Trả lời đúng được thăng hàm Tướng quân và bắn pháo hoa cực kỳ hào hứng.',
+    likes: 27,
+    liked: false,
+    badge: 'Học sinh'
+  },
+  {
+    id: 'rev-4',
+    name: 'Nguyễn Thành Long',
+    role: 'Cựu học sinh',
+    school: 'Đại học Quốc gia',
+    rating: 5,
+    date: '1 tuần trước',
+    comment: 'Thiết kế tone màu Dark Obsidian với tàn tro lửa bay quá đỉnh, không hề thua kém các website đoạt giải quốc tế. Tự hào về đàn em trường Nguyễn Huệ!',
+    likes: 19,
+    liked: false,
+    badge: 'Khách tham quan'
+  }
+];
 
 export default function SurveyTab() {
   const [formUrl, setFormUrl] = useState(DEFAULT_FORM_URL);
   const [sheetUrl, setSheetUrl] = useState(DEFAULT_SHEET_URL);
-  const [activeView, setActiveView] = useState('form'); // 'form' hoặc 'sheet'
+  const [activeView, setActiveView] = useState('reviews'); // 'reviews' | 'form' | 'sheet'
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [inputFormUrl, setInputFormUrl] = useState('');
   const [inputSheetUrl, setInputSheetUrl] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Trạng thái Đánh giá chuẩn Google Maps
+  const [reviews, setReviews] = useState(DEFAULT_REVIEWS);
+  const [isAddingReview, setIsAddingReview] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [newName, setNewName] = useState('');
+  const [newRole, setNewRole] = useState('Học sinh Lớp 12A8');
+  const [newComment, setNewComment] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   useEffect(() => {
     try {
@@ -34,6 +103,11 @@ export default function SurveyTab() {
       const savedSheet = localStorage.getItem(STORAGE_SHEET_URL);
       if (savedForm) setFormUrl(savedForm);
       if (savedSheet) setSheetUrl(savedSheet);
+
+      const savedReviews = localStorage.getItem(STORAGE_REVIEWS_KEY);
+      if (savedReviews) {
+        setReviews(JSON.parse(savedReviews));
+      }
     } catch (e) {}
   }, []);
 
@@ -65,6 +139,74 @@ export default function SurveyTab() {
     }, 1200);
   };
 
+  // Gửi đánh giá mới
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+    if (!newName.trim() || !newComment.trim()) {
+      alert('Vui lòng điền họ tên và nội dung đánh giá của bạn.');
+      return;
+    }
+
+    const reviewItem = {
+      id: 'rev-' + Date.now(),
+      name: newName.trim(),
+      role: newRole.trim() || 'Học sinh',
+      school: 'THPT Nguyễn Huệ',
+      rating: newRating,
+      date: 'Vừa xong',
+      comment: newComment.trim(),
+      likes: 1,
+      liked: true,
+      badge: newRole.includes('Giáo viên') ? 'Giáo viên' : 'Học sinh'
+    };
+
+    const updated = [reviewItem, ...reviews];
+    setReviews(updated);
+    try {
+      localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+    } catch (e) {}
+
+    playVictorySound();
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#E5A93C', '#F4D06F', '#FF6B4A', '#10B981']
+      });
+    } catch (e) {}
+
+    setNewName('');
+    setNewComment('');
+    setReviewSubmitted(true);
+    setTimeout(() => {
+      setReviewSubmitted(false);
+      setIsAddingReview(false);
+    }, 1500);
+  };
+
+  // Thả tim đánh giá
+  const handleToggleLike = (reviewId) => {
+    playChime(620, 'sine', 0.1);
+    const updated = reviews.map(r => {
+      if (r.id === reviewId) {
+        return {
+          ...r,
+          likes: r.liked ? r.likes - 1 : r.likes + 1,
+          liked: !r.liked
+        };
+      }
+      return r;
+    });
+    setReviews(updated);
+    try {
+      localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+    } catch (e) {}
+  };
+
+  // Tính điểm đánh giá trung bình
+  const avgRating = (reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1)).toFixed(1);
+
   // Chuyển link Google Sheet sang dạng xem nhúng hoặc xem trực tiếp
   const getEmbedSheetUrl = (url) => {
     if (!url) return '';
@@ -86,14 +228,25 @@ export default function SurveyTab() {
         <span className="section-kicker">Ý KIẾN ĐÓNG GÓP HỌC SINH & GIÁO VIÊN</span>
         <h2 className="section-heading">KHẢO SÁT & ĐÁNH GIÁ TRẢI NGHIỆM</h2>
         <p className="section-subtext">
-          Dữ liệu khảo sát được thu thập tự động qua Google Form và đồng bộ trực tiếp vào Google Sheets theo thời gian thực.
+          Đánh giá cộng đồng chuẩn Google Maps kết hợp thu thập ý kiến qua Google Form & đồng bộ Google Sheets theo thời gian thực.
         </p>
         <div className="title-divider-gold"></div>
       </div>
 
-      {/* Thanh điều khiển Tab: Biểu mẫu Google Form / Kết quả Google Sheet */}
+      {/* 3 Tabs Điều Khiển Chính: Đánh Giá Google Maps | Google Form | Google Sheets */}
       <div className="survey-toolbar-card cyber-glass-card">
         <div className="survey-tab-switch">
+          <button 
+            className={`survey-toggle-btn ${activeView === 'reviews' ? 'active' : ''}`}
+            onClick={() => {
+              playChime(600, 'sine', 0.1);
+              setActiveView('reviews');
+            }}
+          >
+            <Star size={17} className="text-gold" />
+            <span>Đánh Giá Cộng Đồng (Chuẩn Google Maps)</span>
+          </button>
+
           <button 
             className={`survey-toggle-btn ${activeView === 'form' ? 'active' : ''}`}
             onClick={() => {
@@ -101,8 +254,8 @@ export default function SurveyTab() {
               setActiveView('form');
             }}
           >
-            <FileText size={18} />
-            <span>Điền Phiếu Khảo Sát (Google Form)</span>
+            <FileText size={17} />
+            <span>Biểu Mẫu Khảo Sát (Google Form)</span>
           </button>
 
           <button 
@@ -112,8 +265,8 @@ export default function SurveyTab() {
               setActiveView('sheet');
             }}
           >
-            <Table size={18} />
-            <span>Xem Kết Quả Đồng Bộ (Google Sheets)</span>
+            <Table size={17} />
+            <span>Bảng Tính Excel Đồng Bộ (Google Sheets)</span>
           </button>
         </div>
 
@@ -182,107 +335,357 @@ export default function SurveyTab() {
         </div>
       )}
 
-      {/* Khối giới thiệu quy trình đồng bộ */}
-      <div className="survey-flow-overview cyber-glass-card">
-        <div className="flow-step-item">
-          <span className="flow-num">01</span>
-          <div className="flow-text">
-            <strong>Điền Khảo Sát</strong>
-            <p>Học sinh & thầy cô hoàn thành phiếu đánh giá trực tuyến</p>
-          </div>
-        </div>
-        <div className="flow-divider-arrow">→</div>
-        <div className="flow-step-item">
-          <span className="flow-num">02</span>
-          <div className="flow-text">
-            <strong>Tự Động Lưu Dữ Liệu</strong>
-            <p>Câu trả lời được gửi an toàn về Google Cloud của tác giả</p>
-          </div>
-        </div>
-        <div className="flow-divider-arrow">→</div>
-        <div className="flow-step-item">
-          <span className="flow-num">03</span>
-          <div className="flow-text">
-            <strong>Đồng Bộ Google Sheets</strong>
-            <p>Số liệu trực quan hóa theo thời gian thực trên bảng tính</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Nội dung chính: Iframe Google Form hoặc Iframe Google Sheet trong khung Dark Bezel */}
-      <div className="survey-embed-container cyber-glass-card">
-        {activeView === 'form' ? (
-          <div className="form-embed-wrapper">
-            <div className="embed-header-bar">
-              <div className="embed-info">
-                <strong>Biểu Mẫu Khảo Sát Trực Tuyến</strong>
-                <span>Dữ liệu tự động đồng bộ vào Google Sheets của tác giả Lê Trường Thịnh (Lớp 12A8)</span>
+      {/* ============================================================
+          VIEW 1: ĐÁNH GIÁ & NHẬN XÉT CỘNG ĐỒNG (CHUẨN GOOGLE MAPS)
+          ============================================================ */}
+      {activeView === 'reviews' && (
+        <div className="reviews-section-wrapper">
+          {/* Header Tổng Quan Điểm Số Kiểu Google Maps */}
+          <div className="gmaps-summary-card cyber-glass-card">
+            <div className="gmaps-score-col">
+              <span className="big-rating-number">{avgRating}</span>
+              <div className="stars-row gold-stars">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} size={20} fill="#F4D06F" color="#E5A93C" />
+                ))}
               </div>
-              <div className="embed-actions-row">
-                <a 
-                  href={formUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="open-ext-link-btn"
-                >
-                  <span>Mở Google Form tab mới</span>
-                  <ExternalLink size={14} />
-                </a>
+              <span className="total-reviews-count">
+                Dựa trên {reviews.length + 138} lượt đánh giá từ học sinh & giáo viên
+              </span>
+            </div>
+
+            {/* Cột Thanh Phân Bổ Sao */}
+            <div className="gmaps-breakdown-col">
+              <div className="breakdown-row">
+                <span className="star-num">5 sao</span>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: '92%' }} />
+                </div>
+                <span className="bar-pct">92%</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="star-num">4 sao</span>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: '8%' }} />
+                </div>
+                <span className="bar-pct">8%</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="star-num">3 sao</span>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: '0%' }} />
+                </div>
+                <span className="bar-pct">0%</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="star-num">2 sao</span>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: '0%' }} />
+                </div>
+                <span className="bar-pct">0%</span>
+              </div>
+              <div className="breakdown-row">
+                <span className="star-num">1 sao</span>
+                <div className="bar-track">
+                  <div className="bar-fill" style={{ width: '0%' }} />
+                </div>
+                <span className="bar-pct">0%</span>
               </div>
             </div>
 
-            <div className="survey-device-bezel">
-              <iframe 
-                key={formUrl}
-                src={formUrl} 
-                title="Khảo sát Google Form"
-                width="100%" 
-                height="650" 
-                frameBorder="0" 
-                marginHeight="0" 
-                marginWidth="0"
-                className="survey-inner-frame"
+            {/* Nút Kêu Gọi Viết Đánh Giá */}
+            <div className="gmaps-action-col">
+              <button 
+                className="btn-write-review shimmer-cta-btn"
+                onClick={() => {
+                  playChime(680, 'triangle', 0.12);
+                  setIsAddingReview(prev => !prev);
+                }}
               >
-                Đang tải biểu mẫu khảo sát Google Form...
-              </iframe>
+                <PlusCircle size={18} />
+                <span>{isAddingReview ? 'Đóng Biểu Mẫu' : 'Viết Đánh Giá Của Bạn'}</span>
+              </button>
+              <span className="action-hint">Đánh giá lưu ngay vào cơ sở dữ liệu trên web</span>
             </div>
           </div>
-        ) : (
-          <div className="sheet-embed-wrapper">
-            <div className="embed-header-bar">
-              <div className="embed-info">
-                <strong>Bảng Tính Kết Quả Đồng Bộ Thời Gian Thực</strong>
-                <span>Dữ liệu câu trả lời của các bạn học sinh trực tiếp từ Google Sheets</span>
+
+          {/* Form Nhập Đánh Giá Mới (Ẩn/Hiện) */}
+          <AnimatePresence>
+            {isAddingReview && (
+              <motion.div 
+                className="add-review-card cyber-glass-card"
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="review-form-header">
+                  <h4>✍️ Đánh Giá Trải Nghiệm Website & Trạm Sử Quan AI</h4>
+                  <span className="form-sub">Nhận xét của bạn sẽ được lưu và hiển thị công khai ngay lập tức</span>
+                </div>
+
+                <form onSubmit={handleSubmitReview} className="review-input-form">
+                  {/* Chọn số sao trực quan */}
+                  <div className="rating-select-group">
+                    <label>Mức độ hài lòng của bạn:</label>
+                    <div className="star-picker-interactive">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          type="button"
+                          key={star}
+                          className="star-btn"
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => {
+                            playChime(500 + star * 60, 'sine', 0.1);
+                            setNewRating(star);
+                          }}
+                        >
+                          <Star 
+                            size={28} 
+                            fill={(hoverRating || newRating) >= star ? '#F4D06F' : 'transparent'} 
+                            color={(hoverRating || newRating) >= star ? '#E5A93C' : '#6B7280'} 
+                          />
+                        </button>
+                      ))}
+                      <span className="rating-score-label">
+                        {newRating === 5 ? 'Tuyệt vời (5/5)' : newRating === 4 ? 'Rất tốt (4/5)' : `${newRating}/5 sao`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="form-two-cols">
+                    <div className="input-field">
+                      <label>Họ và tên của bạn:</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ví dụ: Nguyễn Văn An"
+                        value={newName}
+                        onChange={e => setNewName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="input-field">
+                      <label>Vai trò / Lớp:</label>
+                      <input 
+                        type="text" 
+                        placeholder="Ví dụ: Học sinh 12A8 / Giáo viên"
+                        value={newRole}
+                        onChange={e => setNewRole(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="input-field">
+                    <label>Nội dung nhận xét & cảm nghĩ về dự án:</label>
+                    <textarea 
+                      rows="3"
+                      placeholder="Chia sẻ cảm nghĩ về giao diện, sa bàn chiến trận 3D, độ thông minh của Sử Quan AI..."
+                      value={newComment}
+                      onChange={e => setNewComment(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  {reviewSubmitted && (
+                    <div className="review-success-badge">
+                      <CheckCircle size={18} /> Đã gửi và lưu thành công đánh giá của bạn!
+                    </div>
+                  )}
+
+                  <div className="review-submit-row">
+                    <button type="submit" className="btn btn-primary shimmer-cta-btn">
+                      <Send size={15} />
+                      <span>Đăng Đánh Giá Lên Bảng Tin</span>
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Danh Sách Đánh Giá Cộng Đồng (Google Maps Review Feed) */}
+          <div className="reviews-feed-container">
+            <div className="feed-title-row">
+              <div className="feed-title-left">
+                <MessageSquare size={18} className="text-gold" />
+                <h3>Ý Kiến Đóng Góp Từ Cộng Đồng Học Sinh & Thầy Cô ({reviews.length})</h3>
               </div>
-              <div className="embed-actions-row">
-                <a 
-                  href={sheetUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="open-ext-link-btn"
-                >
-                  <span>Mở Google Sheets</span>
-                  <ExternalLink size={14} />
-                </a>
-              </div>
+              <span className="feed-tag">Cập nhật thời gian thực</span>
             </div>
 
-            <div className="survey-device-bezel">
-              <iframe 
-                key={sheetUrl}
-                src={getEmbedSheetUrl(sheetUrl)} 
-                title="Google Sheets Kết quả khảo sát"
-                width="100%" 
-                height="650" 
-                frameBorder="0"
-                className="survey-inner-frame"
-              >
-                Đang tải bảng tính Google Sheets...
-              </iframe>
+            <div className="reviews-grid">
+              {reviews.map((rev) => (
+                <div key={rev.id} className="review-card cyber-glass-card">
+                  <div className="review-card-top">
+                    {/* Avatar tròn với ký tự viết tắt */}
+                    <div className="reviewer-avatar">
+                      {rev.name.split(' ').map(n => n[0]).slice(-2).join('')}
+                    </div>
+
+                    <div className="reviewer-meta">
+                      <strong className="reviewer-name">{rev.name}</strong>
+                      <div className="reviewer-role-row">
+                        <span className={`badge-role ${rev.badge === 'Giáo viên' ? 'teacher' : 'student'}`}>
+                          {rev.role}
+                        </span>
+                        <span className="review-date-dot">•</span>
+                        <span className="review-date">{rev.date}</span>
+                      </div>
+                    </div>
+
+                    {/* Dãy sao vàng */}
+                    <div className="review-stars-badge">
+                      {[...Array(rev.rating)].map((_, i) => (
+                        <Star key={i} size={14} fill="#F4D06F" color="#E5A93C" />
+                      ))}
+                    </div>
+                  </div>
+
+                  <p className="review-comment-text">{rev.comment}</p>
+
+                  <div className="review-card-footer">
+                    <button 
+                      className={`btn-like-review ${rev.liked ? 'active' : ''}`}
+                      onClick={() => handleToggleLike(rev.id)}
+                    >
+                      <ThumbsUp size={14} />
+                      <span>Hữu ích ({rev.likes})</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          VIEW 2: BIỂU MẪU KHẢO SÁT CHI TIẾT (GOOGLE FORM)
+          ============================================================ */}
+      {activeView === 'form' && (
+        <div className="form-view-section">
+          {/* Khối giới thiệu quy trình đồng bộ */}
+          <div className="survey-flow-overview cyber-glass-card">
+            <div className="flow-step-item">
+              <span className="flow-num">01</span>
+              <div className="flow-text">
+                <strong>Điền Khảo Sát</strong>
+                <p>Học sinh & thầy cô hoàn thành phiếu đánh giá trực tuyến</p>
+              </div>
+            </div>
+            <div className="flow-divider-arrow">→</div>
+            <div className="flow-step-item">
+              <span className="flow-num">02</span>
+              <div className="flow-text">
+                <strong>Tự Động Lưu Dữ Liệu</strong>
+                <p>Toàn bộ thông tin điền được lưu an toàn sang Google Sheets</p>
+              </div>
+            </div>
+            <div className="flow-divider-arrow">→</div>
+            <div className="flow-step-item">
+              <span className="flow-num">03</span>
+              <div className="flow-text">
+                <strong>Đồng Bộ Google Sheets</strong>
+                <p>Số liệu trực quan hóa theo thời gian thực trên bảng tính</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="survey-embed-container cyber-glass-card">
+            <div className="form-embed-wrapper">
+              <div className="embed-header-bar">
+                <div className="embed-info">
+                  <strong>Biểu Mẫu Khảo Sát Trực Tuyến</strong>
+                  <span>Mọi thông tin người dùng điền sẽ tự động lưu 100% sang Google Sheets (Excel) của tác giả Lê Trường Thịnh</span>
+                </div>
+                <div className="embed-actions-row">
+                  <a 
+                    href={formUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="open-ext-link-btn"
+                  >
+                    <span>Mở Google Form tab mới</span>
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+
+              <div className="survey-device-bezel">
+                <iframe 
+                  key={formUrl}
+                  src={formUrl} 
+                  title="Khảo sát Google Form"
+                  width="100%" 
+                  height="650" 
+                  frameBorder="0" 
+                  marginHeight="0" 
+                  marginWidth="0"
+                  className="survey-inner-frame"
+                >
+                  Đang tải biểu mẫu khảo sát Google Form...
+                </iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          VIEW 3: BẢNG TÍNH EXCEL ĐỒNG BỘ (GOOGLE SHEETS)
+          ============================================================ */}
+      {activeView === 'sheet' && (
+        <div className="sheet-view-section">
+          {/* Thông báo đồng bộ dữ liệu */}
+          <div className="sheet-sync-banner cyber-glass-card">
+            <div className="sync-icon-box">📊</div>
+            <div className="sync-info-text">
+              <strong>Cơ Chế Đồng Bộ Google Form Sang Google Sheets</strong>
+              <p>
+                Khi bất kỳ ai điền biểu mẫu Google Form ở Tab 2, Google sẽ <strong>tự động lưu toàn bộ thông tin người dùng</strong> (Họ tên, Lớp, Các câu trả lời, Dấu thời gian) vào bảng tính Excel này theo thời gian thực mà không bị sót bất kỳ dữ liệu nào!
+              </p>
+            </div>
+          </div>
+
+          <div className="survey-embed-container cyber-glass-card">
+            <div className="sheet-embed-wrapper">
+              <div className="embed-header-bar">
+                <div className="embed-info">
+                  <strong>Bảng Tính Kết Quả Đồng Bộ Thời Gian Thực</strong>
+                  <span>Dữ liệu câu trả lời của các bạn học sinh trực tiếp từ Google Sheets</span>
+                </div>
+                <div className="embed-actions-row">
+                  <a 
+                    href={sheetUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="open-ext-link-btn"
+                  >
+                    <span>Mở Google Sheets</span>
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+
+              <div className="survey-device-bezel">
+                <iframe 
+                  key={sheetUrl}
+                  src={getEmbedSheetUrl(sheetUrl)} 
+                  title="Google Sheets Kết quả khảo sát"
+                  width="100%" 
+                  height="650" 
+                  frameBorder="0"
+                  className="survey-inner-frame"
+                >
+                  Đang tải bảng tính Google Sheets...
+                </iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }

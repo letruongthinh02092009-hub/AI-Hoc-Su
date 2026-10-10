@@ -21,6 +21,7 @@ import {
   saveKnowledgeBase
 } from '../services/geminiService';
 import { playChime, playCorrectSound } from '../utils/audio';
+import mammoth from 'mammoth';
 
 const ADMIN_PASSCODE = '1789'; // Mật khẩu năm đại phá quân Thanh 1789
 
@@ -59,15 +60,44 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
     }
   };
 
-  // Xử lý tải file tư liệu lên (.txt, .md, .json)
+  // Xử lý tải file tư liệu lên (.docx, .txt, .md, .json)
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const fileName = file.name;
     setUploadedFileName(fileName);
-    const reader = new FileReader();
 
+    // 1. Xử lý file Microsoft Word (.docx)
+    if (fileName.toLowerCase().endsWith('.docx')) {
+      const docxReader = new FileReader();
+      docxReader.onload = async (event) => {
+        try {
+          const arrayBuffer = event.target?.result;
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          const text = result.value || '';
+          if (!text.trim()) {
+            alert('File Word không có nội dung văn bản.');
+            return;
+          }
+          const defaultTitle = fileName.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+          setTitle(defaultTitle.charAt(0).toUpperCase() + defaultTitle.slice(1));
+          setContent(text.trim());
+          setSource(`Tài liệu Word: ${fileName} (Lê Trường Thịnh phê duyệt)`);
+          setSuccessMsg(`Đã trích xuất thành công nội dung từ file Word "${fileName}"! Hãy kiểm tra và nhấn "Lưu vào kho tư liệu".`);
+          playCorrectSound();
+          setTimeout(() => setSuccessMsg(''), 4000);
+        } catch (err) {
+          alert('Không thể đọc file Word: ' + err.message);
+        }
+      };
+      docxReader.readAsArrayBuffer(file);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // 2. Xử lý file văn bản (.txt, .md) hoặc cấu trúc (.json)
+    const reader = new FileReader();
     reader.onload = (event) => {
       const fileText = event.target?.result;
       if (typeof fileText !== 'string') return;
@@ -111,7 +141,6 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
     };
 
     reader.readAsText(file);
-    // Reset file input
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -213,17 +242,17 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                   <div className="upload-file-card">
                     <div className="upload-header">
                       <Upload size={18} className="upload-icon" />
-                      <strong>Tải File Tài Liệu Lên (.txt, .md, .json)</strong>
+                      <strong>Tải File Word (.docx), Văn Bản (.txt, .md) hoặc Dữ Liệu (.json)</strong>
                     </div>
                     <p className="upload-desc">
-                      Tải file văn bản hoặc file JSON để tự động điền tiêu đề và nội dung sử liệu nhanh chóng.
+                      Tự động trích xuất nội dung văn bản từ tài liệu Microsoft Word hoặc file văn bản để nạp vào kho tri thức RAG của Sử Quan AI.
                     </p>
 
                     <input 
                       type="file" 
                       ref={fileInputRef} 
                       onChange={handleFileUpload} 
-                      accept=".txt,.md,.json,.csv" 
+                      accept=".docx,.txt,.md,.json" 
                       style={{ display: 'none' }} 
                     />
 
@@ -233,7 +262,7 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                       onClick={() => fileInputRef.current?.click()}
                     >
                       <FileText size={16} />
-                      <span>{uploadedFileName ? `Đã chọn: ${uploadedFileName}` : 'Chọn file từ máy tính'}</span>
+                      <span>{uploadedFileName ? `Đã chọn: ${uploadedFileName}` : 'Chọn file Word (.docx) hoặc Text (.txt, .md)'}</span>
                     </button>
                   </div>
 

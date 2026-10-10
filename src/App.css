@@ -3879,3 +3879,517 @@ body {
   background: #FFF;
 }
 
+/* ==========================================================================
+   GOOGLE MAPS-STYLE REVIEWS & RATINGS SYSTEM
+   ========================================================================== */
+.reviews-section-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Google Maps Rating Summary Card */
+.gmaps-summary-card {
+  display: grid;
+  grid-template-columns: 240px 1fr 240px;
+  gap: 32px;
+  align-items: center;
+  padding: 28px 32px;
+  background: rgba(18, 20, 27, 0.85);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
+.gmaps-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-right: 24px;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.big-rating-number {
+  font-family: var(--font-serif);
+  font-size: 3.6rem;
+  font-weight: 800;
+  color: #FFF;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(244, 208, 111, 0.4);
+}
+
+.stars-row {
+  display: flex;
+  gap: 4px;
+  margin: 10px 0 8px;
+}
+
+.total-reviews-count {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Star Breakdown Bar Chart (Google Maps style) */
+.gmaps-breakdown-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.breakdown-row .star-num {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  width: 44px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-gold-light));
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(229, 169, 60, 0.4);
+}
+
+.breakdown-row .bar-pct {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  width: 36px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+/* Call to action Write Review */
+.gmaps-action-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding-left: 20px;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-write-review {
+  width: 100%;
+  padding: 12px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #FFF;
+  background: linear-gradient(135deg, var(--crimson-fire), var(--primary-crimson));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(216, 74, 56, 0.4);
+  transition: all 0.25s ease;
+}
+
+.btn-write-review:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(216, 74, 56, 0.6);
+  border-color: var(--accent-gold);
+}
+
+.action-hint {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+@media (max-width: 900px) {
+  .gmaps-summary-card {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 22px 20px;
+  }
+  .gmaps-score-col {
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 18px;
+  }
+  .gmaps-action-col {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 18px;
+  }
+}
+
+/* Review Composer Card */
+.add-review-card {
+  padding: 26px 28px;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  background: rgba(18, 20, 27, 0.92);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-form-header {
+  margin-bottom: 18px;
+}
+
+.review-form-header h4 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: #FFF;
+  margin-bottom: 4px;
+}
+
+.form-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.review-input-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rating-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-select-group label {
+  font-size: 0.85rem;
+  color: var(--accent-gold-light);
+  font-weight: 600;
+}
+
+.star-picker-interactive {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.15s ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.22);
+}
+
+.rating-score-label {
+  margin-left: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent-gold-light);
+}
+
+.form-two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .form-two-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-field label {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.input-field input,
+.input-field textarea {
+  background: rgba(10, 10, 12, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: #FFF;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.input-field input:focus,
+.input-field textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 10px rgba(229, 169, 60, 0.2);
+}
+
+.review-success-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--emerald-hero);
+  font-size: 0.88rem;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-submit-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+/* Reviews Feed */
+.reviews-feed-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.feed-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.feed-title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.feed-title-left h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: #FFF;
+  font-weight: 600;
+}
+
+.feed-tag {
+  font-size: 0.76rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--emerald-hero);
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .reviews-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.review-card {
+  padding: 22px 24px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(18, 20, 27, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-gold);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+.review-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviewer-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--crimson-fire), var(--accent-gold));
+  color: #FFF;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(229, 169, 60, 0.3);
+}
+
+.reviewer-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.reviewer-name {
+  font-size: 0.95rem;
+  color: #FFF;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reviewer-role-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.badge-role {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.badge-role.student {
+  background: rgba(229, 169, 60, 0.12);
+  color: var(--accent-gold-light);
+  border: 1px solid rgba(229, 169, 60, 0.25);
+}
+
+.badge-role.teacher {
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--emerald-hero);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.review-date-dot {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.review-date {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.review-stars-badge {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.review-comment-text {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.review-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-like-review {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-like-review:hover {
+  color: #FFF;
+  border-color: var(--accent-gold);
+}
+
+.btn-like-review.active {
+  background: rgba(229, 169, 60, 0.15);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-light);
+}
+
+/* Sheet Sync Banner */
+.sheet-sync-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-md);
+}
+
+.sync-icon-box {
+  font-size: 2rem;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sync-info-text strong {
+  display: block;
+  font-size: 1rem;
+  color: #FFF;
+  margin-bottom: 4px;
+}
+
+.sync-info-text p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
