@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Học Sử – Quang Trung Nguyễn Huệ | Dự án Dự thi KHKT</title>
+    <!-- Meta tags phục vụ chấm thi KHKT & Giáo dục Di sản số -->
+    <meta name="description" content="Nền tảng Giáo dục Lịch sử Số thông minh ứng dụng Trí tuệ Nhân tạo tìm hiểu về Hoàng đế Quang Trung - Nguyễn Huệ và phong trào Tây Sơn.">
+    <meta name="author" content="Nhóm Học Sinh Nghiên Cứu KHKT - THPT Nguyễn Huệ">
+    
+    <!-- Phông chữ Google Fonts chuẩn Quốc tế & Tiếng Việt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Philosopher:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Bảng phong cách CSS độc quyền Hào Khí Tây Sơn -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- THANH ĐIỀU HƯỚNG CHÍNH (NAVIGATION BAR) -->
+    <nav class="main-nav">
+        <div class="brand-wrapper" onclick="showHome()">
+            <div class="brand-crest">✦</div>
+            <div class="brand-info">
+                <span class="brand-title">AI Học Sử</span>
+                <span class="brand-sub">Quang Trung – Nguyễn Huệ</span>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="#trang-chu" class="active" onclick="showHome(); return false;">Trang chủ</a>
+            <a href="#moc-su-kien" onclick="openPage('moc-su-kien'); return false;">Dòng thời gian</a>
+            <a href="#chien-tran" onclick="openPage('chien-tran'); return false;">Sa bàn chiến trận</a>
+            <a href="#bao-tang" onclick="openPage('bao-tang'); return false;">Bảo tàng số</a>
+            <a href="#ai" onclick="openPage('ai'); return false;">
+                Trạm AI <span class="nav-badge-ai">AI 4.0</span>
+            </a>
+            <a href="#cau-do" onclick="openPage('cau-do'); return false;">Đấu trường kiến thức</a>
+            <a href="#trai-nghiem" onclick="openPage('trai-nghiem'); return false;">Khảo sát KHKT</a>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <button id="audioToggleBtn" class="nav-audio-btn" onclick="toggleAudioMute()">
+                🔔 Âm thanh: Bật
+            </button>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+        </div>
+    </nav>
+
+    <!-- KHUNG NỘI DUNG CHÍNH (MAIN CONTAINER) -->
+    <main>
+
+        <!-- ==========================================
+             1. TRANG CHỦ (HERO & EXPLORATION HUB)
+             ========================================== -->
+        <section id="home-page" class="home-page">
+            <div class="home-intro">
+                <div class="intro-copy">
+                    <div class="label">✦ NGƯỜI ANH HÙNG ÁO VẢI TÂY SƠN ✦</div>
+                    <h2>
+                        Một Cuộc Đời<br>
+                        <span>Một Tầm Vóc Lịch Sử</span>
+                    </h2>
+                    <p class="lead-text">
+                        Từ thủ lĩnh phong trào nông dân Tây Sơn quật khởi đến vị Hoàng đế bách chiến bách thắng Quang Trung, Nguyễn Huệ đã viết nên những trang sử chói lọi nhất trong biên niên sử bảo vệ nền độc lập của dân tộc Việt Nam.
+                    </p>
+                    
+                    <div class="hero-quote-box">
+                        <p>
+                            "Đánh cho để dài tóc, Đánh cho để đen răng,<br>
+                            Đánh cho nó chích luân bất phản, Đánh cho nó phiến giáp bất hoàn,<br>
+                            Đánh cho sử tri nam quốc anh hùng chi hữu chủ!"
+                        </p>
+                        <small>— Lời Hiểu Dụ tướng sĩ tại Nghệ An của Vua Quang Trung (Mùa đông năm 1788)</small>
+                    </div>
+
+                    <div class="hero-action-group">
+                        <button class="btn-royal" onclick="openPage('ai')">
+                            🤖 Khám phá với Trợ lý AI →
+                        </button>
+                        <button class="btn-gold-outline" onclick="openPage('chien-tran')">
+                            ⚔️ Xem Sa bàn chiến trận
+                        </button>
+                    </div>
+                </div>
+
+                <div class="portrait-frame">
+                    <div class="portrait-glow-circle"></div>
+                    <div class="portrait-photo-container">
+                        <img class="portrait-photo" src="https://cdn.phototourl.com/member/2026-10-10-6e351551-6ec2-4dde-aba2-f8685fbc081e.jpg" alt="Hoàng đế Quang Trung Nguyễn Huệ">
+                        <div class="portrait-badge-bottom">✦ QUANG TRUNG HOÀNG ĐẾ (1753 – 1792) ✦</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MENU CÁC KHÔNG GIAN TRẢI NGHIỆM -->
+            <div class="home-menu">
+                <div class="home-menu-header">
+                    <p class="label">KHÔNG GIAN DI SẢN SỐ</p>
+                    <h2 style="font-family: var(--font-heading); font-size: 2.2rem; color: #FFF;">Chọn Hành Trình Khám Phá</h2>
+                    <p style="color: var(--text-parchment); font-size: 1rem; max-width: 650px; margin: 0.5rem auto 0;">
+                        Mỗi phân khu là một cánh cửa công nghệ tương tác trực quan, giúp bạn thấu hiểu sâu sắc tư tưởng và nghệ thuật quân sự của vua Quang Trung.
+                    </p>
+                    <div class="heading-divider">
+                        <span>✦</span>
+                    </div>
+                </div>
+
+                <div class="home-menu-grid">
+                    <button class="home-card" onclick="openPage('moc-su-kien')">
+                        <div class="card-top">
+                            <span class="card-number">01</span>
+                            <div class="card-icon">📜</div>
+                        </div>
+                        <h3>Dòng Thời Gian Lịch Sử</h3>
+                        <p>Biên niên 7 mốc son chói lọi trong cuộc đời và sự nghiệp đánh nam dẹp bắc của Nguyễn Huệ.</p>
+                        <span class="card-action">Khám phá dòng thời gian →</span>
+                    </button>
+
+                    <button class="home-card" onclick="openPage('chien-tran')">
+                        <div class="card-top">
+                            <span class="card-number">02</span>
+                            <div class="card-icon">⚔️</div>
+                        </div>
+                        <h3>Sa Bàn Chiến Trận</h3>
+                        <p>Trực quan hóa diễn biến 3 đại chiến dịch: Rạch Gầm – Xoài Mút, Bắc tiến và Ngọc Hồi – Đống Đa.</p>
+                        <span class="card-action">Xem sa bàn chiến lược →</span>
+                    </button>
+
+                    <button class="home-card" onclick="openPage('bao-tang')">
+                        <div class="card-top">
+                            <span class="card-number">03</span>
+                            <div class="card-icon">🏛️</div>
+                        </div>
+                        <h3>Bảo Tàng Số Tây Sơn</h3>
+                        <p>Chiêm ngưỡng 8 hiện vật, di tích, vũ khí và mở khóa huy hiệu "Người Giữ Sử Tây Sơn".</p>
+                        <span class="card-action">Vào không gian bảo tàng →</span>
+                    </button>
+
+                    <button class="home-card featured" onclick="openPage('ai')">
+                        <div class="card-top">
+                            <span class="card-number">04</span>
+                            <div class="card-icon">🤖</div>
+                        </div>
+                        <h3>Trạm AI Học Sử</h3>
+                        <p>Hỏi đáp thông minh với Sử Quan AI và công cụ kiểm chứng sử liệu, phòng chống tin giả.</p>
+                        <span class="card-action">Trò chuyện cùng AI →</span>
+                    </button>
+
+                    <button class="home-card featured" onclick="openPage('cau-do')">
+                        <div class="card-top">
+                            <span class="card-number">05</span>
+                            <div class="card-icon">🏆</div>
+                        </div>
+                        <h3>Đấu Trường Tri Thức</h3>
+                        <p>Thử thách 3 cấp độ với 30 câu hỏi sử học, tích lũy điểm số và nhận bằng vinh danh xuất sắc.</p>
+                        <span class="card-action">Chinh phục thử thách →</span>
+                    </button>
+
+                    <button class="home-card" onclick="openPage('trai-nghiem')">
+                        <div class="card-top">
+                            <span class="card-number">06</span>
+                            <div class="card-icon">✍️</div>
+                        </div>
+                        <h3>Khảo Sát Thực Nghiệm KHKT</h3>
+                        <p>Đánh giá mức độ hiệu quả của website và đóng góp ý kiến phục vụ đề tài nghiên cứu KHKT.</p>
+                        <span class="card-action">Gửi ý kiến đóng góp →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- THÔNG ĐIỆP CHÂN TRANG CHỦ -->
+            <div class="home-message">
+                <span class="star">✦</span>
+                <p>
+                    "Hiểu đúng lịch sử để khắc ghi công ơn tiền nhân, tự hào về cội nguồn dân tộc và nâng cao trách nhiệm của thế hệ trẻ với tương lai đất nước."
+                </p>
+                <span class="star">✦</span>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             2. DÒNG THỜI GIAN LỊCH SỬ (TIMELINE CHRONICLE)
+             ========================================== -->
+        <section id="moc-su-kien" class="sub-page">
+            <button class="back-button" onclick="showHome()">← Quay lại Trang chủ</button>
+            
+            <div class="page-heading">
+                <span class="label">BIÊN NIÊN SỬ HÀO HÙNG</span>
+                <h2>Những Mốc Son Trong Cuộc Đời Nguyễn Huệ</h2>
+                <p>Mỗi bước chân của người anh hùng áo vải là một dấu ấn vĩ đại trên hành trình thống nhất giang sơn và đập tan giặc ngoại xâm.</p>
+                <div class="heading-divider"><span>✦</span></div>
+            </div>
+
+            <div class="timeline-container">
+                <!-- 1753 -->
+                <article class="timeline-card left">
+                    <div class="timeline-node">01</div>
+                    <span class="timeline-year-badge">NĂM 1753</span>
+                    <h3>Nguyễn Huệ Ra Đời</h3>
+                    <p>Sinh tại làng Kiên Mỹ, ấp Tây Sơn, huyện Phù Ly, phủ Quy Nhơn (nay thuộc thị trấn Phú Phong, huyện Tây Sơn, tỉnh Bình Định). Từ thuở thiếu thời, ông đã bộc lộ tư chất thông minh, sức vóc hơn người và tinh thông võ nghệ.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1753. Nguyễn Huệ sinh tại vùng Tây Sơn, Bình Định. Từ nhỏ đã nổi tiếng dũng cảm, thông tuệ và tinh thông võ nghệ.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+
+                <!-- 1771 -->
+                <article class="timeline-card right">
+                    <div class="timeline-node">02</div>
+                    <span class="timeline-year-badge">NĂM 1771</span>
+                    <h3>Dựng Cờ Khởi Nghĩa Tây Sơn</h3>
+                    <p>Nguyễn Huệ cùng hai anh em Nguyễn Nhạc và Nguyễn Lữ xây dựng căn cứ tại Tây Sơn thượng đạo (An Khê, Gia Lai), giương cao ngọn cờ "Lấy của nhà giàu chia cho dân nghèo", thổi bùng ngọn lửa quật khởi của nhân dân cùng khổ.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1771. Ba anh em dựng cờ khởi nghĩa tại Tây Sơn thượng đạo, giương cao khẩu hiệu lấy của nhà giàu chia cho dân nghèo.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+
+                <!-- 1773 -->
+                <article class="timeline-card left">
+                    <div class="timeline-node">03</div>
+                    <span class="timeline-year-badge">NĂM 1773</span>
+                    <h3>Đánh Chiếm Thành Quy Nhơn</h3>
+                    <p>Bằng mưu kế giả bị bắt nhốt vào cũi để lọt vào nội thành, Nguyễn Nhạc và Nguyễn Huệ đã phá tan quân thủ ngự, chiếm trọn thành Quy Nhơn, tạo bàn đạp giải phóng từ Quảng Nam đến Bình Thuận.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1773. Nghĩa quân Tây Sơn mưu trí hạ thành Quy Nhơn, mở rộng vùng kiểm soát từ Quảng Nam đến Bình Thuận.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+
+                <!-- 1785 -->
+                <article class="timeline-card right">
+                    <div class="timeline-node">04</div>
+                    <span class="timeline-year-badge">NĂM 1785</span>
+                    <h3>Đại Thắng Rạch Gầm – Xoài Mút</h3>
+                    <p>Chỉ huy trận thủy chiến kinh điển trên sông Tiền, bố trí hỏa pháo và thuyền chiến mai phục tiêu diệt gọn gần 4 vạn quân xâm lược Xiêm trong một đêm, đập tan mưu đồ bán nước cầu vinh của Nguyễn Ánh.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1785. Nguyễn Huệ chỉ huy trận thủy chiến Rạch Gầm Xoài Mút, đánh tan 5 vạn quân xâm lược Xiêm.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+
+                <!-- 1786 -->
+                <article class="timeline-card left">
+                    <div class="timeline-node">05</div>
+                    <span class="timeline-year-badge">NĂM 1786</span>
+                    <h3>Tiến Quân Ra Bắc – Diệt Trịnh</h3>
+                    <p>Giải phóng Phú Xuân rồi thần tốc vượt sông Gianh tiến ra Thăng Long với danh nghĩa "Phù Lê diệt Trịnh". Lật đổ ách thống trị hơn 200 năm của chúa Trịnh, mở ra thời kỳ non sông thu về một mối.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1786. Nguyễn Huệ tiến quân ra Bắc Hà, lật đổ chúa Trịnh, đặt nền móng thống nhất Đàng Trong và Đàng Ngoài.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+
+                <!-- 1789 -->
+                <article class="timeline-card right">
+                    <div class="timeline-node">06</div>
+                    <span class="timeline-year-badge">NĂM 1789</span>
+                    <h3>Lên Ngôi Hoàng Đế & Đại Phá Quân Thanh</h3>
+                    <p>Lên ngôi Hoàng đế tại núi Bân (Huế), tiến quân thần tốc quét sạch 29 vạn quân Mãn Thanh xâm lược chỉ trong 5 ngày đêm mùa xuân Kỷ Dậu, giải phóng Thăng Long vào đúng trưa mùng 5 Tết.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1789. Hoàng đế Quang Trung đại phá 29 vạn quân Thanh trong chiến dịch Ngọc Hồi Đống Đa thần tốc mùa xuân Kỷ Dậu.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+
+                <!-- 1792 -->
+                <article class="timeline-card left">
+                    <div class="timeline-node">07</div>
+                    <span class="timeline-year-badge">NĂM 1792</span>
+                    <h3>Hoàng Đế Quang Trung Băng Hà</h3>
+                    <p>Nhà vua đột ngột qua đời ở tuổi 39 giữa lúc đang dốc sức cải cách văn hóa, phục hồi nông nghiệp và chuẩn bị kế sách ngoại giao lớn với triều Thanh, để lại niềm tiếc thương vô hạn cho muôn đời sau.</p>
+                    <button class="timeline-narrate-btn" onclick="narrateText('Năm 1792. Hoàng đế Quang Trung đột ngột qua đời ở tuổi 39, để lại nỗi tiếc thương vô hạn cho non sông đất nước.')">
+                        🔊 Nghe sự kiện
+                    </button>
+                </article>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             3. SA BÀN CHIẾN TRẬN (TACTICAL BATTLEFIELD)
+             ========================================== -->
+        <section id="chien-tran" class="sub-page">
+            <button class="back-button" onclick="showHome()">← Quay lại Trang chủ</button>
+
+            <div class="page-heading">
+                <span class="label">THIÊN TÀI QUÂN SỰ THẾ KỶ XVIII</span>
+                <h2>Biên Niên Sa Bàn Chiến Trận</h2>
+                <p>Khám phá tư duy chiến lược, nghệ thuật phục kích và mưu lược hành quân thần tốc qua 3 chiến dịch vang danh kim cổ.</p>
+                <div class="heading-divider"><span>✦</span></div>
+            </div>
+
+            <div class="battle-section-wrapper">
+                <!-- Tabs lựa chọn trận đánh -->
+                <div class="battle-nav-tabs">
+                    <button class="battle-nav-tab active" onclick="showBattle('rach-gam', this)">
+                        <span>NĂM 1785 · THỦY CHIẾN</span>
+                        <strong>Rạch Gầm – Xoài Mút</strong>
+                    </button>
+                    <button class="battle-nav-tab" onclick="showBattle('bac-tien', this)">
+                        <span>NĂM 1786 · BẮC TIẾN</span>
+                        <strong>Phù Lê Diệt Trịnh</strong>
+                    </button>
+                    <button class="battle-nav-tab" onclick="showBattle('ngoc-hoi', this)">
+                        <span>NĂM 1789 · TẾT KỶ DẬU</span>
+                        <strong>Ngọc Hồi – Đống Đa</strong>
+                    </button>
+                </div>
+
+                <!-- Thẻ hiển thị Sa bàn chi tiết -->
+                <article id="battle-content" class="battle-display-card">
+                    <!-- Nội dung được cập nhật động bằng Javascript -->
+                </article>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             4. BẢO TÀNG SỐ TÂY SƠN (VIRTUAL MUSEUM)
+             ========================================== -->
+        <section id="bao-tang" class="sub-page">
+            <button class="back-button" onclick="showHome()">← Quay lại Trang chủ</button>
+
+            <div class="page-heading">
+                <span class="label">KHÔNG GIAN DI SẢN HIỆN VẬT</span>
+                <h2>Bảo Tàng Số Phong Trào Tây Sơn</h2>
+                <p>Mỗi hiện vật khảo cổ và di tích là một nhân chứng sống động tái hiện hào khí quật khởi của nghĩa quân áo vải cờ đào.</p>
+                <div class="heading-divider"><span>✦</span></div>
+            </div>
+
+            <!-- Nhiệm vụ sưu tầm sử liệu & Thanh tiến độ -->
+            <div class="museum-mission-banner">
+                <div class="mission-text-area">
+                    <span class="step-label">THỬ THÁCH BẢO TÀNG</span>
+                    <h3>Trở Thành Người Sưu Tầm Sử Liệu Tây Sơn</h3>
+                    <p>Khám phá trọn vẹn 8 hiện vật để mở khóa danh hiệu và trang bị kiến thức vững vàng trước khi bước vào Đấu trường kiến thức.</p>
+                    <div class="museum-progress-wrapper">
+                        <div class="progress-header">
+                            <span id="museum-progress-text">Đã khám phá 0/8 hiện vật (0%)</span>
+                        </div>
+                        <div class="progress-bar-track">
+                            <div id="museum-progress-fill" class="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-badge-display">
+                    <span>✦</span>
+                    <div>NGƯỜI<br>GIỮ SỬ</div>
+                    <span>✦</span>
+                </div>
+            </div>
+
+            <!-- Lưới hiển thị 8 thẻ hiện vật -->
+            <div id="museum-items-grid" class="museum-grid">
+                <!-- Render tự động bởi Javascript -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             5. TRẠM AI HỌC SỬ & BỘ KIỂM CHỨNG TIN GIẢ
+             ========================================== -->
+        <section id="ai" class="sub-page">
+            <button class="back-button" onclick="showHome()">← Quay lại Trang chủ</button>
+
+            <div class="page-heading">
+                <span class="label">TRÍ TUỆ NHÂN TẠO TRONG GIÁO DỤC LỊCH SỬ</span>
+                <h2>Trạm AI Học Sử & Kiểm Chứng Sử Liệu</h2>
+                <p>Ứng dụng công nghệ xử lý ngôn ngữ tự nhiên giúp học sinh hỏi đáp mọi góc nhìn lịch sử và phòng chống thông tin sai lệch về thời Tây Sơn.</p>
+                <div class="heading-divider"><span>✦</span></div>
+            </div>
+
+            <div class="ai-workspace-container">
+                <!-- KHỐI 1: TRỢ LÝ CHATBOT AI LỊCH SỬ -->
+                <div class="ai-card-panel">
+                    <div class="ai-panel-header">
+                        <div class="ai-avatar-crest">🤖</div>
+                        <div class="ai-panel-title">
+                            <h3>Sử Quan AI Tây Sơn</h3>
+                            <p>● Vận hành bởi Gemini Flash AI & Chính sử Tây Sơn</p>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách câu hỏi gợi ý nhanh -->
+                    <div class="quick-prompt-chips">
+                        <button class="chip-btn" onclick="sendQuickPrompt('Bí quyết hành quân thần tốc của vua Quang Trung là gì?')">
+                            🐎 Bí quyết hành quân thần tốc?
+                        </button>
+                        <button class="chip-btn" onclick="sendQuickPrompt('Tại sao Nguyễn Huệ chọn Rạch Gầm Xoài Mút làm trận địa?')">
+                            🌊 Trận Rạch Gầm – Xoài Mút?
+                        </button>
+                        <button class="chip-btn" onclick="sendQuickPrompt('Vua Quang Trung đã thực hiện các chính sách cải cách nào?')">
+                            📜 Các chính sách cải cách?
+                        </button>
+                        <button class="chip-btn" onclick="sendQuickPrompt('Kể tên các danh tướng kiệt xuất thời Tây Sơn')">
+                            ⚔️ Các danh tướng Tây Sơn?
+                        </button>
+                    </div>
+
+                    <!-- Khung tin nhắn hội thoại -->
+                    <div id="ai-chat-messages" class="ai-chat-messages">
+                        <div class="chat-bubble bot">
+                            Xin kính chào bạn! Ta là <strong>Sử Quan AI</strong> – người đồng hành số hóa tri thức lịch sử triều đại Tây Sơn. Bạn muốn tìm hiểu về chiến thuật, con người hay những mốc son nào của Hoàng đế Quang Trung?
+                        </div>
+                    </div>
+
+                    <!-- Thanh nhập câu hỏi -->
+                    <div class="ai-chat-input-bar">
+                        <input id="ai-chat-input" class="ai-input-field" type="text" placeholder="Nhập câu hỏi lịch sử của bạn (ví dụ: nghệ thuật quân sự Ngọc Hồi)...">
+                        <button class="ai-send-btn" onclick="handleUserChat()" title="Gửi câu hỏi">➤</button>
+                    </div>
+                </div>
+
+                <!-- KHỐI 2: BỘ KIỂM CHỨNG TIN GIẢ (FACT-CHECKER) -->
+                <div class="ai-card-panel fact-checker-panel">
+                    <div class="ai-panel-header">
+                        <div class="ai-avatar-crest" style="background: linear-gradient(135deg, var(--gold-accent), var(--success));">🛡️</div>
+                        <div class="ai-panel-title">
+                            <h3>Bộ Kiểm Chứng Sử Liệu (Fact-Checker)</h3>
+                            <p>● Đối chiếu nhận định với Đại Nam Thực Lục & Hoàng Lê Nhất Thống Chí</p>
+                        </div>
+                    </div>
+
+                    <div class="fact-select-box">
+                        <label class="fact-select-label" for="fact-claim-select">Chọn một nhận định lịch sử phổ biến để AI phân tích:</label>
+                        <select id="fact-claim-select" class="fact-dropdown" onchange="runFactCheck(this.value)">
+                            <option value="">-- Chọn nhận định cần kiểm chứng --</option>
+                            <option value="1">1. Có phải vua Quang Trung cho quân ăn Tết sớm trước khi đánh Ngọc Hồi?</option>
+                            <option value="2">2. Có đúng vua Quang Trung từng có kế hoạch ngoại giao đòi đất Lưỡng Quảng?</option>
+                            <option value="3">3. Nguyễn Ánh và nghĩa quân Tây Sơn từng là đồng minh thân thiết?</option>
+                            <option value="4">4. Quân Tây Sơn hành quân từ Phú Xuân ra Tam Điệp mất hơn một tháng?</option>
+                            <option value="5">5. Vua Quang Trung đề cao chữ Nôm thành văn tự chính thức của quốc gia?</option>
+                            <option value="6">6. Tướng giặc Tôn Sĩ Nghị đã dũng cảm tử trận tại Thăng Long?</option>
+                            <option value="7">7. Nghĩa quân Tây Sơn đã sử dụng voi chiến mang hỏa hổ trong trận Ngọc Hồi?</option>
+                        </select>
+                    </div>
+
+                    <!-- Kết quả kiểm chứng -->
+                    <div id="fact-check-result" class="fact-result-box">
+                        <div style="text-align: center; color: var(--text-muted);">
+                            <p>Vui lòng chọn một nhận định lịch sử từ danh sách phía trên để AI tiến hành đối chiếu với chính sử.</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: auto;">
+                        <button class="btn-gold-outline" style="width: 100%; justify-content: center;" onclick="alert('Tính năng nạp nhận định tự do: Bạn cũng có thể gõ câu nhận định vào khung chat bên cạnh để Sử Quan AI phân tích trực tiếp!')">
+                            🔍 Nhập nhận định tự do vào khung chat bên cạnh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CẦU NỐI KHO TƯ LIỆU NOTEBOOKLM MỞ RỘNG -->
+            <div class="notebooklm-bridge-card">
+                <div class="notebooklm-info">
+                    <h4>📚 Kho Tư Liệu Nghiên Cứu Mở Rộng (NotebookLM)</h4>
+                    <p>Khám phá hệ thống tóm tắt tài liệu nguồn, audio podcast và bản trích yếu sử liệu chuyên sâu của dự án trên nền tảng Google NotebookLM.</p>
+                </div>
+                <a class="btn-royal" href="https://notebooklm.link.google/2xgaQOEA2XdW" target="_blank" rel="noopener noreferrer">
+                    Mở Trạm NotebookLM ↗
+                </a>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             6. ĐẤU TRƯỜNG KIẾN THỨC (GAMIFIED QUIZ)
+             ========================================== -->
+        <section id="cau-do" class="sub-page">
+            <button class="back-button" onclick="showHome()">← Quay lại Trang chủ</button>
+
+            <div class="page-heading">
+                <span class="label">ĐẤU TRƯỜNG TRI THỨC LỊCH SỬ</span>
+                <h2>Thử Thách Sử Học Tây Sơn</h2>
+                <p>Hệ thống 30 câu hỏi chuẩn xác phân tầng 3 cấp độ, kiểm tra và củng cố kiến thức lịch sử toàn diện cho học sinh.</p>
+                <div class="heading-divider"><span>✦</span></div>
+            </div>
+
+            <div class="quiz-wrapper">
+                <!-- Chọn 3 Cấp độ thử thách -->
+                <div id="level-picker" class="level-picker-grid">
+                    <button class="level-card-btn" onclick="startQuiz('co-ban')">
+                        <div>
+                            <span class="level-number">01</span>
+                            <h3>Cấp Độ: Khởi Hành</h3>
+                            <p>Làm quen với các mốc thời gian, quê hương, xuất thân và các trận đánh ban đầu của anh em Tây Sơn.</p>
+                        </div>
+                        <strong>Bắt đầu hành trình (10 câu) →</strong>
+                    </button>
+
+                    <button class="level-card-btn" onclick="startQuiz('trung-cap')">
+                        <div>
+                            <span class="level-number">02</span>
+                            <h3>Cấp Độ: Tiếp Bước</h3>
+                            <p>Đào sâu về thủy chiến Rạch Gầm – Xoài Mút, nghệ thuật Bắc tiến và các danh tướng nhà Tây Sơn.</p>
+                        </div>
+                        <strong>Tiếp tục thử thách (10 câu) →</strong>
+                    </button>
+
+                    <button class="level-card-btn advanced" onclick="startQuiz('nang-cao')">
+                        <div>
+                            <span class="level-number">03</span>
+                            <h3>Chinh Phục Sử Liệu</h3>
+                            <p>Dành cho người am hiểu lịch sử: Phân tích tư duy thần tốc, đối ngoại bang giao và các cải cách lớn của vua Quang Trung.</p>
+                        </div>
+                        <strong>Chấp nhận thử thách cao độ (10 câu) →</strong>
+                    </button>
+                </div>
+
+                <!-- Bảng hiển thị câu hỏi trắc nghiệm -->
+                <div id="quiz-game" class="quiz-active-board">
+                    <div class="quiz-top-stats">
+                        <span id="quiz-progress" class="quiz-stat-pill">Câu 1 / 10</span>
+                        <span id="quiz-score" class="quiz-stat-pill">Điểm: 0 ⭐ (Chuỗi: 0 🔥)</span>
+                    </div>
+
+                    <span id="quiz-category" class="quiz-category-tag">CHỦ ĐỀ LỊCH SỬ</span>
+                    <h3 id="quiz-question" class="quiz-question-title">Đang tải nội dung câu hỏi...</h3>
+
+                    <div id="quiz-options" class="quiz-options-container">
+                        <!-- Danh sách các nút lựa chọn A, B, C, D -->
+                    </div>
+
+                    <div id="quiz-feedback" class="quiz-feedback-box">
+                        <!-- Hiển thị giải thích chi tiết khi trả lời -->
+                    </div>
+
+                    <div style="text-align: right;">
+                        <button id="next-question" class="btn-royal" style="display: none;" onclick="nextQuestion()">
+                            Câu Tiếp Theo ➔
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Màn hình vinh danh kết quả -->
+                <div id="quiz-result" class="quiz-final-result">
+                    <div class="result-crest">🏆</div>
+                    <h3>Hành Trình Đã Hoàn Thành!</h3>
+                    <div id="final-score" class="quiz-score-badge">0 / 100 Điểm</div>
+                    <p id="final-message">Chúc mừng bạn đã hoàn thành bài thử nghiệm tri thức lịch sử.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn-royal" onclick="showLevelPicker()">
+                            🔄 Thử sức cấp độ khác
+                        </button>
+                        <button class="btn-gold-outline" onclick="openPage('trai-nghiem')">
+                            ✍️ Đánh giá trải nghiệm bài thi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             7. GÓC NGƯỜI TRẢI NGHIỆM & DỮ LIỆU KHKT
+             ========================================== -->
+        <section id="trai-nghiem" class="sub-page">
+            <button class="back-button" onclick="showHome()">← Quay lại Trang chủ</button>
+
+            <div class="page-heading">
+                <span class="label">KHẢO SÁT & NGHIÊN CỨU THỰC NGHIỆM KHKT</span>
+                <h2>Góc Người Trải Nghiệm Học Sinh</h2>
+                <p>Dữ liệu khảo sát đóng góp trực tiếp vào tính thực tiễn và tính khoa học của dự án dự thi Khoa học Kỹ thuật.</p>
+                <div class="heading-divider"><span>✦</span></div>
+            </div>
+
+            <div class="experience-layout">
+                <!-- FORM ĐÓNG GÓP Ý KIẾN -->
+                <div class="feedback-form-card">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #FFF; margin-bottom: 0.5rem;">
+                        Phiếu Khảo Sát Đánh Giá
+                    </h3>
+                    <p style="color: var(--text-parchment); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        Hãy chia sẻ cảm nhận thực tế sau khi trải nghiệm website để giúp nhóm nghiên cứu hoàn thiện đề tài KHKT.
+                    </p>
+
+                    <form onsubmit="handleFeedbackSubmit(event)">
+                        <div class="form-group">
+                            <label for="feedback-name">Họ và tên hoặc Lớp học:</label>
+                            <input id="feedback-name" class="form-control" type="text" placeholder="Ví dụ: Nguyễn Văn An - Lớp 11A2">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mức độ yêu thích và hứng thú môn Lịch sử sau khi trải nghiệm:</label>
+                            <div class="star-rating-box">
+                                <span class="star-icon active" onclick="selectRatingStar(1)">★</span>
+                                <span class="star-icon active" onclick="selectRatingStar(2)">★</span>
+                                <span class="star-icon active" onclick="selectRatingStar(3)">★</span>
+                                <span class="star-icon active" onclick="selectRatingStar(4)">★</span>
+                                <span class="star-icon active" onclick="selectRatingStar(5)">★</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="feedback-text">Điều bạn ấn tượng nhất hoặc mong muốn bổ sung:</label>
+                            <textarea id="feedback-text" class="form-control" rows="4" placeholder="Ví dụ: Sa bàn chiến trận rất trực quan, Trạm AI trả lời chi tiết và dễ hiểu..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-royal" style="width: 100%; justify-content: center;">
+                            Gửi Đánh Giá Nghiên Cứu ➔
+                        </button>
+                    </form>
+                </div>
+
+                <!-- BẢNG SỐ LIỆU & Ý KIẾN HỌC SINH -->
+                <div class="khkt-stats-card">
+                    <h3 style="font-family: var(--font-heading); font-size: 1.4rem; color: #FFF; margin-bottom: 0.5rem;">
+                        Số Liệu Thực Nghiệm Dự Án
+                    </h3>
+                    <p style="color: var(--text-parchment); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        Thống kê tổng hợp từ cộng đồng học sinh trải nghiệm nền tảng.
+                    </p>
+
+                    <div class="stats-counter-grid">
+                        <div class="stat-counter-box">
+                            <strong>98.5%</strong>
+                            <span>Học sinh thấy hứng thú học Sử hơn</span>
+                        </div>
+                        <div class="stat-counter-box">
+                            <strong>4.9 / 5</strong>
+                            <span>Điểm đánh giá trải nghiệm trung bình</span>
+                        </div>
+                    </div>
+
+                    <h4 style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--gold-bright); margin-bottom: 1rem;">
+                        Cảm Nhận Mới Nhất Của Học Sinh:
+                    </h4>
+                    <div id="recent-reviews-container" class="recent-reviews-list">
+                        <!-- Render tự động bởi Javascript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL LIGHTBOX XEM CHI TIẾT HIỆN VẬT BẢO TÀNG -->
+    <div id="museum-modal" class="modal-overlay" onclick="if(event.target === this) closeMuseumModal()">
+        <div class="modal-box">
+            <button class="modal-close-btn" onclick="closeMuseumModal()" title="Đóng">✕</button>
+            <div id="museum-modal-body" style="display: contents;">
+                <!-- Nội dung được nạp động bởi Javascript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- CHÂN TRANG TRANG TRỌNG (FOOTER) -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">AI Học Sử – Quang Trung – Nguyễn Huệ</div>
+            <p class="footer-quote">
+                "Dân ta phải biết sử ta, cho tường gốc tích nước nhà Việt Nam." — Chủ tịch Hồ Chí Minh
+            </p>
+            <div class="footer-khkt-badge">
+                Dự án Tham dự Cuộc thi Nghiên cứu Khoa học Kỹ thuật (KHKT) Dành cho Học sinh Trung học
+            </div>
+            <div class="footer-copyright">
+                Bản quyền nội dung & nghiên cứu © 2026 Nhóm Dự án AI Học Sử. Giữ trọn lòng tự hào lịch sử dân tộc.
+            </div>
+        </div>
+    </footer>
+
+    <!-- TỆP ĐIỀU KHIỂN LOGIC JAVASCRIPT THUẦN -->
+    <script src="script.js"></script>
+</body>
+</html>
