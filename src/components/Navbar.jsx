@@ -12,9 +12,13 @@ import {
   VolumeX, 
   Menu, 
   X,
+  Shield,
   ShieldCheck,
-  Swords
+  Crown,
+  Swords,
+  LogOut
 } from 'lucide-react';
+import { useAdmin } from '../context/AdminContext';
 import { playChime, getSoundEnabled, setSoundEnabled } from '../utils/audio';
 
 const NAV_TABS = [
@@ -30,6 +34,7 @@ const NAV_TABS = [
 export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(getSoundEnabled());
+  const { isAdmin, toggleAdminModal } = useAdmin();
 
   const handleTabClick = (tabId) => {
     playChime(600, 'sine', 0.1);
@@ -86,17 +91,40 @@ export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
 
           {/* Action Controls */}
           <div className="nav-actions">
-            <button 
-              className="action-icon-btn admin-btn" 
-              title="Quản trị dữ liệu"
-              onClick={() => {
-                playChime(500, 'sine', 0.1);
-                onOpenAdmin();
-              }}
-            >
-              <ShieldCheck size={17} />
-              <span className="admin-btn-text">Nạp Dữ Liệu</span>
-            </button>
+            {/* Nút Chế độ Admin */}
+            {isAdmin ? (
+              <>
+                <button 
+                  className="action-icon-btn admin-active-badge" 
+                  title="Chế độ Quản trị đang BẬT. Bấm để thoát"
+                  onClick={toggleAdminModal}
+                >
+                  <Crown size={15} className="admin-crown-icon" />
+                  <span className="admin-btn-text">Admin</span>
+                  <LogOut size={13} className="admin-logout-icon" />
+                </button>
+                <button 
+                  className="action-icon-btn admin-btn" 
+                  title="Nạp sử liệu vào AI"
+                  onClick={() => {
+                    playChime(500, 'sine', 0.1);
+                    onOpenAdmin();
+                  }}
+                >
+                  <ShieldCheck size={16} />
+                  <span className="admin-btn-text">Nạp Sử Liệu</span>
+                </button>
+              </>
+            ) : (
+              <button 
+                className="action-icon-btn admin-btn-guest" 
+                title="Kích hoạt Chế độ Quản trị viên (Dành cho tác giả)"
+                onClick={toggleAdminModal}
+              >
+                <Shield size={15} />
+                <span className="admin-btn-text">Admin</span>
+              </button>
+            )}
 
             <button 
               className={`action-icon-btn ${soundOn ? 'sound-on' : 'sound-off'}`}
@@ -141,6 +169,18 @@ export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
                     </button>
                   );
                 })}
+
+                <div className="mobile-drawer-admin-divider" />
+                <button 
+                  className={`mobile-nav-item mobile-admin-toggle ${isAdmin ? 'admin-on' : ''}`}
+                  onClick={() => {
+                    toggleAdminModal();
+                    setIsMobileOpen(false);
+                  }}
+                >
+                  {isAdmin ? <Crown size={18} className="text-gold" /> : <Shield size={18} />}
+                  <span>{isAdmin ? '👑 Quản Trị Viên (Bấm để thoát)' : '🛡️ Chế độ Quản Trị Viên'}</span>
+                </button>
               </div>
             </motion.div>
           )}

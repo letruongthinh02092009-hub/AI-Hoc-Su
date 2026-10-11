@@ -17,8 +17,11 @@ import {
   PlusCircle,
   Award,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Trash2,
+  RotateCcw
 } from 'lucide-react';
+import { useAdmin } from '../context/AdminContext';
 import { playChime, playCorrectSound, playVictorySound } from '../utils/audio';
 
 const STORAGE_FORM_URL = 'su_survey_google_form_url';
@@ -80,15 +83,17 @@ const DEFAULT_REVIEWS = [
 ];
 
 export default function SurveyTab() {
+  const { isAdmin } = useAdmin();
   const [formUrl, setFormUrl] = useState(DEFAULT_FORM_URL);
   const [sheetUrl, setSheetUrl] = useState(DEFAULT_SHEET_URL);
   const [activeView, setActiveView] = useState('reviews'); // 'reviews' | 'form' | 'sheet'
+  const [sheetSubView, setSheetSubView] = useState('table'); // 'table' | 'embed'
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [inputFormUrl, setInputFormUrl] = useState('');
   const [inputSheetUrl, setInputSheetUrl] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Trạng thái Đánh giá chuẩn Google Maps
+  // Trạng thái Đánh giá cộng đồng
   const [reviews, setReviews] = useState(DEFAULT_REVIEWS);
   const [isAddingReview, setIsAddingReview] = useState(false);
   const [newRating, setNewRating] = useState(5);
@@ -111,6 +116,27 @@ export default function SurveyTab() {
       }
     } catch (e) {}
   }, []);
+
+  const handleDeleteReview = (id) => {
+    if (window.confirm('Quản trị viên: Bạn có chắc chắn muốn xóa đánh giá này?')) {
+      const updated = reviews.filter(r => r.id !== id);
+      setReviews(updated);
+      try {
+        localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(updated));
+      } catch (e) {}
+      playChime(450, 'sine', 0.1);
+    }
+  };
+
+  const handleRestoreDefaultReviews = () => {
+    if (window.confirm('Quản trị viên: Khôi phục lại 4 đánh giá mẫu ban đầu?')) {
+      setReviews(DEFAULT_REVIEWS);
+      try {
+        localStorage.setItem(STORAGE_REVIEWS_KEY, JSON.stringify(DEFAULT_REVIEWS));
+      } catch (e) {}
+      playCorrectSound();
+    }
+  };
 
   const handleOpenConfig = () => {
     setInputFormUrl(formUrl);
@@ -225,11 +251,11 @@ export default function SurveyTab() {
     1: totalReviewsCount > 0 ? Math.round((starCounts[1] / totalReviewsCount) * 100) : 0,
   };
 
-  // Chuyển link Google Sheet sang dạng xem nhúng hoặc xem trực tiếp
+  // Chuyển link Google Sheet sang dạng xem nhúng trực tiếp an toàn
   const getEmbedSheetUrl = (url) => {
     if (!url) return '';
     if (url.includes('/edit')) {
-      return url.replace(/\/edit.*$/, '/pubhtml?widget=true&headers=false');
+      return url.replace(/\/edit.*$/, '/preview');
     }
     return url;
   };
@@ -508,14 +534,38 @@ export default function SurveyTab() {
             )}
           </AnimatePresence>
 
-          {/* Danh Sách Đánh Giá Cộng Đồng (Google Maps Review Feed) */}
+          {/* Danh Sách Đánh Giá Cộng Đồng */}
           <div className="reviews-feed-container">
             <div className="feed-title-row">
               <div className="feed-title-left">
                 <MessageSquare size={18} className="text-gold" />
-                <h3>Ý Kiến Đóng Góp Từ Cộng Đồng Học Sinh & Thầy Cô ({reviews.length})</h3>
+                <h3>Ý Kiến Đóng Góp Từ Cộng Đồng ({reviews.length})</h3>
               </div>
-              <span className="feed-tag">Cập nhật thời gian thực</span>
+              <div className="feed-actions-right">
+                {isAdmin && (
+                  <>
+                    <button 
+                      className="btn-admin-config-link" 
+                      onClick={handleOpenConfig}
+                      title="Cài đặt liên kết Google Form & Sheets"
+                    >
+                      <Settings size={14} />
+                      <span>Cấu hình Link</span>
+                    </button>
+                    {reviews.length < DEFAULT_REVIEWS.length && (
+                      <button 
+                        className="btn-restore-samples" 
+                        onClick={handleRestoreDefaultReviews}
+                        title="Khôi phục lại 4 đánh giá mẫu ban đầu"
+                      >
+                        <RotateCcw size={14} />
+                        <span>Khôi phục mẫu</span>
+                      </button>
+                    )}
+                  </>
+                )}
+                <span className="feed-tag">Cập nhật thời gian thực</span>
+              </div>
             </div>
 
             {/* Banner kết nối Bảng Tính Google Sheets chứa kết quả Google Form */}
@@ -589,6 +639,17 @@ export default function SurveyTab() {
                       <ThumbsUp size={14} />
                       <span>Hữu ích ({rev.likes})</span>
                     </button>
+
+                    {isAdmin && (
+                      <button 
+                        className="btn-delete-review"
+                        onClick={() => handleDeleteReview(rev.id)}
+                        title="Xóa đánh giá này (Dành riêng cho Quản trị viên)"
+                      >
+                        <Trash2 size={13} />
+                        <span>Xóa</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -634,7 +695,7 @@ export default function SurveyTab() {
               <div className="embed-header-bar">
                 <div className="embed-info">
                   <strong>Biểu Mẫu Khảo Sát Trực Tuyến</strong>
-                  <span>Mọi thông tin người dùng điền sẽ tự động lưu 100% sang Google Sheets (Excel) của tác giả Lê Trường Thịnh</span>
+                  <span>Mọi thông tin điền sẽ tự động lưu sang Bảng tính Google Sheets của tác giả Lê Trường Thịnh</span>
                 </div>
                 <div className="embed-actions-row">
                   <a 
@@ -643,7 +704,7 @@ export default function SurveyTab() {
                     rel="noopener noreferrer"
                     className="open-ext-link-btn"
                   >
-                    <span>Mở Google Form tab mới</span>
+                    <span>Mở Google Form (Tab Mới)</span>
                     <ExternalLink size={14} />
                   </a>
                 </div>
@@ -680,44 +741,120 @@ export default function SurveyTab() {
             <div className="sync-info-text">
               <strong>Cơ Chế Đồng Bộ Google Form Sang Google Sheets</strong>
               <p>
-                Khi bất kỳ ai điền biểu mẫu Google Form ở Tab 2, Google sẽ <strong>tự động lưu toàn bộ thông tin người dùng</strong> (Họ tên, Lớp, Các câu trả lời, Dấu thời gian) vào bảng tính Excel này theo thời gian thực mà không bị sót bất kỳ dữ liệu nào!
+                Khi bất kỳ ai điền biểu mẫu Google Form ở Tab 2, dữ liệu sẽ được tự động lưu trữ 100% vào Bảng tính Google Sheets của tác giả theo thời gian thực mà không bao giờ bị thất lạc dữ liệu.
               </p>
             </div>
+          </div>
+
+          {/* Sub Navigation: Chọn chế độ xem Sổ Dữ Liệu hoặc Nhúng Trực Tiếp */}
+          <div className="sheet-subnav-bar">
+            <button 
+              className={`sheet-subnav-btn ${sheetSubView === 'table' ? 'active' : ''}`}
+              onClick={() => setSheetSubView('table')}
+            >
+              <Table size={15} />
+              <span>Sổ Dữ Liệu Đồng Bộ Trực Tiếp ({reviews.length} phiếu)</span>
+            </button>
+            <button 
+              className={`sheet-subnav-btn ${sheetSubView === 'embed' ? 'active' : ''}`}
+              onClick={() => setSheetSubView('embed')}
+            >
+              <ExternalLink size={15} />
+              <span>Nhúng Trực Tiếp Google Sheets</span>
+            </button>
           </div>
 
           <div className="survey-embed-container cyber-glass-card">
             <div className="sheet-embed-wrapper">
               <div className="embed-header-bar">
                 <div className="embed-info">
-                  <strong>Bảng Tính Kết Quả Đồng Bộ Thời Gian Thực</strong>
-                  <span>Dữ liệu câu trả lời của các bạn học sinh trực tiếp từ Google Sheets</span>
+                  <strong>{sheetSubView === 'table' ? 'Bảng Dữ Liệu Khảo Sát Đồng Bộ Thời Gian Thực' : 'Bảng Tính Google Sheets Trực Tiếp'}</strong>
+                  <span>{sheetSubView === 'table' ? 'Đối chiếu kết quả đóng góp của học sinh & giáo viên' : 'Nhúng trực tiếp từ file Google Sheets của tác giả'}</span>
                 </div>
                 <div className="embed-actions-row">
+                  {isAdmin && (
+                    <button 
+                      className="open-ext-link-btn" 
+                      onClick={handleOpenConfig}
+                      style={{ marginRight: '8px' }}
+                    >
+                      <Settings size={14} />
+                      <span>Cấu hình Link</span>
+                    </button>
+                  )}
                   <a 
                     href={sheetUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="open-ext-link-btn"
                   >
-                    <span>Mở Google Sheets</span>
+                    <span>Mở Google Sheets (Tab Mới)</span>
                     <ExternalLink size={14} />
                   </a>
                 </div>
               </div>
 
-              <div className="survey-device-bezel">
-                <iframe 
-                  key={sheetUrl}
-                  src={getEmbedSheetUrl(sheetUrl)} 
-                  title="Google Sheets Kết quả khảo sát"
-                  width="100%" 
-                  height="650" 
-                  frameBorder="0"
-                  className="survey-inner-frame"
-                >
-                  Đang tải bảng tính Google Sheets...
-                </iframe>
-              </div>
+              {sheetSubView === 'table' ? (
+                /* Bảng dữ liệu trực quan phong cách sổ sách di sản */
+                <div className="live-sheet-table-wrapper">
+                  <table className="heritage-sheet-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Dấu Thời Gian</th>
+                        <th>Họ Và Tên</th>
+                        <th>Lớp / Đơn Vị</th>
+                        <th>Đánh Giá</th>
+                        <th>Nội Dung Ý Kiến</th>
+                        <th>Trạng Thái</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reviews.map((rev, idx) => (
+                        <tr key={rev.id}>
+                          <td><strong>{idx + 1}</strong></td>
+                          <td className="col-date">{rev.date}</td>
+                          <td className="col-name"><strong>{rev.name}</strong></td>
+                          <td className="col-role"><span className="table-role-pill">{rev.role}</span></td>
+                          <td className="col-rating">
+                            <span className="table-star-chip">
+                              {'★'.repeat(rev.rating)}
+                            </span>
+                          </td>
+                          <td className="col-comment">{rev.comment}</td>
+                          <td className="col-status">
+                            <span className="synced-status-tag">
+                              <CheckCircle size={12} /> Đã đồng bộ
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <div className="table-summary-footer">
+                    <span>Tổng cộng: <strong>{reviews.length} phiếu khảo sát</strong></span>
+                    <span>Đánh giá trung bình: <strong>{averageRating}/5 sao</strong></span>
+                  </div>
+                </div>
+              ) : (
+                /* Khung nhúng Google Sheets Iframe với /preview */
+                <div className="survey-device-bezel">
+                  <iframe 
+                    key={sheetUrl}
+                    src={getEmbedSheetUrl(sheetUrl)} 
+                    title="Google Sheets Kết quả khảo sát"
+                    width="100%" 
+                    height="650" 
+                    frameBorder="0" 
+                    className="survey-inner-frame"
+                  >
+                    Đang tải bảng tính Google Sheets...
+                  </iframe>
+                  <div className="embed-helper-footer">
+                    <span>💡 Nếu khung hiển thị báo quyền truy cập, bạn có thể bấm nút <strong>"Mở Google Sheets (Tab Mới)"</strong> ở trên để xem trực tiếp hoặc chuyển sang tab <strong>"Sổ Dữ Liệu Đồng Bộ Trực Tiếp"</strong>.</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

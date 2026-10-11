@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, Volume2, VolumeX, Eye, X, BookOpen, Sparkles, CheckCircle, Upload, RotateCcw, Image } from 'lucide-react';
+import { Landmark, Eye, X, BookOpen, Sparkles, CheckCircle, Upload, RotateCcw, ShieldCheck } from 'lucide-react';
 import { MUSEUM_ITEMS } from '../data/museumData';
-import { speakText, stopSpeech, subscribeSpeechStatus } from '../services/speechService';
+import { useAdmin } from '../context/AdminContext';
 import { playChime } from '../utils/audio';
 
 export default function MuseumTab() {
+  const { isAdmin } = useAdmin();
   const [selectedItem, setSelectedItem] = useState(null);
   const [exploredIds, setExploredIds] = useState(new Set());
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
   const [customImages, setCustomImages] = useState({});
   const [urlInput, setUrlInput] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
 
   useEffect(() => {
-    const unsubscribe = subscribeSpeechStatus((speaking) => {
-      setIsSpeaking(speaking);
-    });
     try {
       const saved = localStorage.getItem('su_custom_museum_images');
       if (saved) setCustomImages(JSON.parse(saved));
     } catch (e) {}
-    return () => unsubscribe();
   }, []);
 
   const handleImageUpload = (e, itemId) => {
@@ -75,32 +71,26 @@ export default function MuseumTab() {
     setTimeout(() => setUploadSuccess(''), 2500);
   };
 
-  const categories = ['all', 'Vũ khí dã chiến', 'Nghệ thuật quân sự', 'Cổ vật tiền tệ', 'Châu bản & Chiếu chỉ', 'Hỏa khí hạng nặng', 'Trang phục hoàng gia', 'Tư liệu tác chiến', 'Tranh ký họa lịch sử'];
+  const categories = [
+    'all', 
+    'Vũ khí dã chiến', 
+    'Nghệ thuật quân sự', 
+    'Cổ vật tiền tệ', 
+    'Châu bản & Chiếu chỉ', 
+    'Hỏa khí hạng nặng', 
+    'Trang phục hoàng gia', 
+    'Tư liệu tác chiến', 
+    'Tranh ký họa lịch sử'
+  ];
 
   const handleOpenItem = (item) => {
-    stopSpeech();
-    setIsSpeaking(false);
     playChime(650, 'sine', 0.1);
     setSelectedItem(item);
     setExploredIds(prev => new Set([...prev, item.id]));
   };
 
   const handleCloseItem = () => {
-    stopSpeech();
-    setIsSpeaking(false);
     setSelectedItem(null);
-  };
-
-  const handleSpeak = (item) => {
-    if (isSpeaking) {
-      stopSpeech();
-      setIsSpeaking(false);
-    } else {
-      setIsSpeaking(true);
-      playChime(600, 'sine', 0.12);
-      const text = `${item.title}. ${item.sub}. Phân loại: ${item.category}. Mô tả hiện vật: ${item.desc}. Giá trị lịch sử: ${item.details}. Nguồn lưu trữ: ${item.source}`;
-      speakText(text, () => setIsSpeaking(false));
-    }
   };
 
   const filteredItems = filterCategory === 'all' 
@@ -140,21 +130,40 @@ export default function MuseumTab() {
         </div>
       </div>
 
-      {/* Grid of Artifacts */}
+      {/* Filter Categories Bar */}
+      <div className="museum-filter-bar">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className={`filter-btn ${filterCategory === cat ? 'active' : ''}`}
+            onClick={() => setFilterCategory(cat)}
+          >
+            {cat === 'all' ? 'Tất cả cổ vật' : cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Museum Artifacts Grid */}
       <div className="museum-grid">
         {filteredItems.map((item) => {
           const isExplored = exploredIds.has(item.id);
+          const currentImg = customImages[item.id] || item.img;
+
           return (
             <motion.div 
               key={item.id}
-              className={`artifact-card ${isExplored ? 'explored' : ''}`}
-              whileHover={{ y: -6 }}
-              transition={{ duration: 0.2 }}
+              className={`museum-card ${isExplored ? 'explored' : ''}`}
+              whileHover={{ y: -6, transition: { duration: 0.25 } }}
               onClick={() => handleOpenItem(item)}
             >
-              <div className="artifact-img-box">
+              <div className="card-badge-row">
+                <span className="artifact-category">{item.category}</span>
+                {isExplored && <span className="explored-chip">Đã chiêm ngưỡng</span>}
+              </div>
+
+              <div className="card-img-wrapper">
                 <img 
-                  src={customImages[item.id] || item.img} 
+                  src={currentImg} 
                   alt={item.title} 
                   loading="lazy" 
                   onError={(e) => {
@@ -162,20 +171,22 @@ export default function MuseumTab() {
                     e.target.src = './images/artifacts/hoa_ho_tay_son.jpg';
                   }}
                 />
-                <span className="artifact-category-badge">{item.category}</span>
-                {isExplored && (
-                  <span className="explored-badge" title="Đã xem">
-                    <CheckCircle size={14} /> Đã khám phá
+                <div className="card-img-overlay">
+                  <span className="view-details-btn">
+                    <Eye size={15} /> Xem hiện vật chi tiết
                   </span>
-                )}
+                </div>
               </div>
 
-              <div className="artifact-body">
+              <div className="card-content">
                 <h3 className="artifact-title">{item.title}</h3>
-                <p className="artifact-subtitle">{item.sub}</p>
+                <h4 className="artifact-sub">{item.sub}</h4>
                 <p className="artifact-desc">{item.desc}</p>
-                <div className="artifact-footer">
-                  <span className="artifact-click-hint"><Eye size={14} /> Xem chi tiết</span>
+
+                <div className="card-footer-meta">
+                  <span className="artifact-source">
+                    <BookOpen size={13} /> {item.source}
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -190,12 +201,14 @@ export default function MuseumTab() {
             <motion.div 
               className="museum-detail-modal"
               onClick={e => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ duration: 0.25 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ duration: 0.22 }}
             >
-              <button className="close-modal-btn" onClick={handleCloseItem}><X size={20} /></button>
+              <button className="close-modal-btn" onClick={handleCloseItem} title="Đóng cửa sổ">
+                <X size={20} />
+              </button>
 
               <div className="modal-img-col">
                 <img 
@@ -210,56 +223,58 @@ export default function MuseumTab() {
                   📚 {selectedItem.source}
                 </div>
 
-                {/* Khu vực Tải ảnh / Đổi ảnh hiện vật */}
-                <div className="custom-img-uploader-box">
-                  <div className="uploader-title-row">
-                    <span>📷 Đổi ảnh hiện vật:</span>
-                    {customImages[selectedItem.id] && (
-                      <button 
-                        className="reset-img-btn" 
-                        onClick={() => handleResetImage(selectedItem.id)}
-                        title="Khôi phục ảnh mặc định"
-                      >
-                        <RotateCcw size={12} /> Khôi phục gốc
-                      </button>
+                {/* Khu vực Tải ảnh / Đổi ảnh hiện vật: CHỈ DÀNH RIÊNG CHO QUẢN TRỊ VIÊN */}
+                {isAdmin ? (
+                  <div className="custom-img-uploader-box admin-active-box">
+                    <div className="uploader-title-row">
+                      <span>👑 Chế độ Admin: Đổi ảnh hiện vật</span>
+                      {customImages[selectedItem.id] && (
+                        <button 
+                          className="reset-img-btn" 
+                          onClick={() => handleResetImage(selectedItem.id)}
+                          title="Khôi phục ảnh mặc định"
+                        >
+                          <RotateCcw size={12} /> Khôi phục gốc
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="uploader-actions-flex">
+                      <label className="upload-file-label">
+                        <Upload size={14} />
+                        <span>Tải ảnh từ máy</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          style={{ display: 'none' }} 
+                          onChange={(e) => handleImageUpload(e, selectedItem.id)} 
+                        />
+                      </label>
+
+                      <div className="url-input-mini-group">
+                        <input 
+                          type="text" 
+                          placeholder="Hoặc dán link ảnh..." 
+                          value={urlInput}
+                          onChange={(e) => setUrlInput(e.target.value)}
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => handleApplyUrl(selectedItem.id)}
+                          disabled={!urlInput.trim()}
+                        >
+                          Lưu
+                        </button>
+                      </div>
+                    </div>
+
+                    {uploadSuccess && (
+                      <div className="uploader-success-msg">
+                        <CheckCircle size={13} /> {uploadSuccess}
+                      </div>
                     )}
                   </div>
-
-                  <div className="uploader-actions-flex">
-                    <label className="upload-file-label">
-                      <Upload size={14} />
-                      <span>Tải ảnh từ máy</span>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        style={{ display: 'none' }} 
-                        onChange={(e) => handleImageUpload(e, selectedItem.id)} 
-                      />
-                    </label>
-
-                    <div className="url-input-mini-group">
-                      <input 
-                        type="text" 
-                        placeholder="Hoặc dán URL ảnh..." 
-                        value={urlInput}
-                        onChange={(e) => setUrlInput(e.target.value)}
-                      />
-                      <button 
-                        type="button" 
-                        onClick={() => handleApplyUrl(selectedItem.id)}
-                        disabled={!urlInput.trim()}
-                      >
-                        Lưu
-                      </button>
-                    </div>
-                  </div>
-
-                  {uploadSuccess && (
-                    <div className="uploader-success-msg">
-                      <CheckCircle size={13} /> {uploadSuccess}
-                    </div>
-                  )}
-                </div>
+                ) : null}
               </div>
 
               <div className="modal-info-col">
@@ -275,16 +290,6 @@ export default function MuseumTab() {
                 <div className="modal-text-block">
                   <h5>Ý Nghĩa Lịch Sử & Giá Trị Quân Sự:</h5>
                   <p>{selectedItem.details}</p>
-                </div>
-
-                <div className="modal-action-row">
-                  <button 
-                    className={`modal-speech-btn ${isSpeaking ? 'active' : ''}`}
-                    onClick={() => handleSpeak(selectedItem)}
-                  >
-                    {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                    <span>{isSpeaking ? 'Dừng giọng đọc' : 'Nghe thuyết minh tiếng Việt'}</span>
-                  </button>
                 </div>
               </div>
             </motion.div>

@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Send, 
   RotateCcw, 
-  Volume2, 
-  VolumeX, 
   Database,
   Cpu,
   BookOpen,
@@ -14,7 +12,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { sendChatMessageToGemini, resetChatHistory, getKnowledgeBase } from '../services/geminiService';
-import { speakText, stopSpeech, subscribeSpeechStatus } from '../services/speechService';
 import { playChime } from '../utils/audio';
 
 const QUICK_PROMPTS = [
@@ -46,7 +43,7 @@ function TypewriterText({ text, onComplete }) {
     }
 
     const interval = setInterval(() => {
-      index += 4; // Tăng bước nhảy 4 ký tự để đọc mượt mà không quá chậm
+      index += 4;
       if (index >= fullText.length) {
         setDisplayedText(fullText);
         clearInterval(interval);
@@ -78,7 +75,7 @@ export default function AiStationTab({ onOpenAdmin }) {
   const [messages, setMessages] = useState([
     {
       role: 'bot',
-      text: `Chào bạn! Ta là **Sử Quan Tây Sơn** — người đồng hành cùng bạn trên không gian số hóa lịch sử (tác giả **Lê Trường Thịnh, lớp 12A8, THPT Nguyễn Huệ**).\n\nBạn có thể hỏi ta về bất kỳ sự kiện, chiến lược quân sự, thân thế hay nhân vật lịch sử nào của phong trào Tây Sơn. Ta sẽ đối chiếu cùng kho tư liệu đã được kiểm chứng để giải đáp cho bạn nhé!`,
+      text: `Chào bạn! Ta là **Sử Quan Tây Sơn** — người đồng hành cùng bạn trên không gian số hóa lịch sử (tác giả **Lê Trường Thịnh, lớp 12A8, THPT Nguyễn Huệ**).\n\nBạn có thể hỏi ta về bất kỳ sự kiện, chiến lược quân sự, thân thế hay nhân vật lịch sử nào của phong trào Tây Sơn. Ta sẽ ưu tiên đối chiếu cùng kho tư liệu đã được kiểm chứng từ Google Docs của tác giả, nếu chưa có sẽ tự động tra cứu trên mạng Internet để giải đáp cho bạn nhé!`,
       sourceType: 'admin',
       model: 'Google Gemini AI',
       isNew: false
@@ -86,16 +83,8 @@ export default function AiStationTab({ onOpenAdmin }) {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [speakingMsgIdx, setSpeakingMsgIdx] = useState(null);
 
   const messagesEndRef = useRef(null);
-
-  useEffect(() => {
-    const unsubscribe = subscribeSpeechStatus((speaking) => {
-      if (!speaking) setSpeakingMsgIdx(null);
-    });
-    return () => unsubscribe();
-  }, []);
 
   // Kiểm tra nếu có câu hỏi nhanh từ Floating AI Widget
   useEffect(() => {
@@ -167,8 +156,6 @@ export default function AiStationTab({ onOpenAdmin }) {
   };
 
   const handleClearChat = () => {
-    stopSpeech();
-    setSpeakingMsgIdx(null);
     resetChatHistory();
     playChime(400, 'sine', 0.1);
     setMessages([
@@ -180,18 +167,6 @@ export default function AiStationTab({ onOpenAdmin }) {
         isNew: false
       }
     ]);
-  };
-
-  const handleSpeak = (text, idx) => {
-    if (speakingMsgIdx === idx) {
-      stopSpeech();
-      setSpeakingMsgIdx(null);
-    } else {
-      stopSpeech();
-      setSpeakingMsgIdx(idx);
-      playChime(550, 'sine', 0.1);
-      speakText(text, () => setSpeakingMsgIdx(null));
-    }
   };
 
   const formatText = (text) => {
@@ -220,8 +195,8 @@ export default function AiStationTab({ onOpenAdmin }) {
         <div className="title-divider-gold"></div>
       </div>
 
-      {/* Cyber-Glass Telemetry Bar */}
-      <div className="ai-telemetry-bar cyber-glass-card">
+      {/* Exhibition Context Bar */}
+      <div className="ai-telemetry-bar">
         <div className="telemetry-item">
           <Cpu size={15} className="telemetry-icon gold" />
           <span>Mô hình: <strong>Google Gemini AI</strong></span>
@@ -231,7 +206,6 @@ export default function AiStationTab({ onOpenAdmin }) {
         <div className="telemetry-item rag-link" onClick={onOpenAdmin}>
           <Database size={15} className="telemetry-icon crimson" />
           <span>Kho sử liệu: <strong>{kbCount} Tài Liệu Gốc</strong></span>
-          <span className="admin-chip">Nạp thêm</span>
         </div>
 
         <div className="telemetry-item author-tag">
@@ -240,22 +214,21 @@ export default function AiStationTab({ onOpenAdmin }) {
         </div>
       </div>
 
-      {/* Dark Glass Container for Chat */}
-      <div className="chat-interface-card dark-glass-container">
+      {/* Parlor Container for Chat */}
+      <div className="chat-interface-card">
         {/* Chat Mini Header */}
         <div className="chat-card-top-header">
           <div className="chat-status-indicator">
             <span className="live-dot-pulse" />
             <span className="chat-status-text">Sử Quan Tây Sơn đang trực tuyến</span>
           </div>
-          <span className="chat-engine-chip">⚡ Google Gemini AI + RAG Google Docs + Google Search Trực Tuyến</span>
+          <span className="chat-engine-chip">⚡ Google Gemini AI + RAG Google Docs + Google Search</span>
         </div>
 
         {/* Messages Stream */}
         <div className="chat-messages-container">
           {messages.map((msg, idx) => {
             const isBot = msg.role === 'bot';
-            const isPlaying = speakingMsgIdx === idx;
 
             return (
               <motion.div 
@@ -265,9 +238,8 @@ export default function AiStationTab({ onOpenAdmin }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
               >
-                {/* Avatar Sử Quan có Glowing Pulsing Ring */}
+                {/* Avatar Sử Quan */}
                 <div className={`chat-avatar-wrapper ${isBot ? 'bot-avatar-wrap' : 'user-avatar-wrap'}`}>
-                  {isBot && <div className="avatar-pulsing-halo" aria-hidden="true" />}
                   <div className={`chat-avatar-badge ${isBot ? 'bot-badge' : 'user-badge'}`}>
                     {isBot ? 'SỬ' : 'BẠN'}
                   </div>
@@ -305,36 +277,6 @@ export default function AiStationTab({ onOpenAdmin }) {
                       dangerouslySetInnerHTML={{ __html: formatText(msg.text) }} 
                     />
                   )}
-
-                  {/* Nút Nghe Thuyết Minh với Audio Wave Equalizer Bouncing */}
-                  {isBot && (
-                    <div className="bubble-footer-actions">
-                      <button 
-                        className={`speak-bubble-btn ${isPlaying ? 'is-speaking' : ''}`}
-                        onClick={() => handleSpeak(msg.text, idx)}
-                        title={isPlaying ? 'Dừng đọc' : 'Nghe giọng đọc tiếng Việt'}
-                      >
-                        {isPlaying ? (
-                          <>
-                            {/* Animated Audio Equalizer Bars */}
-                            <div className="audio-equalizer-bars" aria-hidden="true">
-                              <span className="eq-bar bar-1"></span>
-                              <span className="eq-bar bar-2"></span>
-                              <span className="eq-bar bar-3"></span>
-                              <span className="eq-bar bar-4"></span>
-                            </div>
-                            <span className="speak-label">Đang đọc...</span>
-                            <VolumeX size={14} className="stop-icon" />
-                          </>
-                        ) : (
-                          <>
-                            <Volume2 size={14} />
-                            <span className="speak-label">Nghe giọng đọc</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
                 </div>
               </motion.div>
             );
@@ -348,7 +290,6 @@ export default function AiStationTab({ onOpenAdmin }) {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="chat-avatar-wrapper bot-avatar-wrap">
-                <div className="avatar-pulsing-halo active-think" aria-hidden="true" />
                 <div className="chat-avatar-badge bot-badge">SỬ</div>
               </div>
               <div className="chat-bubble-box bot-box thinking-box">
@@ -357,7 +298,7 @@ export default function AiStationTab({ onOpenAdmin }) {
                   <span className="t-dot dot-2" />
                   <span className="t-dot dot-3" />
                 </div>
-                <span className="thinking-text">Sử Quan đang tra cứu sử tịch và đối soát RAG...</span>
+                <span className="thinking-text">Sử Quan đang tra cứu sử liệu và đối soát dữ liệu...</span>
               </div>
             </motion.div>
           )}
