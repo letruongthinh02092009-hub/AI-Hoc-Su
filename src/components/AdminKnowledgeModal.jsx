@@ -360,7 +360,7 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                       <h4>Kho Sử Liệu Đã Nạp ({knowledgeList.length} tài liệu)</h4>
                       <div className="cloud-sync-status-badge">
                         <Cloud size={13} className="text-emerald" />
-                        <span>Đám mây Google Sheets: <strong>Đã kết nối</strong></span>
+                        <span>Đám mây Google Docs: <strong>Đã kết nối</strong></span>
                       </div>
                     </div>
                     <div className="list-header-actions">
@@ -368,7 +368,7 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                         className={`sync-cloud-btn ${isSyncingCloud ? 'loading' : ''}`} 
                         onClick={handleManualSyncCloud} 
                         disabled={isSyncingCloud}
-                        title="Đồng bộ sử liệu từ Google Sheets về máy này"
+                        title="Đồng bộ sử liệu từ Google Docs về máy này"
                       >
                         <RefreshCw size={13} className={isSyncingCloud ? 'spin-icon' : ''} />
                         <span>{isSyncingCloud ? 'Đang kéo...' : 'Đồng bộ'}</span>
