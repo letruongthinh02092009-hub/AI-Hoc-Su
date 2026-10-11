@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#1e1814" />
+      <stop offset="100%" stop-color="#0a0908" />
+    </radialGradient>
+    <linearGradient id="silkPaper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8cf96" />
+      <stop offset="30%" stop-color="#f5e1b5" />
+      <stop offset="70%" stop-color="#dfc385" />
+      <stop offset="100%" stop-color="#c6a765" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="15" stdDeviation="20" flood-color="#000" flood-opacity="0.8" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bgGlow)" />
+  <ellipse cx="400" cy="540" rx="350" ry="40" fill="#000" opacity="0.6" filter="blur(20px)" />
+
+  <!-- Scroll Backing Rollers -->
+  <rect x="110" y="55" width="25" height="490" rx="8" fill="#4a2511" stroke="#e5a93c" stroke-width="2" />
+  <rect x="665" y="55" width="25" height="490" rx="8" fill="#4a2511" stroke="#e5a93c" stroke-width="2" />
+  <circle cx="122" cy="55" r="14" fill="#d8973c" />
+  <circle cx="122" cy="545" r="14" fill="#d8973c" />
+  <circle cx="678" cy="55" r="14" fill="#d8973c" />
+  <circle cx="678" cy="545" r="14" fill="#d8973c" />
+
+  <!-- Silk Scroll Parchment -->
+  <rect x="130" y="75" width="540" height="450" rx="4" fill="url(#silkPaper)" filter="url(#shadow)" stroke="#8b6834" stroke-width="3" />
+  
+  <!-- Dragon Border Pattern -->
+  <rect x="145" y="90" width="510" height="420" fill="none" stroke="#9e2a2b" stroke-width="2" stroke-dasharray="8 4" opacity="0.6" />
+  <rect x="150" y="95" width="500" height="410" fill="none" stroke="#d84a38" stroke-width="1.5" />
+
+  <!-- Chu Nom Traditional Calligraphy Lines -->
+  <g fill="#241408" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">
+    <text x="400" y="145" font-size="28" letter-spacing="12" fill="#9e2a2b">光中皇帝詔旨</text>
+    <text x="400" y="180" font-size="16" letter-spacing="4" fill="#6d4c1b">QUANG TRUNG HOÀNG ĐẾ CHIẾU CHỈ (CHỮ NÔM)</text>
+    
+    <g font-size="24" opacity="0.85" letter-spacing="8">
+      <text x="590" y="240">奉</text>
+      <text x="590" y="280">天</text>
+      <text x="590" y="320">承</text>
+      <text x="590" y="360">運</text>
+      <text x="590" y="400">詔</text>
+      <text x="590" y="440">曰</text>
+
+      <text x="520" y="240">崇</text>
+      <text x="520" y="280">政</text>
+      <text x="520" y="320">院</text>
+      <text x="520" y="360">阮</text>
+      <text x="520" y="400">浹</text>
+      <text x="520" y="440">立</text>
+
+      <text x="450" y="240">國</text>
+      <text x="450" y="280">音</text>
+      <text x="450" y="320">教</text>
+      <text x="450" y="360">化</text>
+      <text x="450" y="400">百</text>
+      <text x="450" y="440">姓</text>
+
+      <text x="350" y="240">社</text>
+      <text x="350" y="280">設</text>
+      <text x="350" y="320">學</text>
+      <text x="350" y="360">堂</text>
+      <text x="350" y="400">文</text>
+      <text x="350" y="440">興</text>
+
+      <text x="280" y="240">光</text>
+      <text x="280" y="280">中</text>
+      <text x="280" y="320">四</text>
+      <text x="280" y="360">年</text>
+      <text x="280" y="400">歲</text>
+      <text x="280" y="440">次</text>
+    </g>
+  </g>
+
+  <!-- Imperial Vermilion Seal (Kim Bảo Tây Sơn) -->
+  <g transform="translate(180, 360)">
+    <rect width="70" height="70" fill="#b91c1c" rx="4" opacity="0.88" />
+    <rect x="4" y="4" width="62" height="62" fill="none" stroke="#fca5a5" stroke-width="2" />
+    <text x="35" y="42" fill="#fff" font-family="serif" font-weight="bold" font-size="14" text-anchor="middle" letter-spacing="2">皇帝之寶</text>
+  </g>
+
+  <!-- Museum Plaque -->
+  <rect x="220" y="525" width="360" height="42" rx="6" fill="#1c1917" stroke="#e5a93c" stroke-width="1.5" />
+  <text x="400" y="551" fill="#f4d06f" font-family="'Be Vietnam Pro', sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+    BẢO VẬT: CHIẾU DÙNG CHỮ NÔM &amp; VIỆN SÙNG CHÍNH (1791)
+  </text>
+</svg>

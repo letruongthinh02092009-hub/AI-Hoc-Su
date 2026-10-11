@@ -16,7 +16,8 @@ import {
   Send,
   PlusCircle,
   Award,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { playChime, playCorrectSound, playVictorySound } from '../utils/audio';
 
@@ -204,8 +205,25 @@ export default function SurveyTab() {
     } catch (e) {}
   };
 
-  // Tính điểm đánh giá trung bình
-  const avgRating = (reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1)).toFixed(1);
+  // Tính toán điểm số và tỷ lệ phân bổ sao động 100% theo thời gian thực
+  const totalReviewsCount = reviews.length;
+  const avgRating = totalReviewsCount > 0 
+    ? (reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0) / totalReviewsCount).toFixed(1)
+    : '5.0';
+
+  const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+  reviews.forEach(r => {
+    const star = Math.min(5, Math.max(1, Math.round(Number(r.rating) || 5)));
+    starCounts[star] = (starCounts[star] || 0) + 1;
+  });
+
+  const starPercentages = {
+    5: totalReviewsCount > 0 ? Math.round((starCounts[5] / totalReviewsCount) * 100) : 0,
+    4: totalReviewsCount > 0 ? Math.round((starCounts[4] / totalReviewsCount) * 100) : 0,
+    3: totalReviewsCount > 0 ? Math.round((starCounts[3] / totalReviewsCount) * 100) : 0,
+    2: totalReviewsCount > 0 ? Math.round((starCounts[2] / totalReviewsCount) * 100) : 0,
+    1: totalReviewsCount > 0 ? Math.round((starCounts[1] / totalReviewsCount) * 100) : 0,
+  };
 
   // Chuyển link Google Sheet sang dạng xem nhúng hoặc xem trực tiếp
   const getEmbedSheetUrl = (url) => {
@@ -228,12 +246,12 @@ export default function SurveyTab() {
         <span className="section-kicker">Ý KIẾN ĐÓNG GÓP HỌC SINH & GIÁO VIÊN</span>
         <h2 className="section-heading">KHẢO SÁT & ĐÁNH GIÁ TRẢI NGHIỆM</h2>
         <p className="section-subtext">
-          Đánh giá cộng đồng chuẩn Google Maps kết hợp thu thập ý kiến qua Google Form & đồng bộ Google Sheets theo thời gian thực.
+          Đánh giá cộng đồng kết hợp thu thập ý kiến qua Google Form & đồng bộ Google Sheets theo thời gian thực.
         </p>
         <div className="title-divider-gold"></div>
       </div>
 
-      {/* 3 Tabs Điều Khiển Chính: Đánh Giá Google Maps | Google Form | Google Sheets */}
+      {/* 3 Tabs Điều Khiển Chính: Đánh Giá Cộng Đồng | Google Form | Google Sheets */}
       <div className="survey-toolbar-card cyber-glass-card">
         <div className="survey-tab-switch">
           <button 
@@ -244,7 +262,7 @@ export default function SurveyTab() {
             }}
           >
             <Star size={17} className="text-gold" />
-            <span>Đánh Giá Cộng Đồng (Chuẩn Google Maps)</span>
+            <span>Đánh Giá & Nhận Xét Cộng Đồng</span>
           </button>
 
           <button 
@@ -336,61 +354,46 @@ export default function SurveyTab() {
       )}
 
       {/* ============================================================
-          VIEW 1: ĐÁNH GIÁ & NHẬN XÉT CỘNG ĐỒNG (CHUẨN GOOGLE MAPS)
+          VIEW 1: ĐÁNH GIÁ & NHẬN XÉT CỘNG ĐỒNG
           ============================================================ */}
       {activeView === 'reviews' && (
         <div className="reviews-section-wrapper">
-          {/* Header Tổng Quan Điểm Số Kiểu Google Maps */}
+          {/* Header Tổng Quan Điểm Số Cộng Đồng */}
           <div className="gmaps-summary-card cyber-glass-card">
             <div className="gmaps-score-col">
               <span className="big-rating-number">{avgRating}</span>
               <div className="stars-row gold-stars">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} size={20} fill="#F4D06F" color="#E5A93C" />
+                  <Star 
+                    key={s} 
+                    size={20} 
+                    fill={parseFloat(avgRating) >= s ? "#F4D06F" : (parseFloat(avgRating) >= s - 0.5 ? "#E5A93C88" : "transparent")} 
+                    color="#E5A93C" 
+                  />
                 ))}
               </div>
               <span className="total-reviews-count">
-                Dựa trên {reviews.length + 138} lượt đánh giá từ học sinh & giáo viên
+                Dựa trên {totalReviewsCount} lượt đánh giá thực tế từ cộng đồng
               </span>
             </div>
 
-            {/* Cột Thanh Phân Bổ Sao */}
+            {/* Cột Thanh Phân Bổ Sao Thời Gian Thực */}
             <div className="gmaps-breakdown-col">
-              <div className="breakdown-row">
-                <span className="star-num">5 sao</span>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: '92%' }} />
+              {[5, 4, 3, 2, 1].map((s) => (
+                <div key={s} className="breakdown-row">
+                  <span className="star-num">{s} sao</span>
+                  <div className="bar-track">
+                    <div 
+                      className="bar-fill" 
+                      style={{ 
+                        width: `${starPercentages[s]}%`,
+                        transition: 'width 0.4s ease'
+                      }} 
+                    />
+                  </div>
+                  <span className="bar-pct">{starPercentages[s]}% ({starCounts[s]})</span>
                 </div>
-                <span className="bar-pct">92%</span>
-              </div>
-              <div className="breakdown-row">
-                <span className="star-num">4 sao</span>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: '8%' }} />
-                </div>
-                <span className="bar-pct">8%</span>
-              </div>
-              <div className="breakdown-row">
-                <span className="star-num">3 sao</span>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: '0%' }} />
-                </div>
-                <span className="bar-pct">0%</span>
-              </div>
-              <div className="breakdown-row">
-                <span className="star-num">2 sao</span>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: '0%' }} />
-                </div>
-                <span className="bar-pct">0%</span>
-              </div>
-              <div className="breakdown-row">
-                <span className="star-num">1 sao</span>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: '0%' }} />
-                </div>
-                <span className="bar-pct">0%</span>
-              </div>
+              ))}
             </div>
 
             {/* Nút Kêu Gọi Viết Đánh Giá */}
@@ -513,6 +516,39 @@ export default function SurveyTab() {
                 <h3>Ý Kiến Đóng Góp Từ Cộng Đồng Học Sinh & Thầy Cô ({reviews.length})</h3>
               </div>
               <span className="feed-tag">Cập nhật thời gian thực</span>
+            </div>
+
+            {/* Banner kết nối Bảng Tính Google Sheets chứa kết quả Google Form */}
+            <div 
+              className="google-sheet-sync-banner cyber-glass-card" 
+              onClick={() => {
+                playChime(600, 'sine', 0.1);
+                setActiveView('sheet');
+              }} 
+              style={{ 
+                cursor: 'pointer', 
+                marginBottom: '20px', 
+                padding: '14px 18px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between', 
+                border: '1px solid rgba(229, 169, 60, 0.35)', 
+                borderRadius: '10px', 
+                background: 'linear-gradient(135deg, rgba(229, 169, 60, 0.12), rgba(18, 20, 27, 0.9))',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Table size={22} className="text-gold" />
+                <div>
+                  <strong style={{ color: '#F4D06F', fontSize: '0.94rem' }}>Xem Kết Quả Đồng Bộ Từ Google Form</strong>
+                  <p style={{ margin: '3px 0 0', color: '#9CA3AF', fontSize: '0.82rem' }}>Toàn bộ phiếu khảo sát của học sinh &amp; giáo viên được tự động lưu 100% sang Bảng tính Google Sheets.</p>
+                </div>
+              </div>
+              <button className="btn btn-secondary" style={{ padding: '7px 14px', fontSize: '0.82rem', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <span>Mở Bảng Tính</span> <ArrowRight size={14} />
+              </button>
             </div>
 
             <div className="reviews-grid">

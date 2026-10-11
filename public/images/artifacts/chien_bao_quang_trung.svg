@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="bgGlowBao" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#2a1a17" />
+      <stop offset="100%" stop-color="#0a0808" />
+    </radialGradient>
+    <linearGradient id="silkGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e5a93c" />
+      <stop offset="40%" stop-color="#f5cc6b" />
+      <stop offset="70%" stop-color="#c98a28" />
+      <stop offset="100%" stop-color="#875713" />
+    </linearGradient>
+    <radialGradient id="smokeBurn" cx="65%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#1c1917" stop-opacity="0.85" />
+      <stop offset="60%" stop-color="#382f2d" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bgGlowBao)" />
+  
+  <!-- Showcase Pedestal & Glass Ambient -->
+  <ellipse cx="400" cy="530" rx="260" ry="30" fill="#000" opacity="0.7" filter="blur(18px)" />
+  <rect x="250" y="510" width="300" height="35" rx="6" fill="#181513" stroke="#e5a93c" stroke-width="2" />
+
+  <!-- Wooden Armor Stand Mannequin -->
+  <rect x="388" y="90" width="24" height="420" fill="#3a1e0d" stroke="#5a3418" stroke-width="2" />
+  <rect x="270" y="110" width="260" height="18" rx="4" fill="#3a1e0d" stroke="#5a3418" stroke-width="2" />
+
+  <!-- Imperial Robe Body (Hoàng Bào) -->
+  <path d="M 270 120 L 160 270 L 230 310 L 290 250 L 280 480 L 520 480 L 510 250 L 570 310 L 640 270 L 530 120 Z" 
+        fill="url(#silkGold)" stroke="#68410d" stroke-width="3" />
+  
+  <!-- Robe Hem & Red Trim -->
+  <path d="M 280 470 L 520 470 L 520 485 L 280 485 Z" fill="#9e2a2b" stroke="#f4d06f" stroke-width="1.5" />
+  <path d="M 160 270 L 230 310 L 225 318 L 155 278 Z" fill="#9e2a2b" />
+  <path d="M 640 270 L 570 310 L 575 318 L 645 278 Z" fill="#9e2a2b" />
+
+  <!-- Embroidered Imperial Dragon Center Chest -->
+  <circle cx="400" cy="240" r="56" fill="none" stroke="#9e2a2b" stroke-width="3" stroke-dasharray="6 3" />
+  <circle cx="400" cy="240" r="50" fill="none" stroke="#d84a38" stroke-width="2" />
+  <path d="M 370 230 Q 400 195 430 230 Q 410 265 375 250 Q 365 240 400 240" fill="none" stroke="#7a1415" stroke-width="4" stroke-linecap="round" />
+  <circle cx="400" cy="235" r="8" fill="#9e2a2b" />
+
+  <!-- Traditional Clouds & Waves Waves (Thủy Ba) -->
+  <path d="M 290 440 Q 320 410 350 440 Q 380 410 410 440 Q 440 410 470 440 Q 500 410 515 440" 
+        fill="none" stroke="#9e2a2b" stroke-width="3" />
+
+  <!-- Mandarin Collar -->
+  <path d="M 365 110 Q 400 135 435 110 L 440 130 Q 400 155 360 130 Z" fill="#9e2a2b" stroke="#f4d06f" stroke-width="1.5" />
+
+  <!-- Legendary Gunpowder Smoke Stains (Khói Súng Tết Kỷ Dậu 1789) -->
+  <ellipse cx="480" cy="210" rx="95" ry="90" fill="url(#smokeBurn)" />
+  <ellipse cx="530" cy="250" rx="60" ry="50" fill="url(#smokeBurn)" />
+  <ellipse cx="330" cy="280" rx="45" ry="40" fill="url(#smokeBurn)" opacity="0.6" />
+
+  <!-- Museum Title Plaque -->
+  <rect x="220" y="525" width="360" height="42" rx="6" fill="#1c1917" stroke="#e5a93c" stroke-width="1.5" />
+  <text x="400" y="551" fill="#f4d06f" font-family="'Be Vietnam Pro', sans-serif" font-size="13" font-weight="600" text-anchor="middle">
+    BẢO VẬT: CHIẾN BÀO SẠM MÀU KHÓI SÚNG (TẾT KỶ DẬU 1789)
+  </text>
+</svg>

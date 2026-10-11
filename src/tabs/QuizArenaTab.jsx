@@ -18,9 +18,52 @@ import {
 import { QUIZ_QUESTIONS } from '../data/quizData';
 import { playCorrectSound, playWrongSound, playVictorySound, playChime } from '../utils/audio';
 
+// Hàm xáo trộn ngẫu nhiên câu hỏi và đáp án cho mỗi lượt thi
+function prepareShuffledQuiz(levelKey, count = 10) {
+  const rawPool = QUIZ_QUESTIONS[levelKey] || QUIZ_QUESTIONS['co-ban'] || [];
+  const pool = [...rawPool];
+  
+  // 1. Xáo trộn toàn bộ ngân hàng câu hỏi
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+
+  // 2. Chọn ngẫu nhiên số câu hỏi (mặc định 10 câu)
+  const selected = pool.slice(0, Math.min(count, pool.length));
+
+  // 3. Đảo lộn vị trí 4 đáp án và cập nhật lại index đáp án đúng
+  return selected.map((q) => {
+    const qText = q.question || q.q;
+    const explanationText = q.explain || q.explanation;
+    const originalOptions = [...q.options];
+    const correctText = originalOptions[q.correct !== undefined ? q.correct : 0];
+
+    // Trộn ngẫu nhiên các đáp án
+    const shuffledOptions = [...originalOptions];
+    for (let i = shuffledOptions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+    }
+
+    const newCorrectIdx = shuffledOptions.indexOf(correctText);
+
+    return {
+      category: q.category,
+      question: qText,
+      q: qText,
+      options: shuffledOptions,
+      correct: newCorrectIdx >= 0 ? newCorrectIdx : 0,
+      explain: explanationText,
+      explanation: explanationText
+    };
+  });
+}
+
 export default function QuizArenaTab() {
   const [level, setLevel] = useState('co-ban');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeQuestions, setActiveQuestions] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -28,12 +71,14 @@ export default function QuizArenaTab() {
   const [isAnswered, setIsAnswered] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
-  const questionsList = QUIZ_QUESTIONS[level] || QUIZ_QUESTIONS['co-ban'];
-  const currentQ = questionsList[currentIndex];
+  const questionsList = activeQuestions.length > 0 ? activeQuestions : (QUIZ_QUESTIONS[level] || QUIZ_QUESTIONS['co-ban']);
+  const currentQ = questionsList[currentIndex] || questionsList[0] || {};
 
   const handleStartLevel = (selectedLevel) => {
     playChime(650, 'sine', 0.15);
     setLevel(selectedLevel);
+    const randomized = prepareShuffledQuiz(selectedLevel, 10);
+    setActiveQuestions(randomized);
     setIsPlaying(true);
     setCurrentIndex(0);
     setScore(0);
@@ -375,7 +420,7 @@ export default function QuizArenaTab() {
                 >
                   <div className="exp-header">
                     <Sparkles size={16} className="exp-icon" />
-                    <strong>Kiểm chứng sử liệu KHKT:</strong>
+                    <strong>Kiểm chứng sử liệu Tây Sơn:</strong>
                   </div>
                   <p className="exp-text">{currentQ.explanation}</p>
                 </motion.div>

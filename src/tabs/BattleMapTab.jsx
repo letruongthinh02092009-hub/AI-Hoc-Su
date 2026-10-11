@@ -248,6 +248,31 @@ export default function BattleMapTab() {
         </button>
       </div>
 
+      {/* Thanh 3 Giai Đoạn Tác Chiến Nằm Ngay Trên Đầu Bản Đồ (Bấm là lia Map tức thì) */}
+      <div className="battlemap-phase-quickbar cyber-glass-card">
+        <div className="quickbar-header">
+          <Compass size={17} className="text-gold" />
+          <span className="quickbar-label">3 GIAI ĐOẠN TÁC CHIẾN (BẤM ĐỂ LIA BẢN ĐỒ TỰ ĐỘNG):</span>
+        </div>
+        <div className="quickbar-buttons-row">
+          {battle.tactics.map((tac, idx) => {
+            const isActive = activePhaseIndex === idx;
+            return (
+              <button
+                key={idx}
+                className={`quick-phase-pill-btn ${isActive ? 'active' : ''}`}
+                onClick={() => handleSelectPhase(tac, idx)}
+                title={`Bấm để bản đồ lia tới: ${tac.phase}`}
+              >
+                <span className="pill-step-num">Giai đoạn {idx + 1}</span>
+                <span className="pill-phase-name">{tac.phase}</span>
+                <span className="pill-phase-tag">{tac.tag}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Workspace */}
       <div className="battlemap-workspace">
         {/* Leaflet Map Area */}
@@ -272,7 +297,7 @@ export default function BattleMapTab() {
           </div>
 
           <div className="map-hint-pill">
-            <span>💡 Nhấp vào mũi tên hoặc chọn giai đoạn bên phải để bản đồ tự động bay tới vị trí</span>
+            <span>💡 Nhấp vào nút giai đoạn ở trên hoặc mũi tên để bản đồ tự động bay tới vị trí</span>
             <button className="reset-view-pill-btn" onClick={handleResetView} title="Trở về toàn cảnh">
               Toàn cảnh
             </button>
@@ -334,7 +359,53 @@ export default function BattleMapTab() {
             </div>
           </div>
 
-          {/* Card 2: Thẻ So Sánh Tương Quan Lực Lượng (Progress Bars) */}
+          {/* Card 2: Thẻ Tiến Trình Tác Chiến (Đưa lên trên để quan sát ngay không cần cuộn) */}
+          <div className="battle-card cyber-glass-card battle-stepper-card">
+            <div className="stepper-header">
+              <div className="header-title-flex">
+                <Compass size={16} className="text-gold" />
+                <h4>Tiến Trình Tác Chiến 3 Giai Đoạn</h4>
+              </div>
+              <span className="stepper-tip">Bấm giai đoạn để lia vị trí</span>
+            </div>
+
+            <div className="tactical-stepper-list">
+              {battle.tactics.map((tac, idx) => {
+                const isActive = activePhaseIndex === idx;
+                return (
+                  <div 
+                    key={idx}
+                    className={`stepper-node-card ${isActive ? 'active' : ''}`}
+                    onClick={() => handleSelectPhase(tac, idx)}
+                  >
+                    <div className="node-indicator-col">
+                      <div className={`node-circle ${isActive ? 'active' : ''}`}>
+                        {tac.icon || (idx + 1)}
+                      </div>
+                      {idx < battle.tactics.length - 1 && <div className="node-line" />}
+                    </div>
+
+                    <div className="node-body">
+                      <div className="node-header-row">
+                        <span className="phase-order-badge">Giai đoạn {idx + 1}</span>
+                        <span className="phase-tag">{tac.tag}</span>
+                      </div>
+                      <h5 className="phase-title">{tac.phase}</h5>
+                      <p className="phase-desc">{tac.desc}</p>
+                      
+                      {isActive && (
+                        <div className="phase-active-focus">
+                          <span>📍 Bản đồ đã định vị trọng điểm giai đoạn này</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Card 3: Thẻ So Sánh Tương Quan Lực Lượng (Progress Bars) */}
           {battle.forcesComparison && (
             <div className="battle-card cyber-glass-card battle-forces-card">
               <div className="forces-card-header">
@@ -392,52 +463,6 @@ export default function BattleMapTab() {
               </div>
             </div>
           )}
-
-          {/* Card 3: Thẻ Tiến Trình Tác Chiến (Interactive 3-Phase Stepper) */}
-          <div className="battle-card cyber-glass-card battle-stepper-card">
-            <div className="stepper-header">
-              <div className="header-title-flex">
-                <Compass size={16} className="text-gold" />
-                <h4>Tiến Trình Tác Chiến 3 Giai Đoạn</h4>
-              </div>
-              <span className="stepper-tip">Bấm giai đoạn để zoom vị trí</span>
-            </div>
-
-            <div className="tactical-stepper-list">
-              {battle.tactics.map((tac, idx) => {
-                const isActive = activePhaseIndex === idx;
-                return (
-                  <div 
-                    key={idx}
-                    className={`stepper-node-card ${isActive ? 'active' : ''}`}
-                    onClick={() => handleSelectPhase(tac, idx)}
-                  >
-                    <div className="node-indicator-col">
-                      <div className={`node-circle ${isActive ? 'active' : ''}`}>
-                        {tac.icon || (idx + 1)}
-                      </div>
-                      {idx < battle.tactics.length - 1 && <div className="node-line" />}
-                    </div>
-
-                    <div className="node-body">
-                      <div className="node-header-row">
-                        <span className="phase-order-badge">Giai đoạn {idx + 1}</span>
-                        <span className="phase-tag">{tac.tag}</span>
-                      </div>
-                      <h5 className="phase-title">{tac.phase}</h5>
-                      <p className="phase-desc">{tac.desc}</p>
-                      
-                      {isActive && (
-                        <div className="phase-active-focus">
-                          <span>📍 Bản đồ đã định vị trọng điểm giai đoạn này</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
 
           {/* Selected Feature Info Popup Card */}
           {selectedFeature && (

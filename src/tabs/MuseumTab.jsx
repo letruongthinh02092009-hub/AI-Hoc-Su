@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, Volume2, VolumeX, Eye, X, BookOpen, Sparkles, CheckCircle } from 'lucide-react';
+import { Landmark, Volume2, VolumeX, Eye, X, BookOpen, Sparkles, CheckCircle, Upload, RotateCcw, Image } from 'lucide-react';
 import { MUSEUM_ITEMS } from '../data/museumData';
 import { speakText, stopSpeech, subscribeSpeechStatus } from '../services/speechService';
 import { playChime } from '../utils/audio';
@@ -10,13 +10,70 @@ export default function MuseumTab() {
   const [exploredIds, setExploredIds] = useState(new Set());
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [filterCategory, setFilterCategory] = useState('all');
+  const [customImages, setCustomImages] = useState({});
+  const [urlInput, setUrlInput] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
 
   useEffect(() => {
     const unsubscribe = subscribeSpeechStatus((speaking) => {
       setIsSpeaking(speaking);
     });
+    try {
+      const saved = localStorage.getItem('su_custom_museum_images');
+      if (saved) setCustomImages(JSON.parse(saved));
+    } catch (e) {}
     return () => unsubscribe();
   }, []);
+
+  const handleImageUpload = (e, itemId) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Vui lòng chọn ảnh có dung lượng dưới 5MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result;
+      if (typeof base64 === 'string') {
+        const updated = { ...customImages, [itemId]: base64 };
+        setCustomImages(updated);
+        try {
+          localStorage.setItem('su_custom_museum_images', JSON.stringify(updated));
+        } catch (err) {}
+        setUploadSuccess('Đã lưu ảnh mới thành công vào bộ sưu tập!');
+        playChime(700, 'sine', 0.15);
+        setTimeout(() => setUploadSuccess(''), 3000);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleApplyUrl = (itemId) => {
+    if (!urlInput.trim()) return;
+    const updated = { ...customImages, [itemId]: urlInput.trim() };
+    setCustomImages(updated);
+    try {
+      localStorage.setItem('su_custom_museum_images', JSON.stringify(updated));
+    } catch (err) {}
+    setUrlInput('');
+    setUploadSuccess('Đã cập nhật link ảnh thành công!');
+    playChime(700, 'sine', 0.15);
+    setTimeout(() => setUploadSuccess(''), 3000);
+  };
+
+  const handleResetImage = (itemId) => {
+    const updated = { ...customImages };
+    delete updated[itemId];
+    setCustomImages(updated);
+    try {
+      localStorage.setItem('su_custom_museum_images', JSON.stringify(updated));
+    } catch (err) {}
+    setUploadSuccess('Đã khôi phục ảnh nguyên bản!');
+    setTimeout(() => setUploadSuccess(''), 2500);
+  };
 
   const categories = ['all', 'Vũ khí dã chiến', 'Nghệ thuật quân sự', 'Cổ vật tiền tệ', 'Châu bản & Chiếu chỉ', 'Hỏa khí hạng nặng', 'Trang phục hoàng gia', 'Tư liệu tác chiến', 'Tranh ký họa lịch sử'];
 
@@ -96,7 +153,15 @@ export default function MuseumTab() {
               onClick={() => handleOpenItem(item)}
             >
               <div className="artifact-img-box">
-                <img src={item.img} alt={item.title} loading="lazy" />
+                <img 
+                  src={customImages[item.id] || item.img} 
+                  alt={item.title} 
+                  loading="lazy" 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = './images/artifacts/hoa_ho_tay_son.jpg';
+                  }}
+                />
                 <span className="artifact-category-badge">{item.category}</span>
                 {isExplored && (
                   <span className="explored-badge" title="Đã xem">
@@ -133,9 +198,67 @@ export default function MuseumTab() {
               <button className="close-modal-btn" onClick={handleCloseItem}><X size={20} /></button>
 
               <div className="modal-img-col">
-                <img src={selectedItem.img} alt={selectedItem.title} />
+                <img 
+                  src={customImages[selectedItem.id] || selectedItem.img} 
+                  alt={selectedItem.title} 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = './images/artifacts/hoa_ho_tay_son.jpg';
+                  }}
+                />
                 <div className="modal-source-tag">
                   📚 {selectedItem.source}
+                </div>
+
+                {/* Khu vực Tải ảnh / Đổi ảnh hiện vật */}
+                <div className="custom-img-uploader-box">
+                  <div className="uploader-title-row">
+                    <span>📷 Đổi ảnh hiện vật:</span>
+                    {customImages[selectedItem.id] && (
+                      <button 
+                        className="reset-img-btn" 
+                        onClick={() => handleResetImage(selectedItem.id)}
+                        title="Khôi phục ảnh mặc định"
+                      >
+                        <RotateCcw size={12} /> Khôi phục gốc
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="uploader-actions-flex">
+                    <label className="upload-file-label">
+                      <Upload size={14} />
+                      <span>Tải ảnh từ máy</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        style={{ display: 'none' }} 
+                        onChange={(e) => handleImageUpload(e, selectedItem.id)} 
+                      />
+                    </label>
+
+                    <div className="url-input-mini-group">
+                      <input 
+                        type="text" 
+                        placeholder="Hoặc dán URL ảnh..." 
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => handleApplyUrl(selectedItem.id)}
+                        disabled={!urlInput.trim()}
+                      >
+                        Lưu
+                      </button>
+                    </div>
+                  </div>
+
+                  {uploadSuccess && (
+                    <div className="uploader-success-msg">
+                      <CheckCircle size={13} /> {uploadSuccess}
+                    </div>
+                  )}
                 </div>
               </div>
 

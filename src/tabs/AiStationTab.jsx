@@ -242,6 +242,15 @@ export default function AiStationTab({ onOpenAdmin }) {
 
       {/* Dark Glass Container for Chat */}
       <div className="chat-interface-card dark-glass-container">
+        {/* Chat Mini Header */}
+        <div className="chat-card-top-header">
+          <div className="chat-status-indicator">
+            <span className="live-dot-pulse" />
+            <span className="chat-status-text">Sử Quan Tây Sơn đang trực tuyến</span>
+          </div>
+          <span className="chat-engine-chip">⚡ Google Gemini AI + RAG Google Docs</span>
+        </div>
+
         {/* Messages Stream */}
         <div className="chat-messages-container">
           {messages.map((msg, idx) => {
