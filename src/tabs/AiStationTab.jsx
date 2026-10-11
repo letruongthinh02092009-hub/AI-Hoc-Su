@@ -248,7 +248,7 @@ export default function AiStationTab({ onOpenAdmin }) {
             <span className="live-dot-pulse" />
             <span className="chat-status-text">Sử Quan Tây Sơn đang trực tuyến</span>
           </div>
-          <span className="chat-engine-chip">⚡ Google Gemini AI + RAG Google Docs</span>
+          <span className="chat-engine-chip">⚡ Google Gemini AI + RAG Google Docs + Google Search Trực Tuyến</span>
         </div>
 
         {/* Messages Stream */}
@@ -278,13 +278,13 @@ export default function AiStationTab({ onOpenAdmin }) {
                     <div className="bot-meta-tag">
                       <span className="bot-name">Sử Quan Tây Sơn</span>
                       {msg.sourceType === 'admin' && (
-                        <span className="source-badge admin" title="Nội dung trích xuất trực tiếp từ Google Docs của tác giả">
+                        <span className="source-badge admin" title="Nội dung chính thống trích xuất từ Google Docs của tác giả">
                           <BookOpen size={12} /> Google Docs Tác Giả
                         </span>
                       )}
                       {msg.sourceType === 'general' && (
-                        <span className="source-badge general" title="Thông tin tổng quát do Google Gemini AI tra cứu">
-                          <Sparkles size={12} /> Google Gemini AI
+                        <span className="source-badge general" title="Thông tin tra cứu trực tuyến trên mạng Internet qua Google Gemini AI">
+                          <Sparkles size={12} /> Trực Tuyến & Google Gemini AI
                         </span>
                       )}
                     </div>

@@ -1,8 +1,8 @@
-// Dịch vụ Tích hợp Gemini 2.5 Flash & Hệ thống Quản trị Tri thức RAG
-import { DEFAULT_KNOWLEDGE_BASE } from '../data/defaultKnowledgeBase';
+import { DEFAULT_KNOWLEDGE_BASE } from '../data/defaultKnowledgeBase.js';
 
 const GEMINI_API_KEY = "AQ.Ab8RN6KVY_X5n_CaZMGXEZ6OSngx6W5kUEE1iw6yPczaMywIEQ";
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
+const PRIMARY_MODEL = "gemini-2.5-flash";
+const FALLBACK_MODEL = "gemini-3.5-flash-lite";
 const KB_STORAGE_KEY = "khkt_su_knowledge_base_v2";
 export const DEFAULT_GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzsgFMs-xMdTGE1wa0Bc9ycj0qEFz2Ga4EOqSrfKb6msLUv6WkoK1fzEmm1C-7xzp487g/exec";
 export const GAS_WEBHOOK_STORAGE_KEY = "su_gas_knowledge_webhook_url";
@@ -222,50 +222,112 @@ export function resetKnowledgeBase() {
   return DEFAULT_KNOWLEDGE_BASE;
 }
 
-// 2. Thuật toán Đối soát Ngữ nghĩa RAG (Semantic Retrieval) ưu tiên Google Docs
+// 2. Thuật toán Đối soát Ngữ nghĩa RAG Hai Tầng: Ưu tiên Google Docs, Loại bỏ từ dừng
+const VIETNAMESE_STOP_WORDS = new Set([
+  'la', 'ai', 'gi', 'nao', 'sao', 'dau', 'o', 'va', 'cua', 'trong', 'cho', 'voi', 
+  'nhung', 'cac', 'thi', 'co', 'duoc', 'se', 'da', 'dang', 'rat', 'nhu', 'mot', 
+  've', 'den', 'tu', 'boi', 'ra', 'vao', 'len', 'xuong', 'khi', 'ma', 'theo',
+  'viet', 'nam', 'nuoc', 'hien', 'nay', 'nguoi', 'chua', 'dien', 'the', 'bao', 'nhieu', 'may', 'toi', 'minh', 'ban'
+]);
+
+function normalizeText(text) {
+  return (text || '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function searchRelevantKnowledge(query) {
   const kb = getKnowledgeBase();
-  const normQuery = query.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ');
+  const normQuery = normalizeText(query);
+  if (!normQuery) return [];
+
+  const rawWords = normQuery.split(/\s+/).filter(w => w.length > 1);
+  const keywords = rawWords.filter(w => !VIETNAMESE_STOP_WORDS.has(w));
+
+  // Nếu câu hỏi chỉ toàn từ dừng/từ thông dụng (ví dụ: "chào bạn", "nước việt nam là ai")
+  if (keywords.length === 0) return [];
 
   const matches = [];
 
+  // A. Quét trong danh mục tri thức đã nạp
   for (const item of kb) {
-    const normTitle = item.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const normContent = item.content.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const normTitle = normalizeText(item.title);
+    const normContent = normalizeText(item.content);
 
     let score = 0;
-    const queryWords = normQuery.split(/\s+/).filter(w => w.length > 1);
+    let matchedKeywords = 0;
 
-    queryWords.forEach(word => {
-      if (normTitle.includes(word)) score += 4;
-      if (normContent.includes(word)) score += 2;
+    keywords.forEach(word => {
+      let wordMatched = false;
+      if (normTitle.includes(word)) {
+        score += 6;
+        wordMatched = true;
+      }
+      if (normContent.includes(word)) {
+        score += 2;
+        wordMatched = true;
+      }
+      if (wordMatched) matchedKeywords++;
     });
+
+    // Kiểm tra các cụm từ ghép 2 âm tiết liên tiếp (bigrams)
+    let phraseMatched = false;
+    for (let i = 0; i < keywords.length - 1; i++) {
+      const bigram = keywords[i] + ' ' + keywords[i + 1];
+      if (normTitle.includes(bigram) || normContent.includes(bigram)) {
+        score += 12;
+        phraseMatched = true;
+      }
+    }
 
     // Ưu tiên cao hơn nếu là tư liệu từ Google Docs của tác giả
     if (item.source && item.source.toLowerCase().includes('google docs')) {
-      score += 3;
+      score += 4;
     }
 
-    if (score > 2) {
+    // Ngưỡng khớp chặt chẽ:
+    // Nếu có 1-2 từ khóa: Bắt buộc phải khớp đủ từ khóa hoặc khớp cụm từ ghép
+    // Nếu có 3 từ khóa trở lên: Cần khớp ít nhất 50% số từ khóa HOẶC khớp cụm từ ghép
+    const minMatched = keywords.length <= 2 ? keywords.length : Math.ceil(keywords.length * 0.5);
+    const hasEnoughWords = matchedKeywords >= minMatched;
+
+    if ((hasEnoughWords || phraseMatched) && score >= 6) {
       matches.push({ item, score });
     }
   }
 
-  // Tra cứu thêm trong raw text nếu chưa tìm thấy
+  // B. Tra cứu thêm trong văn bản thô Google Docs (nếu có)
   try {
     const rawText = localStorage.getItem('su_google_docs_raw_text');
     if (rawText && matches.length === 0) {
       const paragraphs = rawText.split(/\n{2,}/);
       for (const p of paragraphs) {
-        const normP = p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const normP = normalizeText(p);
         let score = 0;
-        const queryWords = normQuery.split(/\s+/).filter(w => w.length > 1);
-        queryWords.forEach(word => {
-          if (normP.includes(word)) score += 2;
+        let matchedKeywords = 0;
+
+        keywords.forEach(word => {
+          if (normP.includes(word)) {
+            score += 2;
+            matchedKeywords++;
+          }
         });
-        if (score > 2) {
+
+        let phraseMatched = false;
+        for (let i = 0; i < keywords.length - 1; i++) {
+          const bigram = keywords[i] + ' ' + keywords[i + 1];
+          if (normP.includes(bigram)) {
+            score += 10;
+            phraseMatched = true;
+          }
+        }
+
+        const minMatched = keywords.length <= 2 ? keywords.length : Math.ceil(keywords.length * 0.5);
+        const hasEnoughWords = matchedKeywords >= minMatched;
+
+        if ((hasEnoughWords || phraseMatched) && score >= 4) {
           matches.push({
             item: {
               id: 'gdoc-raw-matched',
@@ -292,7 +354,7 @@ export function resetChatHistory() {
   chatHistory = [];
 }
 
-// 3. Hàm gửi truy vấn tới Gemini có bảo vệ và RAG ưu tiên Google Docs
+// 3. Hàm gửi truy vấn tới Gemini: Ưu tiên Bậc 1 Google Docs -> Tự động Bậc 2 Google Search Trực Tuyến
 export async function sendChatMessageToGemini(userQuestion) {
   // Lọc từ ngữ thô tục
   const vulgarList = ['đụ', 'địt', 'lồn', 'cặc', 'buồi', 'đm', 'dcm', 'vcl', 'clgt', 'chó đẻ'];
@@ -313,67 +375,90 @@ export async function sendChatMessageToGemini(userQuestion) {
 
   let ragContextPrompt = '';
   if (hasMatchedDoc) {
-    ragContextPrompt = `\n\n[DỮ LIỆU ĐẶC BIỆT TỪ GOOGLE DOCS DO TÁC GIẢ (Lê Trường Thịnh - 12A8 THPT Nguyễn Huệ) CUNG CẤP]:\n` +
+    ragContextPrompt = `\n\n[KỊCH BẢN ƯU TIÊN BẬC 1: TƯ LIỆU CHÍNH THỐNG TỪ GOOGLE DOCS DO TÁC GIẢ (Lê Trường Thịnh - 12A8 THPT Nguyễn Huệ) BIÊN SOẠN]:\n` +
       matchedDocs.map(d => `✦ Tiêu đề: ${d.title}\n✦ Nguồn: ${d.source}\n✦ Nội dung: ${d.content}`).join('\n\n') +
-      `\n\nQUY TẮC BẮT BUỘC: Bạn PHẢI trả lời hoàn toàn dựa trên tư liệu trong Google Docs trên. Trình bày khoa học, chính xác, súc tích. Ở cuối câu trả lời, hãy đính kèm đúng cú pháp:\n"\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)"`;
+      `\n\nQUY TẮC BẮT BUỘC:
+- NẾU câu hỏi của người dùng có dữ liệu giải đáp trong nội dung Google Docs trên: Bạn BẮT BUỘC ưu tiên trả lời theo thông tin từ Google Docs này.
+Ở cuối câu trả lời, hãy đính kèm đúng cú pháp nguồn:
+"\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)"
+- NẾU câu hỏi của người dùng hỏi về khía cạnh KHÔNG CÓ trong Google Docs trên: Bạn HÃY TỰ ĐỘNG TÌM KIẾM TRỰC TUYẾN TRÊN MẠNG (Google Search) và sử dụng tri thức mở của Google Gemini AI để giải đáp chuẩn xác nhất cho người dùng.
+Ở cuối câu trả lời, hãy đính kèm đúng cú pháp nguồn:
+"\n\n🌐 *Nguồn tư liệu:* Tìm kiếm trực tuyến & Tri thức Google Gemini AI (Chưa có trong Google Docs của tác giả)"`;
   } else {
-    ragContextPrompt = `\n\n[LƯU Ý QUAN TRỌNG VỀ NGUỒN TƯ LIỆU]: Thông tin cho câu hỏi này HIỆN CHƯA CÓ trong tài liệu Google Docs của tác giả Lê Trường Thịnh.\nBạn hãy sử dụng tri thức Lịch sử chuẩn xác của bạn (Đại Nam Thực Lục, SGK Lịch Sử) để giải đáp khoa học, khách quan cho học sinh.\n\nQUY TẮC BẮT BUỘC ĐỂ TRÁNH NHẦM LẪN: Ở cuối câu trả lời, bạn BẮT BUỘC đính kèm đúng cú pháp nguồn sau để người đọc phân biệt rõ:\n"\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử chung do Google Gemini AI đối chiếu (Chưa có trong Google Docs của tác giả)"`;
+    ragContextPrompt = `\n\n[KỊCH BẢN BẬC 2: TỰ ĐỘNG TÌM KIẾM TRỰC TUYẾN TRÊN MẠNG (GOOGLE SEARCH)]:\nThông tin cho câu hỏi này HIỆN CHƯA CÓ trong file Google Docs của tác giả Lê Trường Thịnh.\nTheo kịch bản của tác giả: Bạn HÃY TỰ ĐỘNG LÊN MẠNG TÌM KIẾM (Google Search) và vận dụng tri thức mở rộng của Google Gemini AI để tìm kiếm thông tin mới nhất và giải đáp đầy đủ, chính xác, khách quan cho người dùng (ví dụ: về các sự kiện lịch sử khác, nhân vật thời nay, chủ tịch nước, văn hóa xã hội...).\n\nQUY TẮC BẮT BUỘC ĐỂ TRÁNH NHẦM LẪN: Ở cuối câu trả lời, bạn BẮT BUỘC đính kèm đúng cú pháp nguồn sau để người đọc phân biệt rõ ràng:\n"\n\n🌐 *Nguồn tư liệu:* Tìm kiếm trực tuyến & Tri thức Google Gemini AI (Chưa có trong Google Docs của tác giả)"`;
   }
 
-  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý Lịch sử thông minh, tâm lý và am tường sử sách của nền tảng Học Sử Số Hóa (Dự án số hóa di sản Lịch sử của tác giả Lê Trường Thịnh, lớp 12A8, Trường THPT Nguyễn Huệ).
+  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý thông minh, am tường sử sách và tin cậy của nền tảng Học Sử Số Hóa (Dự án của tác giả Lê Trường Thịnh, lớp 12A8, Trường THPT Nguyễn Huệ).
 
-TÍNH CÁCH & PHONG THÁI GIAO TIẾP:
-1. THÂN THIỆN & CỞI MỞ:
-   - Khi người dùng chào hỏi hoặc tự giới thiệu (ví dụ: "chào bạn", "mình là Khang", "hi"): Hãy chào lại niềm nở, gọi đúng tên người dùng (ví dụ: "Chào bạn Khang! Rất vui được đồng hành cùng bạn...").
-   - Nhớ tên người dùng trong suốt cuộc hội thoại để xưng hô thân mật như một người bạn học.
-2. TRẢ LỜI ĐÚNG TRỌNG TÂM, GÃY GỌN & KHOA HỌC:
-   - Đi thẳng vào bản chất câu hỏi ngay câu đầu tiên.
-   - Giải thích ngắn gọn trong 2 - 3 đoạn hoặc dùng gạch đầu dòng rõ ràng, sinh động. Đọc trong 15 giây là nắm trọn bài học.
-3. KẾT NỐI TƯƠNG TÁC:
-   - Khéo léo gợi mở người dùng trải nghiệm các tính năng trên web (Sa bàn chiến trận Rạch Gầm - Xoài Mút, Bảo tàng số 3D, Đấu trường đố vui 30 câu).
-4. CHÍNH XÁC SỬ LIỆU 100%: Dựa theo tài liệu Google Docs do tác giả Lê Trường Thịnh cung cấp, Đại Nam Thực Lục, Hoàng Lê Nhất Thống Chí. Tuyệt đối không bịa đặt.${ragContextPrompt}`;
+PHONG THÁI GIAO TIẾP:
+1. THÂN THIỆN & CỞI MỞ: Khi người dùng chào hỏi hoặc tự giới thiệu, hãy niềm nở chào lại và gọi đúng tên người dùng.
+2. TRẢ LỜI ĐÚNG TRỌNG TÂM, GÃY GỌN & KHOA HỌC: Đi thẳng vào bản chất câu hỏi ngay câu đầu tiên. Giải thích sinh động, khoa học trong 2 - 3 đoạn hoặc gạch đầu dòng rõ ràng.
+3. KỊCH BẢN 2 TẦNG NGUỒN TRI THỨC:${ragContextPrompt}`;
+
+  chatHistory.push({ role: "user", parts: [{ text: userQuestion }] });
+  if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
+
+  const payload = {
+    system_instruction: {
+      parts: [{ text: systemInstruction }]
+    },
+    contents: chatHistory,
+    tools: [{ googleSearch: {} }],
+    generationConfig: {
+      temperature: 0.3,
+      topP: 0.85,
+      maxOutputTokens: 850
+    }
+  };
+
+  // Hàm gọi API với cơ chế dự phòng Primary -> Fallback Model
+  async function callApi(modelName) {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 18000);
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Gemini HTTP Error: ${response.status}`);
+      }
+      return await response.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      throw err;
+    }
+  }
 
   try {
-    chatHistory.push({ role: "user", parts: [{ text: userQuestion }] });
-    if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
-
-    const payload = {
-      system_instruction: {
-        parts: [{ text: systemInstruction }]
-      },
-      contents: chatHistory,
-      generationConfig: {
-        temperature: 0.3,
-        topP: 0.85,
-        maxOutputTokens: 650
-      }
-    };
-
-    const response = await fetch(GEMINI_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-goog-api-key": GEMINI_API_KEY
-      },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Gemini HTTP Error: ${response.status}`);
+    let data;
+    try {
+      data = await callApi(PRIMARY_MODEL);
+    } catch (primaryErr) {
+      console.warn(`Lỗi gọi mô hình chính (${PRIMARY_MODEL}), chuyển sang dự phòng (${FALLBACK_MODEL}):`, primaryErr);
+      data = await callApi(FALLBACK_MODEL);
     }
 
-    const data = await response.json();
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
       let replyText = data.candidates[0].content.parts[0].text;
 
-      // Đảm bảo luôn có dòng nguồn rõ ràng ở cuối câu trả lời để không bị nhầm lẫn
-      if (hasMatchedDoc) {
-        if (!replyText.includes('Google Docs') && !replyText.includes('Nguồn tư liệu')) {
+      // Chuẩn hóa và nhận diện nguồn chính xác
+      const isOnlineSearch = replyText.includes('Tìm kiếm trực tuyến') || replyText.includes('Chưa có trong Google Docs') || !hasMatchedDoc;
+      const isGDocAnswer = !isOnlineSearch && (replyText.includes('Trích xuất từ Google Docs') || hasMatchedDoc);
+
+      if (isGDocAnswer) {
+        if (!replyText.includes('Trích xuất từ Google Docs') && !replyText.includes('Nguồn tư liệu')) {
           replyText += `\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)`;
         }
       } else {
-        if (!replyText.includes('Google Gemini AI') && !replyText.includes('Nguồn tư liệu')) {
-          replyText += `\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử chung do Google Gemini AI đối chiếu (Chưa có trong Google Docs của tác giả)`;
+        if (!replyText.includes('Tìm kiếm trực tuyến') && !replyText.includes('Google Gemini AI') && !replyText.includes('Nguồn tư liệu')) {
+          replyText += `\n\n🌐 *Nguồn tư liệu:* Tìm kiếm trực tuyến & Tri thức Google Gemini AI (Chưa có trong Google Docs của tác giả)`;
         }
       }
 
@@ -381,16 +466,16 @@ TÍNH CÁCH & PHONG THÁI GIAO TIẾP:
 
       return {
         text: replyText,
-        sourceType: hasMatchedDoc ? 'admin' : 'general',
-        docTitle: hasMatchedDoc ? matchedDocs[0].title : null,
+        sourceType: isGDocAnswer ? 'admin' : 'general',
+        docTitle: isGDocAnswer && hasMatchedDoc ? matchedDocs[0].title : null,
         model: 'Google Gemini AI'
       };
     } else {
-      throw new Error('Dữ liệu phản hồi không hợp lệ');
+      throw new Error('Dữ liệu phản hồi không hợp lệ từ máy chủ AI');
     }
   } catch (err) {
-    console.warn('Lỗi gọi Gemini API, chuyển sang cơ chế dự phòng cục bộ:', err);
-    // Dự phòng offline từ kho tri thức
+    console.warn('Lỗi gọi Gemini API, kích hoạt cơ chế dự phòng ngoại tuyến:', err);
+    // Dự phòng ngoại tuyến nếu có tư liệu Google Docs
     if (hasMatchedDoc) {
       return {
         text: `📜 **Sử Quan AI Tây Sơn (Chế độ Ngoại tuyến):**\n\n${matchedDocs[0].content}\n\n📚 *Nguồn tư liệu:* ${matchedDocs[0].source} (Admin Lê Trường Thịnh phê duyệt - Ngoại tuyến)`,
@@ -400,7 +485,7 @@ TÍNH CÁCH & PHONG THÁI GIAO TIẾP:
       };
     }
     return {
-      text: `📜 **Sử Quan AI Tây Sơn:** Hiện tại kết nối mạng đang gián đoạn, nhưng bạn có thể khám phá trực tiếp các mốc son trong Dòng thời gian hoặc chiêm ngưỡng Bảo tàng hiện vật ở thanh menu bên trên nhé!`,
+      text: `📜 **Sử Quan AI Tây Sơn:** Hiện tại kết nối đến mạng tìm kiếm AI đang gặp chút gián đoạn. Bạn hãy thử gửi lại câu hỏi sau giây lát hoặc khám phá các tư liệu đã nạp sẵn trên website nhé!`,
       sourceType: 'offline',
       model: 'Offline Engine'
     };
