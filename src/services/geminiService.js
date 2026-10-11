@@ -70,7 +70,7 @@ export async function syncKnowledgeToCloud(item) {
   }
 }
 
-// Tự động kéo dữ liệu từ Google Sheets về khi mở web trên Điện Thoại hoặc máy khác
+// Tự động kéo toàn bộ dữ liệu từ Google Docs về khi mở web trên Điện Thoại hoặc máy khác
 export async function fetchCloudKnowledgeBase() {
   const url = getWebhookUrl();
   if (!url) return getKnowledgeBase();
@@ -81,6 +81,8 @@ export async function fetchCloudKnowledgeBase() {
       headers: { 'Accept': 'application/json' }
     });
     const result = await response.json();
+    
+    // 1. Trường hợp Google Docs trả về mảng các bài học đã phân đoạn
     if (result && Array.isArray(result.data) && result.data.length > 0) {
       const current = getKnowledgeBase();
       const existingIds = new Set(current.map(item => item.id));
@@ -92,9 +94,15 @@ export async function fetchCloudKnowledgeBase() {
         return combined;
       }
     }
+
+    // 2. Trường hợp Google Docs trả về rawText văn bản tự do
+    if (result && result.rawText && typeof result.rawText === 'string') {
+      try {
+        localStorage.setItem('su_google_docs_raw_text', result.rawText);
+      } catch (e) {}
+    }
   } catch (e) {
-    // Có thể URL chưa bật "Anyone" hoặc lỗi mạng tạm thời
-    console.log("Chưa thể kéo từ Google Cloud:", e);
+    console.log("Chưa thể kéo từ Google Docs Webhook:", e);
   }
   return getKnowledgeBase();
 }
@@ -106,13 +114,13 @@ export function addKnowledgeItem(item) {
     title: item.title,
     category: item.category || 'Tư liệu bổ sung',
     authorApproved: 'Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
-    source: item.source || 'Sử liệu KHKT kiểm định',
+    source: item.source || 'Sử liệu kiểm định (Lê Trường Thịnh)',
     content: item.content
   };
   current.unshift(newItem);
   saveKnowledgeBase(current);
 
-  // Tự động đẩy lên Google Cloud qua Webhook
+  // Tự động đẩy lên Google Docs qua Webhook
   syncKnowledgeToCloud(newItem);
 
   return newItem;
@@ -130,7 +138,7 @@ export function resetKnowledgeBase() {
   return DEFAULT_KNOWLEDGE_BASE;
 }
 
-// 2. Thuật toán Đối soát Ngữ nghĩa RAG (Semantic Retrieval)
+// 2. Thuật toán Đối soát Ngữ nghĩa RAG (Semantic Retrieval) ưu tiên Google Docs
 function searchRelevantKnowledge(query) {
   const kb = getKnowledgeBase();
   const normQuery = query.toLowerCase()
@@ -147,9 +155,14 @@ function searchRelevantKnowledge(query) {
     const queryWords = normQuery.split(/\s+/).filter(w => w.length > 1);
 
     queryWords.forEach(word => {
-      if (normTitle.includes(word)) score += 3;
+      if (normTitle.includes(word)) score += 4;
       if (normContent.includes(word)) score += 1;
     });
+
+    // Ưu tiên cao hơn nếu là tư liệu từ Google Docs của tác giả
+    if (item.source && item.source.toLowerCase().includes('google docs')) {
+      score += 2;
+    }
 
     if (score > 2) {
       matches.push({ item, score });
@@ -157,7 +170,7 @@ function searchRelevantKnowledge(query) {
   }
 
   matches.sort((a, b) => b.score - a.score);
-  return matches.slice(0, 2).map(m => m.item);
+  return matches.slice(0, 3).map(m => m.item);
 }
 
 // Lịch sử hội thoại
@@ -167,7 +180,7 @@ export function resetChatHistory() {
   chatHistory = [];
 }
 
-// 3. Hàm gửi truy vấn tới Gemini 2.5 Flash có bảo vệ và RAG
+// 3. Hàm gửi truy vấn tới Gemini có bảo vệ và RAG ưu tiên Google Docs
 export async function sendChatMessageToGemini(userQuestion) {
   // Lọc từ ngữ thô tục
   const vulgarList = ['đụ', 'địt', 'lồn', 'cặc', 'buồi', 'đm', 'dcm', 'vcl', 'clgt', 'chó đẻ'];
@@ -177,25 +190,25 @@ export async function sendChatMessageToGemini(userQuestion) {
       return {
         text: '⚠️ Vui lòng giữ gìn sự tôn nghiêm và sử dụng ngôn từ văn minh khi tìm hiểu lịch sử nhé bạn!',
         sourceType: 'guardrail',
-        model: 'Gemini 3.5 Flash Lite'
+        model: 'Google Gemini AI'
       };
     }
   }
 
-  // Tra cứu dữ liệu RAG trong Kho tri thức do Admin phê duyệt
+  // Tra cứu dữ liệu RAG trong Kho tri thức Google Docs do Admin Lê Trường Thịnh phê duyệt
   const matchedDocs = searchRelevantKnowledge(userQuestion);
   const hasMatchedDoc = matchedDocs.length > 0;
 
   let ragContextPrompt = '';
   if (hasMatchedDoc) {
-    ragContextPrompt = `\n\n[DỮ LIỆU ĐẶC BIỆT ĐƯỢC ƯU TIÊN DO ADMIN (Lê Trường Thịnh - 12A8 THPT Nguyễn Huệ) PHÊ DUYỆT]:\n` +
+    ragContextPrompt = `\n\n[DỮ LIỆU ĐẶC BIỆT TỪ GOOGLE DOCS DO TÁC GIẢ (Lê Trường Thịnh - 12A8 THPT Nguyễn Huệ) CUNG CẤP]:\n` +
       matchedDocs.map(d => `✦ Tiêu đề: ${d.title}\n✦ Nguồn: ${d.source}\n✦ Nội dung: ${d.content}`).join('\n\n') +
-      `\n\nQUY TẮC BẮT BUỘC: Bạn PHẢI ưu tiên 100% thông tin trong dữ liệu trên để trả lời. Ở cuối câu trả lời, hãy đính kèm đúng cú pháp: "\n\n📚 *Nguồn tư liệu:* ${matchedDocs[0].source} (Được phê duyệt bởi Admin Lê Trường Thịnh)"`;
+      `\n\nQUY TẮC BẮT BUỘC: Bạn PHẢI trả lời hoàn toàn dựa trên tư liệu trong Google Docs trên. Trình bày khoa học, chính xác, súc tích. Ở cuối câu trả lời, hãy đính kèm đúng cú pháp: "\n\n📚 *Nguồn tư liệu:* ${matchedDocs[0].source} (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)"`;
   } else {
-    ragContextPrompt = `\n\nLƯU Ý: Không có dữ liệu chuyên biệt trong kho lưu trữ cho câu hỏi này. Bạn hãy sử dụng tri thức lịch sử chuẩn xác nhất của bạn và đính kèm ở cuối câu trả lời: "\n\n🌐 *Nguồn tư liệu:* Tri thức tổng quát (Được xác thực bởi Gemini 3.5 Flash Lite)"`;
+    ragContextPrompt = `\n\nLƯU Ý: Không có dữ liệu chuyên biệt trong kho tài liệu Google Docs cho câu hỏi này. Bạn hãy sử dụng tri thức lịch sử chuẩn xác nhất của bạn và đính kèm ở cuối câu trả lời: "\n\n🌐 *Nguồn tư liệu:* Tri thức tổng quát (Được xác thực bởi Google Gemini AI)"`;
   }
 
-  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý Lịch sử thông minh, tâm lý và am tường sử sách của nền tảng Học Sử Số Hóa (Đề tài KHKT của tác giả Lê Trường Thịnh, lớp 12A8, Trường THPT Nguyễn Huệ).
+  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý Lịch sử thông minh, tâm lý và am tường sử sách của nền tảng Học Sử Số Hóa (Dự án số hóa di sản Lịch sử của tác giả Lê Trường Thịnh, lớp 12A8, Trường THPT Nguyễn Huệ).
 
 TÍNH CÁCH & PHONG THÁI GIAO TIẾP:
 1. THÂN THIỆN & CỞI MỞ:
@@ -205,8 +218,8 @@ TÍNH CÁCH & PHONG THÁI GIAO TIẾP:
    - Đi thẳng vào bản chất câu hỏi ngay câu đầu tiên.
    - Giải thích ngắn gọn trong 2 - 3 đoạn hoặc dùng gạch đầu dòng rõ ràng, sinh động. Đọc trong 15 giây là nắm trọn bài học.
 3. KẾT NỐI TƯƠNG TÁC:
-   - Khéo léo gợi mở người dùng trải nghiệm các tính năng trên web (Sa bàn chiến trận Leaflet, Bảo tàng số 3D, Đấu trường đố vui 30 câu).
-4. CHÍNH XÁC SỬ LIỆU 100%: Dựa theo Đại Nam Thực Lục, Hoàng Lê Nhất Thống Chí. Không bịa đặt.${ragContextPrompt}`;
+   - Khéo léo gợi mở người dùng trải nghiệm các tính năng trên web (Sa bàn chiến trận Rạch Gầm - Xoài Mút, Bảo tàng số 3D, Đấu trường đố vui 30 câu).
+4. CHÍNH XÁC SỬ LIỆU 100%: Dựa theo tài liệu Google Docs do tác giả Lê Trường Thịnh cung cấp, Đại Nam Thực Lục, Hoàng Lê Nhất Thống Chí. Tuyệt đối không bịa đặt.${ragContextPrompt}`;
 
   try {
     chatHistory.push({ role: "user", parts: [{ text: userQuestion }] });
