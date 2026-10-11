@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Landmark, Eye, X, BookOpen, Sparkles, CheckCircle, Upload, RotateCcw, ShieldCheck } from 'lucide-react';
+import { 
+  Landmark, 
+  Eye, 
+  X, 
+  BookOpen, 
+  Sparkles, 
+  CheckCircle, 
+  Upload, 
+  RotateCcw, 
+  ShieldCheck,
+  Compass,
+  Search,
+  ExternalLink
+} from 'lucide-react';
 import { MUSEUM_ITEMS } from '../data/museumData';
 import { useAdmin } from '../context/AdminContext';
 import { playChime } from '../utils/audio';
@@ -9,10 +22,12 @@ export default function MuseumTab() {
   const { isAdmin } = useAdmin();
   const [selectedItem, setSelectedItem] = useState(null);
   const [exploredIds, setExploredIds] = useState(new Set());
-  const [filterCategory, setFilterCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [customImages, setCustomImages] = useState({});
   const [urlInput, setUrlInput] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState('');
+  const [showAdminUploadPanel, setShowAdminUploadPanel] = useState(false);
 
   useEffect(() => {
     try {
@@ -39,7 +54,7 @@ export default function MuseumTab() {
         try {
           localStorage.setItem('su_custom_museum_images', JSON.stringify(updated));
         } catch (err) {}
-        setUploadSuccess('Đã lưu ảnh mới thành công vào bộ sưu tập!');
+        setUploadSuccess('Đã cập nhật ảnh hiện vật thành công!');
         playChime(700, 'sine', 0.15);
         setTimeout(() => setUploadSuccess(''), 3000);
       }
@@ -55,7 +70,7 @@ export default function MuseumTab() {
       localStorage.setItem('su_custom_museum_images', JSON.stringify(updated));
     } catch (err) {}
     setUrlInput('');
-    setUploadSuccess('Đã cập nhật link ảnh thành công!');
+    setUploadSuccess('Đã lưu đường dẫn ảnh mới!');
     playChime(700, 'sine', 0.15);
     setTimeout(() => setUploadSuccess(''), 3000);
   };
@@ -67,35 +82,45 @@ export default function MuseumTab() {
     try {
       localStorage.setItem('su_custom_museum_images', JSON.stringify(updated));
     } catch (err) {}
-    setUploadSuccess('Đã khôi phục ảnh nguyên bản!');
+    setUploadSuccess('Đã khôi phục ảnh gốc của bảo tàng!');
     setTimeout(() => setUploadSuccess(''), 2500);
   };
 
-  const categories = [
-    'all', 
-    'Vũ khí dã chiến', 
-    'Nghệ thuật quân sự', 
-    'Cổ vật tiền tệ', 
-    'Châu bản & Chiếu chỉ', 
-    'Hỏa khí hạng nặng', 
-    'Trang phục hoàng gia', 
-    'Tư liệu tác chiến', 
-    'Tranh ký họa lịch sử'
+  // Danh mục nhóm hiện vật cô đọng, rõ ràng
+  const EXHIBIT_CATEGORIES = [
+    { id: 'all', label: 'Tất cả bảo vật' },
+    { id: 'binh-khi', label: 'Binh khí & Hỏa lực', match: ['Vũ khí dã chiến', 'Hỏa khí hạng nặng'] },
+    { id: 'nghe-thuat', label: 'Nghệ thuật tác chiến', match: ['Nghệ thuật quân sự', 'Tư liệu tác chiến'] },
+    { id: 'an-tin', label: 'Ấn tín & Tiền tệ', match: ['Cổ vật tiền tệ', 'Châu bản & Chiếu chỉ'] },
+    { id: 'trang-phuc', label: 'Trang phục & Ký họa', match: ['Trang phục hoàng gia', 'Tranh ký họa lịch sử'] }
   ];
 
   const handleOpenItem = (item) => {
     playChime(650, 'sine', 0.1);
     setSelectedItem(item);
+    setShowAdminUploadPanel(false);
     setExploredIds(prev => new Set([...prev, item.id]));
   };
 
   const handleCloseItem = () => {
     setSelectedItem(null);
+    setShowAdminUploadPanel(false);
   };
 
-  const filteredItems = filterCategory === 'all' 
-    ? MUSEUM_ITEMS 
-    : MUSEUM_ITEMS.filter(it => it.category === filterCategory);
+  // Lọc hiện vật theo danh mục và từ khóa tìm kiếm
+  const filteredItems = MUSEUM_ITEMS.filter((item) => {
+    const matchesCat = activeCategory === 'all' || (() => {
+      const catConfig = EXHIBIT_CATEGORIES.find(c => c.id === activeCategory);
+      return catConfig?.match?.includes(item.category);
+    })();
+
+    const matchesSearch = !searchQuery.trim() || 
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.sub.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesCat && matchesSearch;
+  });
 
   const progressPercent = Math.round((exploredIds.size / MUSEUM_ITEMS.length) * 100);
 
@@ -108,43 +133,51 @@ export default function MuseumTab() {
       transition={{ duration: 0.3 }}
     >
       <div className="section-title-box">
-        <span className="section-kicker">KHÔNG GIAN DI SẢN KỸ THUẬT SỐ</span>
+        <span className="section-kicker">KHÔNG GIAN DI SẢN QUỐC GIA</span>
         <h2 className="section-heading">BẢO TÀNG HIỆN VẬT THỜI TÂY SƠN</h2>
-        <p className="section-subtext">Chiêm ngưỡng 8 bảo vật vô giá minh chứng cho hỏa lực quân sự và sự phát triển vượt bậc của triều đại Hoàng đế Quang Trung.</p>
-        <div className="title-divider"></div>
+        <p className="section-subtext">Chiêm ngưỡng bộ sưu tập 8 bảo vật vô giá minh chứng cho hỏa lực quân sự và sự hưng thịnh của triều đại Hoàng đế Quang Trung.</p>
+        <div className="title-divider-gold"></div>
       </div>
 
-      {/* Progress Explorer Bar */}
-      <div className="museum-progress-card">
-        <div className="progress-text-row">
-          <span><Sparkles size={16} /> Tiến độ khám phá bảo tàng:</span>
-          <strong>Đã mở khóa {exploredIds.size}/{MUSEUM_ITEMS.length} hiện vật ({progressPercent}%)</strong>
+      {/* Thanh điều hướng gian trưng bày và tìm kiếm */}
+      <div className="museum-nav-toolbar">
+        <div className="museum-category-tabs">
+          {EXHIBIT_CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              className={`museum-cat-tab ${activeCategory === cat.id ? 'active' : ''}`}
+              onClick={() => {
+                playChime(600, 'sine', 0.08);
+                setActiveCategory(cat.id);
+              }}
+            >
+              <span>{cat.label}</span>
+            </button>
+          ))}
         </div>
-        <div className="progress-bar-bg">
-          <motion.div 
-            className="progress-bar-fill" 
-            initial={{ width: 0 }}
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 0.5 }}
+
+        <div className="museum-search-box">
+          <Search size={16} className="search-icon" />
+          <input 
+            type="text"
+            placeholder="Tìm tên vũ khí, chiếu chỉ, cổ vật..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {searchQuery && (
+            <button className="clear-search-btn" onClick={() => setSearchQuery('')}>×</button>
+          )}
         </div>
       </div>
 
-      {/* Filter Categories Bar */}
-      <div className="museum-filter-bar">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={`filter-btn ${filterCategory === cat ? 'active' : ''}`}
-            onClick={() => setFilterCategory(cat)}
-          >
-            {cat === 'all' ? 'Tất cả cổ vật' : cat}
-          </button>
-        ))}
+      {/* Thông số khám phá tinh tế */}
+      <div className="museum-collection-meta">
+        <span>Hiện vật trưng bày: <strong>{filteredItems.length} bảo vật</strong></span>
+        <span>Đã chiêm ngưỡng: <strong>{exploredIds.size}/{MUSEUM_ITEMS.length} ({progressPercent}%)</strong></span>
       </div>
 
-      {/* Museum Artifacts Grid */}
-      <div className="museum-grid">
+      {/* Lưới trưng bày chuẩn bảo tàng nghệ thuật */}
+      <div className="exhibition-grid">
         {filteredItems.map((item) => {
           const isExplored = exploredIds.has(item.id);
           const currentImg = customImages[item.id] || item.img;
@@ -152,16 +185,11 @@ export default function MuseumTab() {
           return (
             <motion.div 
               key={item.id}
-              className={`museum-card ${isExplored ? 'explored' : ''}`}
-              whileHover={{ y: -6, transition: { duration: 0.25 } }}
+              className={`exhibit-card ${isExplored ? 'viewed' : ''}`}
+              whileHover={{ y: -5, transition: { duration: 0.2 } }}
               onClick={() => handleOpenItem(item)}
             >
-              <div className="card-badge-row">
-                <span className="artifact-category">{item.category}</span>
-                {isExplored && <span className="explored-chip">Đã chiêm ngưỡng</span>}
-              </div>
-
-              <div className="card-img-wrapper">
+              <div className="exhibit-frame">
                 <img 
                   src={currentImg} 
                   alt={item.title} 
@@ -171,22 +199,30 @@ export default function MuseumTab() {
                     e.target.src = './images/artifacts/hoa_ho_tay_son.jpg';
                   }}
                 />
-                <div className="card-img-overlay">
-                  <span className="view-details-btn">
-                    <Eye size={15} /> Xem hiện vật chi tiết
+                <div className="exhibit-badge-category">
+                  {item.category}
+                </div>
+                {isExplored && (
+                  <div className="exhibit-viewed-tag">
+                    <CheckCircle size={12} /> Đã xem
+                  </div>
+                )}
+                <div className="exhibit-hover-veil">
+                  <span className="veil-inspect-btn">
+                    <Eye size={15} /> Khảo Cứu Hiện Vật
                   </span>
                 </div>
               </div>
 
-              <div className="card-content">
-                <h3 className="artifact-title">{item.title}</h3>
-                <h4 className="artifact-sub">{item.sub}</h4>
-                <p className="artifact-desc">{item.desc}</p>
-
-                <div className="card-footer-meta">
-                  <span className="artifact-source">
-                    <BookOpen size={13} /> {item.source}
+              <div className="exhibit-caption">
+                <h3 className="exhibit-title">{item.title}</h3>
+                <h4 className="exhibit-subtitle">{item.sub}</h4>
+                <p className="exhibit-summary">{item.desc}</p>
+                <div className="exhibit-footer">
+                  <span className="exhibit-source">
+                    <BookOpen size={12} /> {item.source.split('&')[0]}
                   </span>
+                  <span className="exhibit-more-link">Chi tiết →</span>
                 </div>
               </div>
             </motion.div>
@@ -194,102 +230,133 @@ export default function MuseumTab() {
         })}
       </div>
 
-      {/* Detail Modal */}
+      {filteredItems.length === 0 && (
+        <div className="museum-empty-state">
+          <Compass size={40} />
+          <h4>Không tìm thấy hiện vật phù hợp</h4>
+          <p>Vui lòng thử tìm với từ khóa khác hoặc chọn gian trưng bày "Tất cả bảo vật".</p>
+          <button className="btn btn-secondary" onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}>
+            Xem toàn bộ hiện vật
+          </button>
+        </div>
+      )}
+
+      {/* CỬA SỔ TRƯNG BÀY CHI TIẾT (EXHIBITION SHOWCASE MODAL) */}
       <AnimatePresence>
         {selectedItem && (
           <div className="modal-backdrop" onClick={handleCloseItem}>
             <motion.div 
-              className="museum-detail-modal"
+              className="museum-curator-modal"
               onClick={e => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.94, y: 16 }}
+              initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              exit={{ opacity: 0, scale: 0.95, y: 16 }}
               transition={{ duration: 0.22 }}
             >
-              <button className="close-modal-btn" onClick={handleCloseItem} title="Đóng cửa sổ">
+              <button className="close-curator-modal-btn" onClick={handleCloseItem} title="Đóng">
                 <X size={20} />
               </button>
 
-              <div className="modal-img-col">
-                <img 
-                  src={customImages[selectedItem.id] || selectedItem.img} 
-                  alt={selectedItem.title} 
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = './images/artifacts/hoa_ho_tay_son.jpg';
-                  }}
-                />
-                <div className="modal-source-tag">
-                  📚 {selectedItem.source}
-                </div>
+              <div className="curator-modal-grid">
+                {/* Cột trái: Khung ảnh hiện vật cao cấp */}
+                <div className="curator-photo-column">
+                  <div className="artifact-velvet-mount">
+                    <img 
+                      src={customImages[selectedItem.id] || selectedItem.img} 
+                      alt={selectedItem.title} 
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = './images/artifacts/hoa_ho_tay_son.jpg';
+                      }}
+                    />
+                  </div>
 
-                {/* Khu vực Tải ảnh / Đổi ảnh hiện vật: CHỈ DÀNH RIÊNG CHO QUẢN TRỊ VIÊN */}
-                {isAdmin ? (
-                  <div className="custom-img-uploader-box admin-active-box">
-                    <div className="uploader-title-row">
-                      <span>👑 Chế độ Admin: Đổi ảnh hiện vật</span>
-                      {customImages[selectedItem.id] && (
-                        <button 
-                          className="reset-img-btn" 
-                          onClick={() => handleResetImage(selectedItem.id)}
-                          title="Khôi phục ảnh mặc định"
-                        >
-                          <RotateCcw size={12} /> Khôi phục gốc
-                        </button>
+                  <div className="artifact-provenance-tag">
+                    <BookOpen size={13} />
+                    <span>Nơi khảo cứu: {selectedItem.source}</span>
+                  </div>
+
+                  {/* Nút mở công cụ Quản trị viên (nếu đang bật Admin) */}
+                  {isAdmin && (
+                    <div className="curator-admin-strip">
+                      <button 
+                        className="btn-toggle-admin-upload"
+                        onClick={() => setShowAdminUploadPanel(!showAdminUploadPanel)}
+                      >
+                        <ShieldCheck size={14} />
+                        <span>{showAdminUploadPanel ? 'Ẩn bảng đổi ảnh' : '👑 Quyền Admin: Đổi ảnh hiện vật này'}</span>
+                      </button>
+
+                      {showAdminUploadPanel && (
+                        <div className="curator-admin-form">
+                          {customImages[selectedItem.id] && (
+                            <button 
+                              className="btn-reset-art-img"
+                              onClick={() => handleResetImage(selectedItem.id)}
+                            >
+                              <RotateCcw size={13} /> Khôi phục ảnh mặc định
+                            </button>
+                          )}
+
+                          <label className="curator-file-upload-btn">
+                            <Upload size={14} />
+                            <span>Tải ảnh từ máy tính (dưới 5MB)</span>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              style={{ display: 'none' }} 
+                              onChange={(e) => handleImageUpload(e, selectedItem.id)} 
+                            />
+                          </label>
+
+                          <div className="curator-url-input-group">
+                            <input 
+                              type="text" 
+                              placeholder="Hoặc dán URL ảnh trực tiếp..." 
+                              value={urlInput}
+                              onChange={(e) => setUrlInput(e.target.value)}
+                            />
+                            <button 
+                              type="button" 
+                              onClick={() => handleApplyUrl(selectedItem.id)}
+                              disabled={!urlInput.trim()}
+                            >
+                              Lưu ảnh
+                            </button>
+                          </div>
+
+                          {uploadSuccess && (
+                            <div className="curator-upload-success">
+                              <CheckCircle size={13} /> {uploadSuccess}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
-
-                    <div className="uploader-actions-flex">
-                      <label className="upload-file-label">
-                        <Upload size={14} />
-                        <span>Tải ảnh từ máy</span>
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          style={{ display: 'none' }} 
-                          onChange={(e) => handleImageUpload(e, selectedItem.id)} 
-                        />
-                      </label>
-
-                      <div className="url-input-mini-group">
-                        <input 
-                          type="text" 
-                          placeholder="Hoặc dán link ảnh..." 
-                          value={urlInput}
-                          onChange={(e) => setUrlInput(e.target.value)}
-                        />
-                        <button 
-                          type="button" 
-                          onClick={() => handleApplyUrl(selectedItem.id)}
-                          disabled={!urlInput.trim()}
-                        >
-                          Lưu
-                        </button>
-                      </div>
-                    </div>
-
-                    {uploadSuccess && (
-                      <div className="uploader-success-msg">
-                        <CheckCircle size={13} /> {uploadSuccess}
-                      </div>
-                    )}
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="modal-info-col">
-                <span className="modal-category">{selectedItem.category}</span>
-                <h3 className="modal-title">{selectedItem.title}</h3>
-                <h4 className="modal-subtitle">{selectedItem.sub}</h4>
-
-                <div className="modal-text-block">
-                  <h5>Mô Tả Hiện Vật:</h5>
-                  <p>{selectedItem.desc}</p>
+                  )}
                 </div>
 
-                <div className="modal-text-block">
-                  <h5>Ý Nghĩa Lịch Sử & Giá Trị Quân Sự:</h5>
-                  <p>{selectedItem.details}</p>
+                {/* Cột phải: Bảng thông tin khảo cứu di sản */}
+                <div className="curator-info-column">
+                  <div className="curator-header-box">
+                    <span className="curator-category-badge">{selectedItem.category}</span>
+                    <h2 className="curator-title">{selectedItem.title}</h2>
+                    <h3 className="curator-subtitle">{selectedItem.sub}</h3>
+                  </div>
+
+                  <div className="curator-detail-card">
+                    <h4 className="detail-section-title">Mô Tả Hiện Vật & Kết Cấu Chế Tác</h4>
+                    <p className="detail-body-text">{selectedItem.desc}</p>
+                  </div>
+
+                  <div className="curator-detail-card highlight-card">
+                    <h4 className="detail-section-title text-gold">Ý Nghĩa Quân Sự & Giá Trị Lịch Sử</h4>
+                    <p className="detail-body-text">{selectedItem.details}</p>
+                  </div>
+
+                  <div className="curator-footer-note">
+                    <strong>Tư liệu biên soạn:</strong> Lê Trường Thịnh (Lớp 12A8 — THPT Nguyễn Huệ) đối chiếu tư liệu Bảo tàng Quang Trung và Viện Bảo tàng Lịch sử Quốc gia.
+                  </div>
                 </div>
               </div>
             </motion.div>

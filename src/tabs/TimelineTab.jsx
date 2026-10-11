@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import { Volume2, VolumeX, CheckCircle2, Sparkles, Flame } from 'lucide-react';
+import { CheckCircle2, Sparkles, Flame } from 'lucide-react';
 import { TIMELINE_EVENTS } from '../data/timelineData';
-import { speakText, stopSpeech, subscribeSpeechStatus } from '../services/speechService';
 import { playChime } from '../utils/audio';
 
 /**
  * TimelineCard3D - Card sự kiện với hiệu ứng nghiêng 3D tương tác theo chuột (Tilt 3D)
  */
-function TimelineCard3D({ event, idx, isPlaying, onSpeak }) {
+function TimelineCard3D({ event, idx }) {
   const cardRef = useRef(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
@@ -51,27 +50,6 @@ function TimelineCard3D({ event, idx, isPlaying, onSpeak }) {
       <div className="timeline-card-header">
         <span className="timeline-year-tag gold-shimmer-tag">{event.year}</span>
         <span className="timeline-badge heritage-badge">{event.badge}</span>
-        <button 
-          className={`tts-btn ${isPlaying ? 'playing' : ''}`}
-          onClick={onSpeak}
-          title={isPlaying ? 'Dừng đọc' : 'Thuyết minh tiếng Việt'}
-        >
-          {isPlaying ? (
-            <>
-              <div className="audio-equalizer-bars mini" aria-hidden="true">
-                <span className="eq-bar bar-1"></span>
-                <span className="eq-bar bar-2"></span>
-                <span className="eq-bar bar-3"></span>
-              </div>
-              <span>Dừng đọc</span>
-            </>
-          ) : (
-            <>
-              <Volume2 size={15} />
-              <span>Nghe thuyết minh</span>
-            </>
-          )}
-        </button>
       </div>
 
       <h3 className="timeline-card-title">{event.title}</h3>
@@ -86,7 +64,6 @@ function TimelineCard3D({ event, idx, isPlaying, onSpeak }) {
 }
 
 export default function TimelineTab() {
-  const [playingId, setPlayingId] = useState(null);
   const timelineRef = useRef(null);
 
   // Đường laser theo dõi tiến trình cuộn
@@ -100,25 +77,6 @@ export default function TimelineTab() {
     damping: 30,
     restDelta: 0.001
   });
-
-  useEffect(() => {
-    const unsubscribe = subscribeSpeechStatus((speaking) => {
-      if (!speaking) setPlayingId(null);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleSpeak = (event, idx) => {
-    if (playingId === idx) {
-      stopSpeech();
-      setPlayingId(null);
-    } else {
-      playChime(600, 'sine', 0.1);
-      setPlayingId(idx);
-      const textToRead = `Năm ${event.year}. ${event.title}. ${event.desc}. Ý nghĩa lịch sử: ${event.impact}`;
-      speakText(textToRead, () => setPlayingId(null));
-    }
-  };
 
   return (
     <motion.div 
@@ -148,7 +106,6 @@ export default function TimelineTab() {
 
         {TIMELINE_EVENTS.map((event, idx) => {
           const isEven = idx % 2 === 0;
-          const isPlaying = playingId === idx;
 
           return (
             <motion.div 
@@ -171,8 +128,6 @@ export default function TimelineTab() {
               <TimelineCard3D 
                 event={event} 
                 idx={idx} 
-                isPlaying={isPlaying} 
-                onSpeak={() => handleSpeak(event, idx)} 
               />
             </motion.div>
           );

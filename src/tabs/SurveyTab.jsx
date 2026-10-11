@@ -596,9 +596,25 @@ export default function SurveyTab() {
                   <p style={{ margin: '3px 0 0', color: '#9CA3AF', fontSize: '0.82rem' }}>Toàn bộ phiếu khảo sát của học sinh &amp; giáo viên được tự động lưu 100% sang Bảng tính Google Sheets.</p>
                 </div>
               </div>
-              <button className="btn btn-secondary" style={{ padding: '7px 14px', fontSize: '0.82rem', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <span>Mở Bảng Tính</span> <ArrowRight size={14} />
-              </button>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button 
+                  type="button"
+                  className="btn btn-secondary" 
+                  onClick={() => setActiveSubTab('sheet')}
+                  style={{ padding: '7px 14px', fontSize: '0.82rem', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
+                >
+                  <span>Xem Bảng Dữ Liệu</span> <ArrowRight size={14} />
+                </button>
+                <a 
+                  href={sheetUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{ padding: '7px 14px', fontSize: '0.82rem', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', background: 'rgba(229, 169, 60, 0.18)', borderColor: 'var(--accent-gold)', color: 'var(--accent-gold-light)' }}
+                >
+                  <span>Mở Google Sheets</span> <ExternalLink size={14} />
+                </a>
+              </div>
             </div>
 
             <div className="reviews-grid">

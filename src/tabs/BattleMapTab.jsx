@@ -5,8 +5,6 @@ import 'leaflet/dist/leaflet.css';
 import { 
   Layers, 
   Swords, 
-  Volume2, 
-  VolumeX, 
   Crosshair, 
   Compass,
   ArrowRight,
@@ -14,7 +12,6 @@ import {
   MapPin
 } from 'lucide-react';
 import { BATTLES_DATA } from '../data/battlesData';
-import { speakText, stopSpeech, subscribeSpeechStatus } from '../services/speechService';
 import { playChime } from '../utils/audio';
 
 export default function BattleMapTab() {
@@ -22,7 +19,6 @@ export default function BattleMapTab() {
   const [mapLayerType, setMapLayerType] = useState('satellite'); // 'satellite' | 'osm'
   const [selectedFeature, setSelectedFeature] = useState(null);
   const [activePhaseIndex, setActivePhaseIndex] = useState(0);
-  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -30,14 +26,6 @@ export default function BattleMapTab() {
   const layersGroupRef = useRef(null);
 
   const battle = BATTLES_DATA[activeBattleId];
-
-  // Lắng nghe trạng thái giọng đọc
-  useEffect(() => {
-    const unsubscribe = subscribeSpeechStatus((speaking) => {
-      setIsSpeaking(speaking);
-    });
-    return () => unsubscribe();
-  }, []);
 
   // Khởi tạo bản đồ Leaflet
   useEffect(() => {
@@ -174,7 +162,6 @@ export default function BattleMapTab() {
   };
 
   const handleSwitchBattle = (id) => {
-    stopSpeech();
     setSelectedFeature(null);
     setActivePhaseIndex(0);
     playChime(600, 'sine', 0.15);
@@ -202,16 +189,6 @@ export default function BattleMapTab() {
         animate: true,
         duration: 1.2
       });
-    }
-  };
-
-  const handleVoiceBriefing = () => {
-    if (isSpeaking) {
-      stopSpeech();
-    } else {
-      playChime(650, 'sine', 0.15);
-      const text = `${battle.title}. ${battle.subtitle}. Thời gian diễn ra: ${battle.time}. Chỉ huy tối cao: ${battle.commander}. Tương quan lực lượng: Quân ta ${battle.ourForce}, giặc ${battle.enemyForce}. Tổng quan thế trận: ${battle.summary}`;
-      speakText(text);
     }
   };
 
@@ -326,36 +303,6 @@ export default function BattleMapTab() {
                 <span className="meta-label">Chỉ huy giặc:</span>
                 <strong className="meta-val enemy-accent">{battle.enemyCommander}</strong>
               </div>
-            </div>
-
-            {/* Pill Thuyết minh âm thanh tách biệt với Sound Wave Equalizer 4 thanh */}
-            <div className="narration-pill-wrapper">
-              <button 
-                className={`speech-narration-pill ${isSpeaking ? 'speaking' : ''}`}
-                onClick={handleVoiceBriefing}
-                title="Nghe thuyết minh tóm tắt chiến sự"
-              >
-                <div className="pill-icon-wrap">
-                  {isSpeaking ? <VolumeX size={17} /> : <Volume2 size={17} />}
-                </div>
-
-                <div className="pill-content">
-                  <span className="pill-title">
-                    {isSpeaking ? 'Đang thuyết minh trận đánh' : 'Nghe Thuyết Minh Trận Đánh'}
-                  </span>
-                  <span className="pill-sub">
-                    {isSpeaking ? 'Bấm để tắt giọng đọc' : 'Giọng đọc AI tự động'}
-                  </span>
-                </div>
-
-                {/* Sound wave equalizer 4 thanh */}
-                <div className={`sound-wave-equalizer ${isSpeaking ? 'active' : ''}`} aria-hidden="true">
-                  <span className="equalizer-bar bar-1"></span>
-                  <span className="equalizer-bar bar-2"></span>
-                  <span className="equalizer-bar bar-3"></span>
-                  <span className="equalizer-bar bar-4"></span>
-                </div>
-              </button>
             </div>
           </div>
 

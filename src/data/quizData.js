@@ -239,6 +239,126 @@ export const QUIZ_QUESTIONS = {
       ],
       "correct": 0,
       "explain": "Nguyễn Huệ thuở nhỏ có tên là Hồ Thơm (chú Thơm), sau này đổi sang họ Nguyễn theo họ của mẹ."
+    },
+    {
+      "category": "Người thầy khởi nguồn",
+      "question": "Người thầy uyên bác dạy văn võ và định hướng nghiệp lớn cho ba anh em Tây Sơn là ai?",
+      "options": [
+        "Giáo Hiến (Trương Văn Hiến)",
+        "Chu Văn An",
+        "Nguyễn Thiếp",
+        "Võ Trường Toản"
+      ],
+      "correct": 0,
+      "explain": "Thầy Giáo Hiến chạy loạn vào Nam lánh nạn, nhận dạy học cho ba anh em và là người đưa ra câu sấm: \"Tây khởi nghĩa, Bắc thu công\"."
+    },
+    {
+      "category": "Gốc tích dòng họ",
+      "question": "Tổ tiên của ba anh em Nguyễn Huệ vốn mang họ gì từ Nghệ An chuyển vào?",
+      "options": [
+        "Họ Hồ",
+        "Họ Lê",
+        "Họ Trần",
+        "Họ Đặng"
+      ],
+      "correct": 0,
+      "explain": "Tổ tiên ba anh em Tây Sơn vốn họ Hồ ở làng Quỳnh Đôi (Quỳnh Lưu, Nghệ An), sau chuyển vào Đàng Trong khai hoang và đổi sang họ Nguyễn."
+    },
+    {
+      "category": "Căn cứ ban đầu",
+      "question": "Căn cứ Tây Sơn Thượng Đạo của nghĩa quân buổi đầu nay thuộc địa phương nào?",
+      "options": [
+        "Thị xã An Khê, tỉnh Gia Lai",
+        "Huyện Đức Phổ, Quảng Ngãi",
+        "Thành phố Kon Tum",
+        "Huyện Krông Nô, Đắk Nông"
+      ],
+      "correct": 0,
+      "explain": "Vùng Tây Sơn Thượng Đạo nằm trên sườn đông dãy Trường Sơn, nay thuộc thị xã An Khê và các huyện lân cận thuộc tỉnh Gia Lai."
+    },
+    {
+      "category": "Quê hương người anh hùng",
+      "question": "Làng Kiên Mỹ - quê hương sinh thành của Hoàng đế Quang Trung ngày nay thuộc huyện nào của tỉnh Bình Định?",
+      "options": [
+        "Huyện Tây Sơn",
+        "Huyện Phù Mỹ",
+        "Huyện An Nhơn",
+        "Huyện Tuy Phước"
+      ],
+      "correct": 0,
+      "explain": "Làng Kiên Mỹ nằm bên bờ sông Kôn, nay thuộc thị trấn Phú Phong, huyện Tây Sơn, tỉnh Bình Định."
+    },
+    {
+      "category": "Tước vị lãnh tụ",
+      "question": "Nguyễn Nhạc tự xưng là gì khi phong trào Tây Sơn làm chủ Quy Nhơn năm 1778?",
+      "options": [
+        "Thái Đức Hoàng đế (Tây Sơn Vương)",
+        "Bắc Bình Vương",
+        "Đông Định Vương",
+        "Quang Trung Hoàng đế"
+      ],
+      "correct": 0,
+      "explain": "Năm 1778, Nguyễn Nhạc xưng hoàng đế, lấy niên hiệu là Thái Đức, đóng đô tại thành Đồ Bàn (thành Hoàng Đế, Quy Nhơn)."
+    },
+    {
+      "category": "Tam Kiệt Tây Sơn",
+      "question": "Trong ba anh em lãnh tụ Tây Sơn, người phụ trách cai quản vùng đất Gia Định miền Nam là ai?",
+      "options": [
+        "Đông Định Vương Nguyễn Lữ",
+        "Thái Đức Nguyễn Nhạc",
+        "Long Nhương Tướng quân Nguyễn Huệ",
+        "Võ Văn Dũng"
+      ],
+      "correct": 0,
+      "explain": "Nguyễn Lữ được phong là Đông Định Vương, được giao trọng trách nắm giữ vùng đất Nam Bộ (Gia Định)."
+    },
+    {
+      "category": "Kế hoạch hành quân thần tốc",
+      "question": "Trong chiến dịch đại phá quân Thanh đầu năm 1789, đại quân Tây Sơn được chia thành mấy đạo?",
+      "options": [
+        "5 đạo quân",
+        "3 đạo quân",
+        "7 đạo quân",
+        "2 đạo quân"
+      ],
+      "correct": 0,
+      "explain": "Vua Quang Trung chia quân làm 5 đạo thần tốc: đạo chủ lực do vua chỉ huy, đạo Đô đốc Bảo, đạo Đô đốc Long, đạo Đô đốc Tuyết và đạo Đô đốc Lộc."
+    },
+    {
+      "category": "Đại thắng mùa xuân",
+      "question": "Chiến thắng vang dội quét sạch quân Thanh trưa mùng 5 Tết Kỷ Dậu 1789 là trận đánh nào?",
+      "options": [
+        "Đại phá đồn Ngọc Hồi và Đống Đa",
+        "Trận Bạch Đằng",
+        "Trận Chi Lăng - Xương Giang",
+        "Trận Như Nguyệt"
+      ],
+      "correct": 0,
+      "explain": "Trưa mùng 5 Tết Kỷ Dậu, đại quân Quang Trung đồng loạt công phá Ngọc Hồi và Đống Đa, tiến thẳng vào Thăng Long giải phóng kinh thành."
+    },
+    {
+      "category": "Niên đại lịch sử",
+      "question": "Hoàng đế Quang Trung đột ngột băng hà khi sự nghiệp đang rực rỡ vào năm nào?",
+      "options": [
+        "Năm 1792 (thọ 39 tuổi)",
+        "Năm 1789",
+        "Năm 1802",
+        "Năm 1785"
+      ],
+      "correct": 0,
+      "explain": "Mùa thu năm 1792, vua Quang Trung đột ngột lâm bệnh nặng và băng hà ở tuổi 39, để lại niềm tiếc thương vô hạn cho dân tộc."
+    },
+    {
+      "category": "Hậu cung vương triều",
+      "question": "Vị Hoàng hậu xuất thân từ dòng dõi nhà Lê tài sắc vẹn toàn, tác giả bài thơ \"Ai Tư Vãn\" là ai?",
+      "options": [
+        "Bắc Cung Hoàng hậu Lê Ngọc Hân",
+        "Bùi Thị Xuân",
+        "Ỷ Lan",
+        "Nguyễn Thị Lộ"
+      ],
+      "correct": 0,
+      "explain": "Công chúa Lê Ngọc Hân được gả cho Nguyễn Huệ năm 1786, sau được phong là Bắc Cung Hoàng hậu, đã viết bài Ai Tư Vãn khóc chồng bất hủ."
     }
   ],
   "nang-cao": [
@@ -481,6 +601,126 @@ export const QUIZ_QUESTIONS = {
       ],
       "correct": 0,
       "explain": "Mùa hè năm 1786, với khẩu hiệu \"Phù Lê diệt Trịnh\", Nguyễn Huệ kéo quân ra Bắc hạ thành Thăng Long, chấm dứt hơn 200 năm thống trị của chúa Trịnh."
+    },
+    {
+      "category": "Chiến lược lùi binh",
+      "question": "Vị mưu sĩ Bắc Hà nào đã hiến kế \"lui binh giữ vững phòng tuyến Tam Điệp - Biện Sơn\" chờ Nguyễn Huệ ra cứu viện?",
+      "options": [
+        "Ngô Thì Nhậm",
+        "Phan Huy Ích",
+        "Nguyễn Thiếp",
+        "Đoàn Nguyễn Tuấn"
+      ],
+      "correct": 0,
+      "explain": "Ngô Thì Nhậm chủ trương \"cho chúng ngủ trọ một đêm\", rút quân về Tam Điệp - Biện Sơn để bảo toàn lực lượng đón đại quân."
+    },
+    {
+      "category": "Hành quân thần tốc",
+      "question": "Biện pháp sáng tạo độc đáo của quân Tây Sơn để di chuyển liên tục từ Phú Xuân ra Tam Điệp mà không bị kiệt sức là gì?",
+      "options": [
+        "Hai người cáng một người nằm nghỉ thay phiên nhau",
+        "Đi ngựa đổi trạm liên tục",
+        "Chèo thuyền ngược gió",
+        "Đi xe bò kéo"
+      ],
+      "correct": 0,
+      "explain": "Cứ 3 người một tốp: 2 người khiêng cáng cho 1 người ngủ và ăn uống, thay phiên luân chuyển liên tục không ngơi nghỉ cả ngày lẫn đêm."
+    },
+    {
+      "category": "Chiến hạm hỏa lực",
+      "question": "Chiến hạm lớn nhất của hải quân Tây Sơn có tên là gì, trang bị tới 50-60 khẩu đại pháo?",
+      "options": [
+        "Định Quốc hải hạm",
+        "Đại Bằng thuyền",
+        "Thần Cơ hạm",
+        "Long Phù chu"
+      ],
+      "correct": 0,
+      "explain": "Chiến thuyền Định Quốc của Tây Sơn là loại thiết giáp hạm khổng lồ, chở voi chiến và đại bác hạng nặng, từng khiến chiến hạm phương Tây kiêng nể."
+    },
+    {
+      "category": "Liên quân Xiêm La",
+      "question": "Hai viên tướng thống lĩnh 5 vạn quân Xiêm kéo sang xâm lược nước ta năm 1785 là ai?",
+      "options": [
+        "Chiêu Tăng và Chiêu Sương",
+        "Sầm Nghi Đống và Ô Mã Nhi",
+        "Tôn Sĩ Nghị và Hứa Thế Hanh",
+        "Thoát Hoan và Toa Đô"
+      ],
+      "correct": 0,
+      "explain": "Tướng Chiêu Tăng và Chiêu Sương chỉ huy 2 vạn thủy binh cùng 3 vạn bộ binh Xiêm bị nghiền nát trong trận Rạch Gầm - Xoài Mút."
+    },
+    {
+      "category": "Cái chết của tướng giặc",
+      "question": "Tướng giặc Thanh chỉ huy cứ điểm Đống Đa hoảng sợ thắt cổ tự tử trên cây đa là ai?",
+      "options": [
+        "Đề đốc Sầm Nghi Đống",
+        "Tổng đốc Tôn Sĩ Nghị",
+        "Thượng thư Phúc Khang An",
+        "Đô đốc Hứa Thế Hanh"
+      ],
+      "correct": 0,
+      "explain": "Bị đạo quân Đô đốc Long và trận rồng lửa của dân làng vây chặt, Sầm Nghi Đống tuyệt vọng thắt cổ tự vẫn tại gò Đống Đa."
+    },
+    {
+      "category": "Chủ tướng giặc Thanh",
+      "question": "Viên Tổng đốc Lưỡng Quảng ngạo mạn vứt bỏ cả ấn tín sắc phong tháo chạy thục mạng qua sông Hồng là ai?",
+      "options": [
+        "Tôn Sĩ Nghị",
+        "Sầm Nghi Đống",
+        "Lý Nam Bằng",
+        "Ô Đa Kính"
+      ],
+      "correct": 0,
+      "explain": "Tôn Sĩ Nghị hoảng loạn nửa đêm không kịp mặc giáp, phi ngựa cướp cầu phao tháo chạy, làm cầu đứt khiến vạn quân rơi xuống sông Hồng chết đuối."
+    },
+    {
+      "category": "Ấn định thời gian ăn Tết",
+      "question": "Khi dừng chân khao quân ở Tam Điệp, vua Quang Trung đã hẹn tướng sĩ ăn Tết lại vào ngày nào và ở đâu?",
+      "options": [
+        "Ăn Tết lại vào mùng 7 Tết tại Thăng Long",
+        "Ăn Tết vào rằm tháng Giêng tại Nghệ An",
+        "Ăn Tết vào mùng 1 Tết tại Phú Xuân",
+        "Ăn Tết vào mùng 10 Tết tại Lạng Sơn"
+      ],
+      "correct": 0,
+      "explain": "Vua tuyên bố: \"Nay hãy làm lễ ăn Tết trước, đến mùng 7 Tết vào Thăng Long sẽ mở tiệc ăn Tết lại!\". Thực tế quân ta đại thắng sớm hơn vào trưa mùng 5."
+    },
+    {
+      "category": "Chiến thuật lá chắn rơm",
+      "question": "Để công phá hỏa lực súng đại bác từ chiến lũy đồn Ngọc Hồi, quân Tây Sơn đã sáng tạo loại mộc chắn nào?",
+      "options": [
+        "Tấm ván ghép quấn rơm bện tẩm nước ướt đẫm",
+        "Khiên bằng sắt nguyên khối",
+        "Tấm tôn đồng",
+        "Lá chuối phơi khô"
+      ],
+      "correct": 0,
+      "explain": "Cứ 20 cảm tử quân khiêng một tấm ván lớn bện rơm dày tẩm nước che chắn đạn pháo và tên lửa, áp sát giật đổ tường thành mở đường cho voi xông vào."
+    },
+    {
+      "category": "Đăng quang hoàng đế",
+      "question": "Địa điểm Nguyễn Huệ dựng đàn tế trời đất chính thức lên ngôi Hoàng đế lấy niên hiệu Quang Trung năm 1788 là đâu?",
+      "options": [
+        "Núi Bân (phía nam kinh thành Phú Xuân, Huế)",
+        "Núi Dũng Quyết (Nghệ An)",
+        "Gò Đống Đa (Hà Nội)",
+        "Núi Ấn (Bình Định)"
+      ],
+      "correct": 0,
+      "explain": "Ngày 25 tháng 11 năm Mậu Thân (1788), Nguyễn Huệ cho đắp đàn tế tại núi Bân (Huế) để tế cáo trời đất và đăng cơ hoàng đế."
+    },
+    {
+      "category": "Chính sách quản lý hộ khẩu",
+      "question": "Để chấn chỉnh hộ tịch và kiểm soát nhân lực quốc phòng, vua Quang Trung đã ban hành chế độ cấp phát vật gì cho mọi công dân?",
+      "options": [
+        "Thẻ Tín bài (khắc chữ \"Thiên hạ đại tín\")",
+        "Căn cước đồng",
+        "Hộ chiếu gỗ",
+        "Sổ bộ hương thôn"
+      ],
+      "correct": 0,
+      "explain": "Vua thi hành chính sách cấp Thẻ Tín bài bằng gỗ có khắc chữ \"Thiên hạ đại tín\", ai có thẻ mới được tự do đi lại và được công nhận là công dân hợp pháp."
     }
   ],
   "chuyen-sau": [
@@ -723,6 +963,126 @@ export const QUIZ_QUESTIONS = {
       ],
       "correct": 0,
       "explain": "Nhà vua khẳng định nhận ngôi Hoàng đế là vì sự sống còn của giang sơn xã tắc và nền độc lập của dân tộc trước họa 29 vạn quân cướp nước."
+    },
+    {
+      "category": "Ngoại giao thượng sách",
+      "question": "Văn kiện ngoại giao nổi tiếng nào do Ngô Thì Nhậm chấp bút kêu gọi sĩ phu Bắc Hà ra hợp tác cùng triều đại mới?",
+      "options": [
+        "Chiếu Cầu Hiền",
+        "Hịch Tướng Sĩ",
+        "Chiếu Dời Đô",
+        "Bình Ngô Đại Cáo"
+      ],
+      "correct": 0,
+      "explain": "Chiếu Cầu Hiền viết: \"Trời sinh ra người tài là để cho đời dùng... Một cột không thể chống nổi một ngôi nhà lớn\", lay động trái tim hàng vạn nhân tài."
+    },
+    {
+      "category": "Cải cách chữ viết",
+      "question": "Cơ quan phụ trách dịch thuật và biên soạn sách giáo khoa bằng chữ Nôm của triều Quang Trung có tên là gì?",
+      "options": [
+        "Viện Sùng Chính",
+        "Quốc Tử Giám",
+        "Hàn Lâm Viện",
+        "Khâm Thiên Giám"
+      ],
+      "correct": 0,
+      "explain": "Vua Quang Trung thành lập Viện Sùng Chính tại núi Dũng Quyết và mời La Sơn Phu Tử Nguyễn Thiếp làm Viện trưởng phụ trách cải cách chữ Nôm."
+    },
+    {
+      "category": "Kế hoạch dời đô vĩ đại",
+      "question": "Đô thành tương lai được vua Quang Trung chỉ đạo xây dựng tại Nghệ An nhằm cân bằng địa chính trị Nam - Bắc có tên là gì?",
+      "options": [
+        "Phượng Hoàng Trung Đô",
+        "Thành Hoàng Đế",
+        "Kinh thành Cổ Loa",
+        "Kinh đô Vạn Lại"
+      ],
+      "correct": 0,
+      "explain": "Vua cho xây dựng Phượng Hoàng Trung Đô ở chân núi Dũng Quyết (TP Vinh, Nghệ An) dự định đặt làm trung tâm chính trị của cả nước."
+    },
+    {
+      "category": "Ngoại giao bình đẳng",
+      "question": "Trong phái đoàn sang chúc thọ vua Càn Long năm 1790, vị tướng nào đã dũng cảm đóng giả Hoàng đế Quang Trung?",
+      "options": [
+        "Phạm Công Trị (cháu gọi Quang Trung bằng cậu)",
+        "Ngô Thì Nhậm",
+        "Ngô Văn Sở",
+        "Võ Văn Dũng"
+      ],
+      "correct": 0,
+      "explain": "Vua cử người cháu là Đô đốc Phạm Công Trị có dung mạo khôi ngô đóng giả vua Quang Trung, được vua Thanh tiếp đón trọng thể bậc nhất ở Cung Nhiệt Hà."
+    },
+    {
+      "category": "Yêu sách đất đai lịch sử",
+      "question": "Trước khi qua đời, vua Quang Trung đã cử sứ thần sang đòi triều đình Mãn Thanh trao trả hai tỉnh biên giới nào?",
+      "options": [
+        "Quảng Đông và Quảng Tây (vùng đất Lưỡng Quảng)",
+        "Vân Nam và Quý Châu",
+        "Hải Nam và Phúc Kiến",
+        "Hồ Nam và Hồ Bắc"
+      ],
+      "correct": 0,
+      "explain": "Vua mưu việc lớn đòi lại đất Lưỡng Quảng vốn là lãnh thổ của tổ tiên người Việt cổ và cầu hôn công chúa con vua Càn Long."
+    },
+    {
+      "category": "Trung thần nghĩa liệt",
+      "question": "Cặp vợ chồng danh tướng nào đã tử thủ thành Quy Nhơn và hy sinh anh dũng bảo toàn khí tiết trước quân Nguyễn Ánh?",
+      "options": [
+        "Thiếu phó Trần Quang Diệu và Đô đốc Bùi Thị Xuân",
+        "Nguyễn Nhạc và bà Ya Dót",
+        "Nguyễn Huệ và công chúa Ngọc Hân",
+        "Võ Văn Dũng và Bùi Thị Nhạn"
+      ],
+      "correct": 0,
+      "explain": "Trần Quang Diệu và Bùi Thị Xuân kiên cường bảo vệ thành Quy Nhơn, khi bị bắt nhất quyết không đầu hàng và cùng con cái hy sinh oanh liệt."
+    },
+    {
+      "category": "Nghệ thuật điêu khắc Tây Sơn",
+      "question": "Di tích chùa nổi tiếng ở Hà Nội lưu giữ bộ tượng La Hán và tượng Phật kiệt tác được đúc nặn vào thời Tây Sơn là chùa nào?",
+      "options": [
+        "Chùa Tây Phương (Thạch Thất, Hà Nội)",
+        "Chùa Trấn Quốc",
+        "Chùa Một Cột",
+        "Chùa Thầy"
+      ],
+      "correct": 0,
+      "explain": "Chùa Tây Phương được đại trùng tu dưới triều vua Quang Trung (1794), nơi có 18 vị La Hán tuyệt tác bất hủ của nền điêu khắc Việt Nam."
+    },
+    {
+      "category": "Kinh tế thương mại",
+      "question": "Chính sách mở cửa kinh tế của vua Quang Trung khuyến khích việc gì tại các cửa biển và thương cảng?",
+      "options": [
+        "Bãi bỏ độc quyền, mở cửa giao thương với thuyền buôn phương Tây và Trung Hoa",
+        "Bế quan tỏa cảng",
+        "Cấm người nước ngoài vào buôn bán",
+        "Chỉ buôn bán với nhà Thanh"
+      ],
+      "correct": 0,
+      "explain": "Vua bãi bỏ lệnh cấm biển, mở cửa các thương cảng Hội An, Thị Nại và Phố Hiến, giảm thuế cho thương nhân nước ngoài vào thông thương."
+    },
+    {
+      "category": "Tư liệu phương Tây",
+      "question": "Phái bộ ngoại giao Anh sang Việt Nam năm 1793 mô tả diện mạo quân đội Tây Sơn do nhà ngoại giao nào dẫn đầu?",
+      "options": [
+        "Lord George Macartney",
+        "Alexandre de Rhodes",
+        "Pierre Poivre",
+        "Francis Garnier"
+      ],
+      "correct": 0,
+      "explain": "Phái bộ Macartney đến vịnh Đà Nẵng năm 1793 đã vẽ lại bức ký họa người lính Tây Sơn với tinh thần kỷ luật và quân phục uy nghiêm."
+    },
+    {
+      "category": "Tài năng y học cung đình",
+      "question": "Vị danh y lỗi lạc bậc nhất nước ta từng được vua Quang Trung triệu vời vào Phú Xuân phụ trách y tế triều đình là ai?",
+      "options": [
+        "Hải Thượng Lãn Ông Lê Hữu Trác",
+        "Tuệ Tĩnh",
+        "Trương Tửu",
+        "Nguyễn Gia Thiều"
+      ],
+      "correct": 0,
+      "explain": "Năm 1789, vua Quang Trung ban chiếu triệu Lê Hữu Trác ra giúp nước chấn hưng y học dân tộc, nhưng danh y tuổi cao sức yếu đã tạ ơn từ chối."
     }
   ]
 };

@@ -71,20 +71,39 @@ function TypewriterText({ text, onComplete }) {
   );
 }
 
+const STORAGE_CHAT_KEY = 'su_ai_chat_history_v2';
+const INITIAL_BOT_MESSAGE = {
+  role: 'bot',
+  text: `Chào bạn! Ta là **Sử Quan Tây Sơn** — người đồng hành cùng bạn trên không gian số hóa lịch sử (tác giả **Lê Trường Thịnh, lớp 12A8, THPT Nguyễn Huệ**).\n\nBạn có thể hỏi ta về bất kỳ sự kiện, chiến lược quân sự, thân thế hay nhân vật lịch sử nào của phong trào Tây Sơn. Ta sẽ ưu tiên đối chiếu cùng kho tư liệu đã được kiểm chứng từ Google Docs của tác giả, nếu chưa có sẽ tự động tra cứu trên mạng Internet để giải đáp cho bạn nhé!`,
+  sourceType: 'admin',
+  model: 'Google Gemini AI',
+  isNew: false
+};
+
 export default function AiStationTab({ onOpenAdmin }) {
-  const [messages, setMessages] = useState([
-    {
-      role: 'bot',
-      text: `Chào bạn! Ta là **Sử Quan Tây Sơn** — người đồng hành cùng bạn trên không gian số hóa lịch sử (tác giả **Lê Trường Thịnh, lớp 12A8, THPT Nguyễn Huệ**).\n\nBạn có thể hỏi ta về bất kỳ sự kiện, chiến lược quân sự, thân thế hay nhân vật lịch sử nào của phong trào Tây Sơn. Ta sẽ ưu tiên đối chiếu cùng kho tư liệu đã được kiểm chứng từ Google Docs của tác giả, nếu chưa có sẽ tự động tra cứu trên mạng Internet để giải đáp cho bạn nhé!`,
-      sourceType: 'admin',
-      model: 'Google Gemini AI',
-      isNew: false
-    }
-  ]);
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_CHAT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map(m => ({ ...m, isNew: false }));
+        }
+      }
+    } catch (e) {}
+    return [INITIAL_BOT_MESSAGE];
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
+
+  // Lưu lịch sử chat vào localStorage mỗi khi có tin nhắn mới
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_CHAT_KEY, JSON.stringify(messages));
+    } catch (e) {}
+  }, [messages]);
 
   // Kiểm tra nếu có câu hỏi nhanh từ Floating AI Widget
   useEffect(() => {
@@ -158,6 +177,9 @@ export default function AiStationTab({ onOpenAdmin }) {
   const handleClearChat = () => {
     resetChatHistory();
     playChime(400, 'sine', 0.1);
+    try {
+      localStorage.removeItem(STORAGE_CHAT_KEY);
+    } catch (e) {}
     setMessages([
       {
         role: 'bot',
