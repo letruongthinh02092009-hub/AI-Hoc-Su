@@ -5977,463 +5977,371 @@ a:focus-visible,
 }
 
 /* ==========================================================================
-   CINEMATIC 3D PARALLAX INTRO & MONUMENT STATUE STAGE
-   Phong cách Web Di sản / Game Dã sử Đỉnh cao (Chinese Cinematic Heritage Style)
+   CINEMATIC INTRO — TRIỂN LÃM DI SẢN (REFINEMENT 02)
+   Tượng là điểm nhấn duy nhất · trang trí tiết chế · không glow mạnh
    ========================================================================== */
 .cinematic-intro-root {
+  --intro-space-1: 8px;
+  --intro-space-2: 16px;
+  --intro-space-3: 24px;
+  --intro-space-4: 32px;
+  --intro-space-5: 48px;
+
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: #0A0807;
-  color: #F0E8DC;
+  background: var(--bg-deep);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  perspective: 1200px;
-  user-select: none;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-/* 1. HẬU CẢNH: Bầu trời trận mạc & Sương khói */
-.intro-bg-layer {
-  position: absolute;
-  inset: -60px;
-  pointer-events: none;
-  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
-  background: radial-gradient(circle at 50% 35%, rgba(158, 42, 43, 0.3) 0%, rgba(21, 18, 16, 0.95) 60%, #070504 100%);
-}
-
-.intro-radial-nebula {
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 700px;
-  height: 500px;
-  background: radial-gradient(ellipse at center, rgba(197, 160, 89, 0.18) 0%, rgba(158, 42, 43, 0.12) 50%, transparent 80%);
-  filter: blur(50px);
-}
-
-.intro-smoke-cloud {
-  position: absolute;
-  width: 500px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(100, 40, 30, 0.15) 0%, transparent 70%);
-  filter: blur(60px);
-}
-
-.cloud-left {
-  top: 30%;
-  left: -100px;
-  animation: floatCloudLeft 16s ease-in-out infinite alternate;
-}
-
-.cloud-right {
-  bottom: 10%;
-  right: -100px;
-  animation: floatCloudRight 20s ease-in-out infinite alternate;
-}
-
-@keyframes floatCloudLeft {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(60px, -40px); }
-}
-
-@keyframes floatCloudRight {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(-70px, 30px); }
-}
-
-/* 2. ÁNH SÁNG HOÀNG TRIỀU: Luồng hào quang vàng kim */
-.intro-godrays-layer {
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  width: 650px;
-  height: 650px;
-  margin-left: -325px;
-  margin-top: -325px;
-  pointer-events: none;
-  z-index: 2;
-  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
-}
-
-.intro-golden-halo {
-  position: absolute;
+/* Nền than ấm + một vầng sáng đồng mờ phía sau tượng (không đỏ, không neon) */
+.intro-backdrop {
+  position: fixed;
   inset: 0;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg at 50% 50%, 
-    rgba(197, 160, 89, 0.14) 0deg, 
-    transparent 35deg, 
-    rgba(197, 160, 89, 0.2) 75deg, 
-    transparent 120deg, 
-    rgba(158, 42, 43, 0.15) 170deg, 
-    transparent 230deg, 
-    rgba(197, 160, 89, 0.22) 290deg, 
-    transparent 360deg
-  );
-  animation: slowSpinRays 50s linear infinite;
-  filter: blur(14px);
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 520px 420px at 50% 30%, rgba(185, 154, 91, 0.08), transparent 70%),
+    linear-gradient(180deg, #151310 0%, #120F0D 100%);
 }
 
-.intro-imperial-ring {
-  position: absolute;
-  inset: 80px;
-  border-radius: 50%;
-  border: 1px dashed rgba(197, 160, 89, 0.25);
-  box-shadow: 0 0 30px rgba(197, 160, 89, 0.15);
-  animation: slowSpinRays 90s linear infinite reverse;
-}
-
-@keyframes slowSpinRays {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* 3. VÙNG TRUNG TÂM: TƯỢNG QUANG TRUNG 3D LẮC LƯ */
-.intro-monument-stage {
+/* Thanh công cụ */
+.intro-toolbar {
   position: relative;
-  z-index: 10;
+  z-index: 2;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1200px;
-  margin-top: 10px;
-  margin-bottom: 22px;
+  justify-content: flex-end;
+  gap: var(--intro-space-1);
+  padding: var(--intro-space-2) var(--intro-space-3);
 }
 
-.intro-statue-3d-wrapper {
+.intro-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--border-surface);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.intro-tool-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-bronze);
+  background: rgba(185, 154, 91, 0.06);
+}
+
+.intro-tool-btn:focus-visible {
+  outline: 2px solid var(--accent-bronze);
+  outline-offset: 2px;
+}
+
+.intro-skip {
+  color: var(--text-primary);
+}
+
+.intro-kbd {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border: 1px solid var(--border-surface);
+  border-radius: 3px;
+  color: var(--text-muted);
+}
+
+/* Sân khấu trung tâm */
+.intro-stage {
   position: relative;
-  transform-style: preserve-3d;
+  z-index: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--intro-space-4);
+  padding: var(--intro-space-2) var(--intro-space-3) var(--intro-space-4);
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Tượng */
+.intro-statue {
+  position: relative;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   will-change: transform;
 }
 
-.statue-gold-rim-glow {
+.intro-statue-ring {
   position: absolute;
-  inset: -12px;
-  border-radius: 18px;
-  background: radial-gradient(ellipse at center, rgba(197, 160, 89, 0.35) 0%, rgba(158, 42, 43, 0.2) 60%, transparent 80%);
-  filter: blur(20px);
-  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -56%);
+  border-radius: 50%;
+  border: 1px solid rgba(185, 154, 91, 0.12);
+  pointer-events: none;
 }
 
-.statue-sculpture-card {
+.intro-statue-frame {
   position: relative;
-  width: 270px;
-  height: 340px;
-  border-radius: 10px;
+  width: 220px;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  border: 2px solid rgba(197, 160, 89, 0.65);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 35px rgba(197, 160, 89, 0.25);
-  background: #151210;
+  border: 1px solid var(--border-surface);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  background: var(--bg-surface);
 }
 
-.statue-image-main {
+.intro-statue-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(21, 19, 16, 0.55) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.intro-statue-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
-  filter: contrast(1.18) brightness(0.96) saturate(1.05);
-  transition: transform 0.4s ease;
+  object-position: center 20%;
+  display: block;
+  user-select: none;
 }
 
-.statue-sculpture-card:hover .statue-image-main {
-  transform: scale(1.04);
+.intro-statue-caption {
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
 }
 
-.statue-specular-glare {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  transition: background 0.12s ease;
-}
-
-.statue-vignette-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 8, 7, 0.65) 100%), linear-gradient(to top, rgba(10, 8, 7, 0.85) 0%, transparent 45%);
-}
-
-.statue-plinth-base {
-  margin-top: -14px;
-  z-index: 5;
-  background: #1C1815;
-  border: 1px solid var(--accent-gold);
-  padding: 6px 18px;
-  border-radius: 4px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.7);
-}
-
-.plinth-inscription {
-  font-family: var(--font-serif);
-  font-size: 0.74rem;
-  letter-spacing: 2px;
-  color: var(--accent-gold-light);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-/* 4. TIỀN CẢNH: CHỮ THƯ PHÁP, LỜI HIỂU DỤ & NÚT BƯỚC VÀO */
-.intro-foreground-content {
-  position: relative;
-  z-index: 20;
-  text-align: center;
-  max-width: 680px;
-  padding: 0 20px;
+/* Tiêu đề */
+.intro-heading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  will-change: transform;
+  gap: var(--intro-space-1);
 }
 
-.intro-brand-header {
-  margin-bottom: 12px;
-}
-
-.intro-kicker {
-  display: inline-block;
-  font-size: 0.72rem;
-  letter-spacing: 3px;
-  color: var(--accent-gold);
-  text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.intro-hero-title {
-  font-family: var(--font-serif);
-  font-size: 2.6rem;
-  font-weight: 900;
-  letter-spacing: 4px;
-  color: #F0E8DC;
-  margin: 0 0 4px 0;
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(197, 160, 89, 0.35);
-}
-
-.intro-sub-title {
-  font-size: 0.86rem;
-  letter-spacing: 2.5px;
-  color: var(--accent-gold-light);
-  margin: 0;
-  text-transform: uppercase;
+.intro-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
   font-weight: 500;
+  color: var(--accent-bronze);
+  letter-spacing: 0.4px;
+  margin: 0;
 }
 
-.intro-quote-scroll {
-  background: rgba(21, 18, 16, 0.88);
-  border-left: 3px solid var(--primary-crimson);
-  border-right: 3px solid var(--primary-crimson);
-  border-top: 1px solid rgba(197, 160, 89, 0.2);
-  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
-  padding: 12px 24px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
-  max-width: 580px;
+.intro-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.intro-proclamation {
+.intro-subtitle {
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 520px;
+}
+
+/* Trích dẫn editorial */
+.intro-quote {
+  margin: 0;
+  max-width: 560px;
+  padding: var(--intro-space-2) 0;
+  border-top: 1px solid var(--border-surface);
+  border-bottom: 1px solid var(--border-surface);
+}
+
+.intro-quote blockquote {
+  margin: 0 0 10px;
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.96rem;
-  line-height: 1.55;
-  color: #E7DDD0;
-  margin: 0 0 6px 0;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  color: var(--text-primary);
 }
 
-.intro-quote-author {
-  font-size: 0.74rem;
-  color: var(--accent-gold);
-  letter-spacing: 1px;
-  display: block;
+.intro-quote figcaption {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
 }
 
-.intro-actions-cluster {
+.intro-quote cite {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* Nút chính */
+.intro-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
+  justify-content: center;
 }
 
 .intro-enter-btn {
-  position: relative;
-  background: linear-gradient(135deg, #B53335 0%, #9E2A2B 50%, #7A1C1D 100%);
-  border: 1px solid #DFC48A;
-  color: #FFF;
-  padding: 13px 36px;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 30px;
+  background: var(--accent-crimson);
+  border: 1px solid rgba(185, 154, 91, 0.45);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 0.96rem;
-  font-weight: 700;
-  letter-spacing: 1.8px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  box-shadow: 0 6px 28px rgba(158, 42, 43, 0.55), 0 0 35px rgba(197, 160, 89, 0.35);
-  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .intro-enter-btn:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 8px 38px rgba(181, 51, 53, 0.75), 0 0 45px rgba(223, 196, 138, 0.5);
-  border-color: #F0E8DC;
+  background: var(--accent-crimson-bright);
+  border-color: var(--accent-bronze);
+  transform: translateY(-1px);
 }
 
-.enter-btn-flame {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-  transition: left 0.6s ease;
+.intro-enter-btn:focus-visible {
+  outline: 2px solid var(--accent-bronze);
+  outline-offset: 3px;
 }
 
-.intro-enter-btn:hover .enter-btn-flame {
-  left: 100%;
-}
-
-.enter-btn-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Chân trang tác giả + nguồn */
+.intro-credits {
   position: relative;
-  z-index: 2;
-}
-
-.enter-sword-icon {
-  color: var(--accent-gold-light);
-}
-
-.intro-skip-btn {
-  background: transparent;
-  border: none;
-  color: #8C827A;
-  font-size: 0.82rem;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  transition: color 0.2s ease;
-  padding: 4px 8px;
-}
-
-.intro-skip-btn:hover {
-  color: var(--accent-gold-light);
-}
-
-.intro-academic-badge {
-  font-size: 0.74rem;
-  color: #736B63;
-  letter-spacing: 0.5px;
-}
-
-.intro-academic-badge strong {
-  color: var(--accent-gold);
-}
-
-/* 5. GÓC TRÊN: ÂM THANH */
-.intro-top-bar {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  z-index: 50;
-}
-
-.intro-sound-toggle {
-  background: rgba(21, 18, 16, 0.75);
-  border: 1px solid var(--border-subtle);
-  color: var(--accent-gold-light);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.76rem;
+  z-index: 1;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  backdrop-filter: blur(6px);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 20px;
+  padding: var(--intro-space-2) var(--intro-space-3) var(--intro-space-3);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
-.intro-sound-toggle:hover {
-  border-color: var(--accent-gold);
-  background: rgba(28, 24, 21, 0.9);
+.intro-credits strong {
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
-/* HIỆU ỨNG CHỚP SÁNG MỞ CỔNG */
-.intro-flash-gate {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle, #DFC48A 0%, #B53335 45%, #070504 100%);
-  z-index: 100000;
-  pointer-events: none;
-  animation: flashGateAnim 0.9s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+.intro-credit-source a {
+  color: var(--accent-bronze-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-@keyframes flashGateAnim {
-  0% { opacity: 0; transform: scale(0.9); }
-  35% { opacity: 0.95; transform: scale(1.05); }
-  100% { opacity: 0; transform: scale(1.25); }
+.intro-credit-source a:hover {
+  color: var(--text-primary);
 }
 
-/* Nút Chiêm ngưỡng lại Intro trên Navbar */
+/* Nút xem lại Intro trên Navbar (giữ nguyên) */
 .intro-replay-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(197, 160, 89, 0.12) !important;
-  border-color: var(--border-gold) !important;
-  color: var(--accent-gold-light) !important;
+  background: rgba(185, 154, 91, 0.1) !important;
+  border-color: var(--border-bronze) !important;
+  color: var(--accent-bronze-light) !important;
 }
 
 .intro-replay-btn:hover {
-  background: rgba(197, 160, 89, 0.22) !important;
-  color: #FFF !important;
+  background: rgba(185, 154, 91, 0.18) !important;
+  color: var(--text-primary) !important;
 }
 
 .intro-btn-label {
   font-size: 0.76rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
 }
 
-/* TỐI ƯU MÀN HÌNH DI ĐỘNG (MOBILE RESPONSIVE) */
+/* Mobile */
 @media (max-width: 640px) {
-  .statue-sculpture-card {
-    width: 210px;
-    height: 270px;
+  .intro-toolbar {
+    padding: 12px 14px;
   }
-  .intro-hero-title {
-    font-size: 2rem;
-    letter-spacing: 2px;
+  .intro-tool-btn span {
+    display: none;
   }
-  .intro-sub-title {
-    font-size: 0.78rem;
+  .intro-tool-btn.intro-skip .intro-kbd {
+    display: none;
   }
-  .intro-proclamation {
-    font-size: 0.84rem;
-    line-height: 1.5;
+  .intro-stage {
+    gap: var(--intro-space-3);
+    padding: 4px 18px var(--intro-space-3);
   }
-  .intro-quote-scroll {
-    padding: 10px 16px;
-    margin-bottom: 16px;
+  .intro-statue-frame {
+    width: 168px;
+  }
+  .intro-statue-ring {
+    width: 230px;
+    height: 230px;
+  }
+  .intro-subtitle {
+    font-size: 0.9rem;
+  }
+  .intro-quote blockquote {
+    font-size: 0.98rem;
   }
   .intro-enter-btn {
-    padding: 11px 26px;
-    font-size: 0.88rem;
+    width: 100%;
+    justify-content: center;
   }
-  .intro-top-bar {
-    top: 14px;
-    right: 14px;
+  .intro-actions {
+    width: 100%;
   }
   .intro-btn-label {
     display: none;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 641px) {
+  .intro-statue-frame {
+    width: 180px;
+  }
+  .intro-stage {
+    gap: var(--intro-space-3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-enter-btn,
+  .intro-tool-btn {
+    transition: none;
+  }
+  .intro-enter-btn:hover {
+    transform: none;
   }
 }
 
