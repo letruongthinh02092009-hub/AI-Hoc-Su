@@ -16,6 +16,7 @@ import AmbientEmbersCanvas from './components/AmbientEmbersCanvas';
 import FloatingAiWidget from './components/FloatingAiWidget';
 import AdminPinModal from './components/AdminPinModal';
 import CinematicIntro from './components/CinematicIntro';
+import DesignSystemPreview from './components/DesignSystemPreview';
 import { AdminProvider } from './context/AdminContext';
 import { fetchCloudKnowledgeBase } from './services/geminiService';
 
@@ -35,7 +36,7 @@ export default function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      const validTabs = ['home', 'timeline', 'battle-map', 'museum', 'ai-station', 'quiz', 'survey'];
+      const validTabs = ['home', 'timeline', 'battle-map', 'museum', 'ai-station', 'quiz', 'survey', 'design-system'];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       }
@@ -68,6 +69,8 @@ export default function App() {
         return <QuizArenaTab />;
       case 'survey':
         return <SurveyTab />;
+      case 'design-system':
+        return <DesignSystemPreview onSelectTab={handleSelectTab} />;
       default:
         return <HomeTab onSelectTab={handleSelectTab} />;
     }

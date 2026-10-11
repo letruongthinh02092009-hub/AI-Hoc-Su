@@ -60,6 +60,14 @@ export default function Footer({ onSelectTab }) {
           </div>
           <div className="footer-tech-tag">
             <span>Ứng dụng React & Google Gemini AI</span>
+            <span className="footer-dot-divider">·</span>
+            <button 
+              className="footer-ds-link" 
+              onClick={() => onSelectTab('design-system')}
+              title="Khảo sát bảng mẫu Design System (Giai đoạn 2)"
+            >
+              Design System
+            </button>
           </div>
         </div>
       </div>

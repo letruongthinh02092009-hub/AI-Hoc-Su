@@ -1,59 +1,71 @@
 /* ==========================================================================
    HÀO KHÍ TÂY SƠN - NỀN TẢNG SỐ HÓA DI SẢN & TRẠM SỬ QUAN AI
-   Thiết kế chuẩn Editorial Heritage Architecture & Museum Exhibition
+   Thiết kế chuẩn Cinematic Heritage (Di sản Lịch sử Điện ảnh)
    Tác giả: Lê Trường Thịnh (Lớp 12A8 - Trường THPT Nguyễn Huệ)
    ========================================================================== */
 
 :root {
-  /* Dark Charcoal & Obsidian Palette (Trầm tĩnh, vững chãi) */
-  --bg-deep: #0E0B0A;
-  --bg-surface: #151210;
-  --bg-card: #151210;
-  --bg-card-hover: #1C1815;
-  
-  /* Tay Son Royal Lacquer Crimson Palette (Sơn son thiếp vàng trầm ấm) */
-  --primary-crimson: #9E2A2B;
-  --crimson-fire: #8B2224;
-  --crimson-bright: #B53335;
-  --crimson-soft: rgba(158, 42, 43, 0.15);
-  --crimson-glow: rgba(158, 42, 43, 0.25);
-  
-  /* Muted Bronze Gold Palette (Đồng cổ thanh tao, triệt tiêu vàng chanh neon) */
-  --accent-gold: #C5A059;
-  --accent-gold-light: #DFC48A;
-  --accent-gold-pale: #F0E8DC;
-  --gold-subtle: rgba(197, 160, 89, 0.12);
-  --gold-glow: rgba(197, 160, 89, 0.25);
-  
-  /* Jade Emerald */
-  --emerald-hero: #10B981;
-  --emerald-glow: rgba(16, 185, 129, 0.2);
+  /* CINEMATIC HERITAGE COLOR PALETTE (Theo đúng quy chuẩn Brief KHKT) */
+  --bg-deep: #151310;              /* Charcoal black nền chính */
+  --bg-surface: #201C18;           /* Surface nền khối */
+  --bg-card: #201C18;              /* Card nền khối */
+  --bg-card-hover: #29241F;        /* Card khi hover */
+  --bg-input: #191613;             /* Ô nhập liệu */
 
-  /* Subtle Borders & Dividers */
-  --border-subtle: #241E1B;
-  --border-gold: rgba(197, 160, 89, 0.25);
-  --border-crimson: rgba(158, 42, 43, 0.35);
-  
-  /* Text Typography (Ngà ngọc quý phái & Mực nho) */
-  --text-primary: #F0E8DC;
-  --text-secondary: #9E968F;
-  --text-muted: #6E6760;
-  
+  /* Muted Bronze (Đồng cổ thanh tao lịch sử) */
+  --accent-bronze: #B99A5B;
+  --accent-bronze-light: #D4B87D;
+  --accent-bronze-dark: #8C713B;
+  --accent-bronze-subtle: rgba(185, 154, 91, 0.12);
+  --border-bronze: rgba(185, 154, 91, 0.28);
+
+  /* Deep Lacquer Crimson (Đỏ trầm sơn son triều Tây Sơn) */
+  --accent-crimson: #672D2B;
+  --accent-crimson-bright: #7F3735;
+  --accent-crimson-subtle: rgba(103, 45, 43, 0.18);
+  --border-crimson: rgba(103, 45, 43, 0.45);
+
+  /* Text Typography (Warm Ivory & Trung tính tương phản cao) */
+  --text-primary: #F0E8DA;         /* Warm ivory cho tiêu đề & nội dung chính */
+  --text-secondary: #B5ACA1;       /* Trung tính sáng (contrast ratio > 7:1) */
+  --text-muted: #80776D;           /* Chú thích & nhãn phụ (contrast ratio > 4.5:1) */
+
+  /* Viền vi tế (Subtle Borders) */
+  --border-subtle: #2C2620;        /* Viền tối thanh mảnh */
+  --border-surface: #38312B;       /* Viền phân cách khối */
+
+  /* Trạng thái hệ thống */
   --success: #10B981;
   --danger: #EF4444;
-  
+
+  /* Aliases tương thích ngược cho các component hiện có */
+  --accent-gold: var(--accent-bronze);
+  --accent-gold-light: var(--accent-bronze-light);
+  --accent-gold-pale: var(--text-primary);
+  --primary-crimson: var(--accent-crimson);
+  --crimson-bright: var(--accent-crimson-bright);
+  --crimson-fire: var(--accent-crimson);
+  --gold-subtle: var(--accent-bronze-subtle);
+  --border-gold: var(--border-bronze);
+
+  /* Typography */
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-  
-  /* Kỷ luật bo góc chặt chẽ 4px - 8px */
+
+  /* Kỷ luật bo góc chặt chẽ 4px - 8px (Không bo tròn quá lớn) */
+  --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 10px;
   --radius-xl: 14px;
-  
+
+  /* Bố cục Container chuẩn biên tập */
+  --container-max: 1260px;
+
   /* Bóng đổ định hướng nhẹ nhàng, không phát sáng neon */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
   --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -72,7 +84,7 @@ body {
   color: var(--text-primary);
   line-height: 1.7;
   overflow-x: hidden;
-  background-image: linear-gradient(180deg, #0E0B0A 0%, #13100E 50%, #0E0B0A 100%);
+  background-image: linear-gradient(180deg, #151310 0%, #1A1713 50%, #151310 100%);
   background-attachment: fixed;
 }
 
@@ -82,14 +94,56 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0E0B0A;
+  background: var(--bg-deep);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(197, 160, 89, 0.35);
+  background: rgba(185, 154, 91, 0.28);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-gold);
+  background: var(--accent-bronze);
+}
+
+/* ==========================================================================
+   NATIVE FORM CONTROLS & FOCUS STATES (TÙY BIẾN THEO CHUẨN DESIGN SYSTEM)
+   ========================================================================== */
+input[type="text"],
+input[type="password"],
+input[type="search"],
+input[type="email"],
+textarea,
+select {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  width: 100%;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-bronze);
+  box-shadow: 0 0 0 3px rgba(185, 154, 91, 0.16);
+  background-color: #201C18;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Global Focus-Visible cho bàn phím / Accessibility */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--accent-bronze);
+  outline-offset: 3px;
 }
 
 /* ==========================================================================
@@ -584,7 +638,7 @@ body {
   font-weight: 600;
 }
 
-/* Editorial Hero Action Buttons (1 Primary CTA + 1 Text Link) */
+/* Editorial Hero Action Buttons & Shared Component System */
 .hero-actions {
   display: flex;
   align-items: center;
@@ -592,9 +646,25 @@ body {
   gap: 16px;
 }
 
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+  text-decoration: none;
+}
+
 .btn-primary {
-  background: var(--primary-crimson);
-  color: #FFF;
+  background: var(--accent-crimson);
+  color: var(--text-primary);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   padding: 13px 26px;
@@ -605,20 +675,65 @@ body {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   user-select: none;
 }
 
 .btn-primary:hover {
-  background: var(--crimson-bright);
+  background: var(--accent-crimson-bright);
   border-color: rgba(255, 255, 255, 0.25);
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-surface);
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-bronze);
+  color: #FFF;
+  background: #26211C;
+  transform: translateY(-1px);
+}
+
+.btn-bronze {
+  background: var(--accent-bronze);
+  color: #151310;
+  border: 1px solid var(--accent-bronze-light);
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-bronze:hover {
+  background: var(--accent-bronze-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(185, 154, 91, 0.3);
+}
+
 .btn-text-link {
   background: transparent;
-  color: var(--accent-gold-light);
+  color: var(--accent-bronze-light);
   border: none;
   font-family: var(--font-sans);
   font-size: 0.94rem;
@@ -633,14 +748,14 @@ body {
 }
 
 .btn-text-link:hover {
-  color: #FFF;
+  color: var(--text-primary);
   transform: translateX(4px);
 }
 
 /* Alias for existing shimmer-cta-btn */
 .btn.shimmer-cta-btn {
-  background: var(--primary-crimson);
-  color: #FFF;
+  background: var(--accent-crimson);
+  color: var(--text-primary);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
   padding: 12px 24px;
@@ -654,6 +769,22 @@ body {
 }
 
 .btn.shimmer-cta-btn:hover {
+  background: var(--accent-crimson-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Shared Card Variants */
+.card-interactive {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-bronze);
+  box-shadow: var(--shadow-card);
+}
   background: var(--crimson-bright);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -737,14 +868,6 @@ body {
 .feature-card:hover .feature-link {
   gap: 9px;
   color: #FFF;
-}
-  font-size: 0.88rem;
-  font-weight: 600;
-  transition: gap 0.2s;
-}
-
-.feature-card:hover .feature-link {
-  gap: 8px;
 }
 
 /* Metrics Banner with Animated Counters */
@@ -6314,5 +6437,357 @@ body {
   }
 }
 
+/* ==========================================================================
+   DESIGN SYSTEM SHARED COMPONENTS (CINEMATIC HERITAGE TOKENS & COMPONENTS)
+   ========================================================================== */
 
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-surface);
+  border-radius: var(--radius-sm);
+  padding: 12px 22px;
+  font-family: var(--font-sans);
+  font-size: 0.94rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
 
+.btn-ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-bronze);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn:disabled,
+button:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Heritage Badges */
+.badge-heritage {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+.badge-bronze {
+  background: var(--accent-bronze-subtle);
+  border-color: var(--border-bronze);
+  color: var(--accent-bronze-light);
+}
+
+.badge-crimson {
+  background: var(--accent-crimson-subtle);
+  border-color: var(--border-crimson);
+  color: #E58380;
+}
+
+/* ==========================================================================
+   DESIGN SYSTEM PREVIEW AREA (KHU VỰC THỬ NGHIỆM GIAI ĐOẠN 2)
+   ========================================================================== */
+.design-system-preview-page {
+  padding: 24px 0 60px;
+}
+
+.ds-header-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 36px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ds-back-btn {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.ds-main-title {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--text-primary);
+  margin: 6px 0 4px;
+}
+
+.ds-main-sub {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.ds-section {
+  margin-bottom: 48px;
+}
+
+.ds-section-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-bronze-light);
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-surface);
+  padding-bottom: 8px;
+}
+
+.ds-section-desc {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+/* Color Chips Grid */
+.ds-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.ds-color-chip {
+  height: 120px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-surface);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-shadow: var(--shadow-sm);
+}
+
+.ds-chip-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-chip-meta strong {
+  font-size: 0.8rem;
+  font-family: monospace;
+}
+
+.ds-chip-meta span {
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
+
+.ds-chip-meta small {
+  font-size: 0.7rem;
+  margin-top: 2px;
+  opacity: 0.75;
+}
+
+/* Typography Specimen */
+.ds-type-specimen {
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ds-type-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ds-type-label {
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent-bronze);
+  font-weight: 700;
+}
+
+.ds-sample-h1 {
+  font-family: var(--font-serif);
+  font-size: 2.3rem;
+  color: var(--text-primary);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.ds-sample-h2 {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.ds-sample-h3 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--accent-bronze-light);
+  font-weight: 600;
+}
+
+.ds-sample-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  max-width: 900px;
+}
+
+.ds-sample-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  border-left: 3px solid var(--accent-crimson);
+  padding-left: 18px;
+  margin: 6px 0;
+  background: rgba(103, 45, 43, 0.08);
+  padding: 12px 20px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Components Row */
+.ds-components-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.ds-spin {
+  animation: dsSpinAnim 1s linear infinite;
+}
+
+@keyframes dsSpinAnim {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Form Grid */
+.ds-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.ds-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ds-form-group.full-width {
+  grid-column: span 2;
+}
+
+.ds-field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Cards Grid */
+.ds-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.ds-sample-card {
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ds-card-index {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--accent-bronze);
+  font-weight: 700;
+}
+
+.ds-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.ds-card-desc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 768px) {
+  .ds-header-bar {
+    flex-direction: column;
+  }
+  .ds-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .ds-form-group.full-width {
+    grid-column: span 1;
+  }
+}
+
+.footer-tech-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.footer-dot-divider {
+  color: var(--border-surface);
+}
+
+.footer-ds-link {
+  background: transparent;
+  border: 1px dashed var(--border-surface);
+  color: var(--accent-bronze-light);
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.footer-ds-link:hover {
+  border-color: var(--accent-bronze);
+  color: var(--text-primary);
+  background: var(--accent-bronze-subtle);
+}
