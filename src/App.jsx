@@ -14,12 +14,18 @@ import SurveyTab from './tabs/SurveyTab';
 
 import AmbientEmbersCanvas from './components/AmbientEmbersCanvas';
 import FloatingAiWidget from './components/FloatingAiWidget';
+import { fetchCloudKnowledgeBase } from './services/geminiService';
 
 import './App.css';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+
+  // Tự động kéo kho tri thức đám mây (Google Sheets Webhook) khi mở web trên mọi thiết bị
+  useEffect(() => {
+    fetchCloudKnowledgeBase();
+  }, []);
 
   // Đồng bộ hóa với hash trên thanh địa chỉ
   useEffect(() => {

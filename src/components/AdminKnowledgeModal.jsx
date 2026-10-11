@@ -11,16 +11,20 @@ import {
   BookOpen, 
   Upload,
   FileText,
-  AlertCircle 
+  AlertCircle,
+  RefreshCw,
+  Cloud
 } from 'lucide-react';
 import { 
   getKnowledgeBase, 
   addKnowledgeItem, 
   deleteKnowledgeItem, 
   resetKnowledgeBase,
-  saveKnowledgeBase
+  saveKnowledgeBase,
+  fetchCloudKnowledgeBase,
+  syncKnowledgeToCloud
 } from '../services/geminiService';
-import { playChime, playCorrectSound } from '../utils/audio';
+import { playChime, playCorrectSound, playVictorySound } from '../utils/audio';
 import mammoth from 'mammoth';
 
 const ADMIN_PASSCODE = '1789'; // Mật khẩu năm đại phá quân Thanh 1789
@@ -30,6 +34,7 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
   const [passcode, setPasscode] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [knowledgeList, setKnowledgeList] = useState([]);
+  const [isSyncingCloud, setIsSyncingCloud] = useState(false);
 
   // Form thêm thủ công
   const [title, setTitle] = useState('');
@@ -45,6 +50,10 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
   useEffect(() => {
     if (isOpen) {
       setKnowledgeList(getKnowledgeBase());
+      // Thử đồng bộ ngầm từ Google Cloud khi mở modal
+      fetchCloudKnowledgeBase().then(updated => {
+        if (updated && updated.length > 0) setKnowledgeList(updated);
+      });
     }
   }, [isOpen]);
 
@@ -181,6 +190,26 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
       const reseted = resetKnowledgeBase();
       setKnowledgeList(reseted);
       playChime(600, 'triangle', 0.2);
+    }
+  };
+
+  const handleManualSyncCloud = async () => {
+    setIsSyncingCloud(true);
+    playChime(550, 'sine', 0.1);
+    try {
+      const updated = await fetchCloudKnowledgeBase();
+      if (updated && updated.length > 0) {
+        setKnowledgeList(updated);
+        playVictorySound();
+        setSuccessMsg('Đã đồng bộ thành công kho tri thức từ Google Sheets!');
+      } else {
+        setSuccessMsg('Đã kết nối Google Sheets. Dữ liệu hiện đã đồng bộ!');
+      }
+    } catch (e) {
+      setErrorMsg('Chưa thể đồng bộ: Vui lòng kiểm tra quyền truy cập Anyone của Webhook.');
+    } finally {
+      setIsSyncingCloud(false);
+      setTimeout(() => setSuccessMsg(''), 4000);
     }
   };
 
@@ -327,10 +356,27 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                 {/* Cột phải: Danh mục tài liệu đã nạp */}
                 <div className="admin-list-col">
                   <div className="list-col-header">
-                    <h4>Kho Sử Liệu Đã Nạp ({knowledgeList.length} tài liệu)</h4>
-                    <button className="reset-kb-btn" onClick={handleReset} title="Khôi phục mặc định">
-                      <RotateCcw size={14} /> Khôi phục ban đầu
-                    </button>
+                    <div>
+                      <h4>Kho Sử Liệu Đã Nạp ({knowledgeList.length} tài liệu)</h4>
+                      <div className="cloud-sync-status-badge">
+                        <Cloud size={13} className="text-emerald" />
+                        <span>Đám mây Google Sheets: <strong>Đã kết nối</strong></span>
+                      </div>
+                    </div>
+                    <div className="list-header-actions">
+                      <button 
+                        className={`sync-cloud-btn ${isSyncingCloud ? 'loading' : ''}`} 
+                        onClick={handleManualSyncCloud} 
+                        disabled={isSyncingCloud}
+                        title="Đồng bộ sử liệu từ Google Sheets về máy này"
+                      >
+                        <RefreshCw size={13} className={isSyncingCloud ? 'spin-icon' : ''} />
+                        <span>{isSyncingCloud ? 'Đang kéo...' : 'Đồng bộ'}</span>
+                      </button>
+                      <button className="reset-kb-btn" onClick={handleReset} title="Khôi phục mặc định">
+                        <RotateCcw size={13} /> Khôi phục
+                      </button>
+                    </div>
                   </div>
 
                   <div className="knowledge-cards-scroll">

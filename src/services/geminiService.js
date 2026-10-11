@@ -4,6 +4,22 @@ import { DEFAULT_KNOWLEDGE_BASE } from '../data/defaultKnowledgeBase';
 const GEMINI_API_KEY = "AQ.Ab8RN6KVY_X5n_CaZMGXEZ6OSngx6W5kUEE1iw6yPczaMywIEQ";
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 const KB_STORAGE_KEY = "khkt_su_knowledge_base_v2";
+export const DEFAULT_GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzsgFMs-xMdTGE1wa0Bc9ycj0qEFz2Ga4EOqSrfKb6msLUv6WkoK1fzEmm1C-7xzp487g/exec";
+export const GAS_WEBHOOK_STORAGE_KEY = "su_gas_knowledge_webhook_url";
+
+export function getWebhookUrl() {
+  try {
+    return localStorage.getItem(GAS_WEBHOOK_STORAGE_KEY) || DEFAULT_GAS_WEBHOOK_URL;
+  } catch (e) {
+    return DEFAULT_GAS_WEBHOOK_URL;
+  }
+}
+
+export function saveWebhookUrl(url) {
+  try {
+    localStorage.setItem(GAS_WEBHOOK_STORAGE_KEY, url);
+  } catch (e) {}
+}
 
 // 1. Quản lý Kho Tri thức (Admin Knowledge Base CRUD)
 export function getKnowledgeBase() {
@@ -23,6 +39,66 @@ export function saveKnowledgeBase(items) {
   }
 }
 
+// Đồng bộ sử liệu mới lên Google Apps Script Webhook (lưu vĩnh viễn trên Google Sheets)
+export async function syncKnowledgeToCloud(item) {
+  const url = getWebhookUrl();
+  if (!url) return false;
+
+  try {
+    const payload = {
+      id: item.id || ('kb-' + Date.now()),
+      title: item.title,
+      category: item.category || 'Tư liệu bổ sung',
+      source: item.source || 'Tư liệu khảo cứu (Lê Trường Thịnh)',
+      content: item.content,
+      authorApproved: item.authorApproved || 'Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)'
+    };
+
+    // Google Apps Script Web App chấp nhận text/plain để tránh lỗi CORS Preflight
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    });
+    return true;
+  } catch (e) {
+    console.warn("Lỗi khi đồng bộ lên Google Cloud:", e);
+    return false;
+  }
+}
+
+// Tự động kéo dữ liệu từ Google Sheets về khi mở web trên Điện Thoại hoặc máy khác
+export async function fetchCloudKnowledgeBase() {
+  const url = getWebhookUrl();
+  if (!url) return getKnowledgeBase();
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+    const result = await response.json();
+    if (result && Array.isArray(result.data) && result.data.length > 0) {
+      const current = getKnowledgeBase();
+      const existingIds = new Set(current.map(item => item.id));
+      const newItems = result.data.filter(item => !existingIds.has(item.id) && item.title && item.content);
+      
+      if (newItems.length > 0) {
+        const combined = [...newItems, ...current];
+        saveKnowledgeBase(combined);
+        return combined;
+      }
+    }
+  } catch (e) {
+    // Có thể URL chưa bật "Anyone" hoặc lỗi mạng tạm thời
+    console.log("Chưa thể kéo từ Google Cloud:", e);
+  }
+  return getKnowledgeBase();
+}
+
 export function addKnowledgeItem(item) {
   const current = getKnowledgeBase();
   const newItem = {
@@ -35,6 +111,10 @@ export function addKnowledgeItem(item) {
   };
   current.unshift(newItem);
   saveKnowledgeBase(current);
+
+  // Tự động đẩy lên Google Cloud qua Webhook
+  syncKnowledgeToCloud(newItem);
+
   return newItem;
 }
 

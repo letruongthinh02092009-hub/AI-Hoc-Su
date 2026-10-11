@@ -4393,3 +4393,62 @@ body {
   margin: 0;
 }
 
+/* Cloud Sync Badge and Controls in Admin Modal */
+.cloud-sync-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: var(--emerald-hero);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-top: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.cloud-sync-status-badge strong {
+  color: #FFF;
+}
+
+.list-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sync-cloud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--emerald-hero);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sync-cloud-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.25);
+  color: #FFF;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.sync-cloud-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
