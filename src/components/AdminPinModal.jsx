@@ -85,7 +85,7 @@ export default function AdminPinModal() {
           </form>
 
           <div className="pin-modal-footer-note">
-            <span>💡 Khách tham quan chỉ xem nội dung. Chỉ tác giả mới cần bật chế độ này.</span>
+            <span>Khách tham quan chỉ xem nội dung. Chế độ này dành cho tác giả quản trị.</span>
           </div>
         </motion.div>
       </div>

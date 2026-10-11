@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Flame, ChevronRight, Sparkles, MapPin, Trophy, Bot, Landmark, ArrowUpRight } from 'lucide-react';
+import { MapPin, Trophy, Bot, Landmark, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { playChime } from '../utils/audio';
 import AnimatedCounter from '../components/AnimatedCounter';
 
@@ -14,7 +14,7 @@ export default function HomeTab({ onSelectTab }) {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 18 },
+    hidden: { opacity: 0, y: 16 },
     visible: { 
       opacity: 1, 
       y: 0, 
@@ -32,18 +32,14 @@ export default function HomeTab({ onSelectTab }) {
     >
       {/* Hero Section */}
       <section className="hero-section">
-        <div className="hero-ambient-orb" aria-hidden="true" />
-
         <div className="hero-content">
-          <motion.div className="hero-badge shimmer-badge" variants={itemVariants}>
-            <Sparkles size={14} className="badge-sparkle-spin" />
-            <span>DỰ ÁN HỌC TẬP LỊCH SỬ THPT NGUYỄN HUỆ</span>
-            <span className="badge-pulse-dot" />
+          <motion.div className="hero-kicker-box" variants={itemVariants}>
+            <span className="hero-kicker-text">CÔNG TRÌNH SỐ HÓA DI SẢN · THPT NGUYỄN HUỆ</span>
           </motion.div>
 
           {/* Hero Title */}
           <motion.div className="hero-title-wrapper" variants={itemVariants}>
-            <h1 className="hero-title metallic-shimmer-text">
+            <h1 className="hero-title">
               HÀO KHÍ TÂY SƠN
             </h1>
             <span className="hero-subtitle">
@@ -52,137 +48,125 @@ export default function HomeTab({ onSelectTab }) {
           </motion.div>
 
           <motion.p className="hero-description" variants={itemVariants}>
-            Khám phá nghệ thuật quân sự bách chiến bách thắng của người anh hùng áo vải qua <strong>Sa bàn trận đánh trực quan</strong>, <strong>Bảo tàng hiện vật số</strong> và <strong>Trợ lý Gemini AI</strong>.
+            Tái hiện không gian sử thi thế kỷ XVIII qua <strong>Sa bàn tác chiến không gian số</strong>, <strong>Bảo tàng hiện vật khảo cứu</strong> và <strong>Trí tuệ nhân tạo đối thoại lịch sử</strong>.
           </motion.p>
 
-          {/* Quote Card */}
-          <motion.div className="hero-quote-card cyber-heritage-card" variants={itemVariants}>
-            <div className="quote-light-beam" aria-hidden="true" />
+          {/* Editorial Quote Card */}
+          <motion.div className="hero-quote-card card" variants={itemVariants}>
             <p className="quote-text">
               "Đánh cho để dài tóc / Đánh cho để đen răng / Đánh cho nó chích luân bất phản / Đánh cho nó phiến giáp bất hoàn / Đánh cho sử tri nam quốc anh hùng chi hữu chủ!"
             </p>
             <span className="quote-author">— Lời Hiểu Dụ Xuất Quân Thần Tốc (1788)</span>
           </motion.div>
 
-          {/* Action Buttons */}
+          {/* Restrained CTAs: 1 Primary Button + 1 Secondary Text Link */}
           <motion.div className="hero-actions" variants={itemVariants}>
             <button 
-              className="btn shimmer-cta-btn btn-fire-glow"
+              className="btn btn-primary"
+              onClick={() => {
+                playChime(600, 'sine', 0.15);
+                onSelectTab('battle-map');
+              }}
+            >
+              <MapPin size={17} />
+              <span>Khám Phá Sa Bàn Chiến Trận</span>
+            </button>
+
+            <button 
+              className="btn-text-link"
               onClick={() => {
                 playChime(650, 'sine', 0.15);
                 onSelectTab('ai-station');
               }}
             >
-              <Bot size={18} className="btn-icon" />
-              <span className="btn-text">Hỏi Đáp Cùng Gemini AI</span>
-            </button>
-
-            <button 
-              className="btn shimmer-cta-btn btn-gold-outline"
-              onClick={() => {
-                playChime(550, 'sine', 0.15);
-                onSelectTab('battle-map');
-              }}
-            >
-              <MapPin size={18} className="btn-icon" />
-              <span className="btn-text">Xem Sa Bàn Trận Đánh</span>
-            </button>
-
-            <button 
-              className="btn shimmer-cta-btn btn-ghost-crimson"
-              onClick={() => {
-                playChime(500, 'sine', 0.15);
-                onSelectTab('museum');
-              }}
-            >
-              <Landmark size={18} className="btn-icon" />
-              <span className="btn-text">Tham Quan Bảo Tàng</span>
+              <span>Đàm đạo cùng Sử Quan AI</span>
+              <ArrowRight size={15} />
             </button>
           </motion.div>
         </div>
       </section>
 
-      {/* 4 Feature Pillars (Gọn gàng, xúc tích, dễ đọc) */}
+      {/* 4 Feature Pillars (Phong cách mục lục di sản đánh số 01-04) */}
       <section className="highlights-section">
         <motion.div className="section-title-box" variants={itemVariants}>
-          <span className="section-kicker">KHÁM PHÁ NỘI DUNG</span>
-          <h2 className="section-heading">4 TRẢI NGHIỆM HỌC SỬ HẤP DẪN</h2>
+          <span className="section-kicker">CHƯƠNG MỤC KHẢO CỨU</span>
+          <h2 className="section-heading">4 TRẢI NGHIỆM HỌC SỬ TRỰC QUAN</h2>
           <div className="title-divider-gold"></div>
         </motion.div>
 
         <div className="features-grid">
           <motion.div 
-            className="feature-card cyber-glass-card" 
+            className="feature-card card" 
             variants={itemVariants}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
             onClick={() => onSelectTab('battle-map')}
           >
-            <div className="card-ambient-glow card-glow-crimson" aria-hidden="true" />
-            <div className="feature-icon-wrapper red-glow">
-              <MapPin size={26} />
+            <div className="feature-top-meta">
+              <span className="feature-index">01</span>
+              <MapPin size={20} className="feature-inline-icon text-gold" />
             </div>
-            <h3>Sa Bàn Chiến Trận Trực Quan</h3>
+            <h3>Sa Bàn Chiến Trận</h3>
             <p>Mô phỏng mũi tên hành quân thần tốc, thế trận mai phục Rạch Gầm – Xoài Mút và đòn vu hồi giải phóng Thăng Long năm 1789.</p>
             <span className="feature-link">
-              Khám phá sa bàn <ArrowUpRight size={15} />
+              Xem sa bàn tác chiến <ArrowUpRight size={14} />
             </span>
           </motion.div>
 
           <motion.div 
-            className="feature-card cyber-glass-card" 
+            className="feature-card card" 
             variants={itemVariants}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
             onClick={() => onSelectTab('ai-station')}
           >
-            <div className="card-ambient-glow card-glow-gold" aria-hidden="true" />
-            <div className="feature-icon-wrapper gold-glow">
-              <Bot size={26} />
+            <div className="feature-top-meta">
+              <span className="feature-index">02</span>
+              <Bot size={20} className="feature-inline-icon text-gold" />
             </div>
-            <h3>Sử Quan Thông Minh (Gemini AI)</h3>
-            <p>Trò chuyện tự nhiên, giải đáp ngay mọi câu hỏi về cuộc đời Nguyễn Huệ, chiến lược quân sự và trích dẫn sử liệu chuẩn xác.</p>
+            <h3>Trạm Sử Quan AI</h3>
+            <p>Trò chuyện tự nhiên, giải đáp mọi vấn đề về cuộc đời Nguyễn Huệ, chiến lược quân sự và đối chiếu sử liệu chính thống.</p>
             <span className="feature-link">
-              Đàm đạo ngay <ArrowUpRight size={15} />
+              Vào trạm đàm đạo <ArrowUpRight size={14} />
             </span>
           </motion.div>
 
           <motion.div 
-            className="feature-card cyber-glass-card" 
+            className="feature-card card" 
             variants={itemVariants}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
             onClick={() => onSelectTab('museum')}
           >
-            <div className="card-ambient-glow card-glow-amber" aria-hidden="true" />
-            <div className="feature-icon-wrapper amber-glow">
-              <Landmark size={26} />
+            <div className="feature-top-meta">
+              <span className="feature-index">03</span>
+              <Landmark size={20} className="feature-inline-icon text-gold" />
             </div>
             <h3>Bảo Tàng Hiện Vật Số</h3>
-            <p>Chiêm ngưỡng 8 hiện vật quý: súng hỏa hổ, voi chiến, tiền đồng, sắc phong kèm thuyết minh giọng đọc tiếng Việt rõ ràng.</p>
+            <p>Trưng bày tư liệu quý: súng hỏa hổ, voi chiến, tiền đồng, sắc phong kèm chú giải và xuất xứ lịch sử chi tiết.</p>
             <span className="feature-link">
-              Vào bảo tàng <ArrowUpRight size={15} />
+              Tham quan hiện vật <ArrowUpRight size={14} />
             </span>
           </motion.div>
 
           <motion.div 
-            className="feature-card cyber-glass-card" 
+            className="feature-card card" 
             variants={itemVariants}
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
             onClick={() => onSelectTab('quiz')}
           >
-            <div className="card-ambient-glow card-glow-emerald" aria-hidden="true" />
-            <div className="feature-icon-wrapper green-glow">
-              <Trophy size={26} />
+            <div className="feature-top-meta">
+              <span className="feature-index">04</span>
+              <Trophy size={20} className="feature-inline-icon text-gold" />
             </div>
-            <h3>Đấu Trường Đố Vui 3 Cấp Độ</h3>
-            <p>30 câu trắc nghiệm thú vị từ cơ bản đến chuyên sâu, tích lũy điểm số, chuỗi thắng và nhận vinh danh Đại Tướng Quân.</p>
+            <h3>Đấu Trường Đố Vui</h3>
+            <p>90 câu hỏi trắc nghiệm tương tác 3 cấp độ, tích lũy điểm số, đổi mới câu hỏi và nhận Giấy Chứng Nhận vinh danh.</p>
             <span className="feature-link">
-              Chinh phục thử thách <ArrowUpRight size={15} />
+              Khởi hành thử thách <ArrowUpRight size={14} />
             </span>
           </motion.div>
         </div>
       </section>
 
       {/* Metrics Banner */}
-      <section className="metrics-banner cyber-glass-card">
+      <section className="metrics-banner card">
         <div className="metrics-grid">
           <div className="metric-box">
             <span className="metric-number">
@@ -204,7 +188,7 @@ export default function HomeTab({ onSelectTab }) {
           </div>
           <div className="metric-box">
             <span className="metric-number">
-              <AnimatedCounter value={30} suffix=" Câu" duration={1200} />
+              <AnimatedCounter value={90} suffix=" Câu" duration={1200} />
             </span>
             <span className="metric-label">Thử thách kiến thức</span>
           </div>

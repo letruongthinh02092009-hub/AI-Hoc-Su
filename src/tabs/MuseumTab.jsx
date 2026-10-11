@@ -284,7 +284,7 @@ export default function MuseumTab() {
                         onClick={() => setShowAdminUploadPanel(!showAdminUploadPanel)}
                       >
                         <ShieldCheck size={14} />
-                        <span>{showAdminUploadPanel ? 'Ẩn bảng đổi ảnh' : '👑 Quyền Admin: Đổi ảnh hiện vật này'}</span>
+                        <span>{showAdminUploadPanel ? 'Ẩn bảng đổi ảnh' : 'Quyền Quản trị: Đổi ảnh hiện vật'}</span>
                       </button>
 
                       {showAdminUploadPanel && (

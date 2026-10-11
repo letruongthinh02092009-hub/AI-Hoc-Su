@@ -19,7 +19,8 @@ import {
   Sparkles,
   ArrowRight,
   Trash2,
-  RotateCcw
+  RotateCcw,
+  Database
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { playChime, playCorrectSound, playVictorySound } from '../utils/audio';
@@ -278,7 +279,7 @@ export default function SurveyTab() {
       </div>
 
       {/* 3 Tabs Điều Khiển Chính: Đánh Giá Cộng Đồng | Google Form | Google Sheets */}
-      <div className="survey-toolbar-card cyber-glass-card">
+      <div className="survey-toolbar-card card">
         <div className="survey-tab-switch">
           <button 
             className={`survey-toggle-btn ${activeView === 'reviews' ? 'active' : ''}`}
@@ -329,8 +330,8 @@ export default function SurveyTab() {
       {/* Modal Cài Đặt Link Google Form / Google Sheets */}
       {isConfigOpen && (
         <div className="modal-backdrop" onClick={() => setIsConfigOpen(false)}>
-          <div className="modal-dialog-box cyber-glass-card" onClick={e => e.stopPropagation()}>
-            <h3>⚙️ Cài Đặt Link Khảo Sát Google Form & Sheet</h3>
+          <div className="modal-dialog-box card" onClick={e => e.stopPropagation()}>
+            <h3>Cài Đặt Link Khảo Sát Google Form & Sheet</h3>
             <p className="dialog-desc">
               Dán đường link Google Form (dành cho người làm khảo sát) và link Google Sheets (chứa dữ liệu câu trả lời tự động).
             </p>
@@ -385,7 +386,7 @@ export default function SurveyTab() {
       {activeView === 'reviews' && (
         <div className="reviews-section-wrapper">
           {/* Header Tổng Quan Điểm Số Cộng Đồng */}
-          <div className="gmaps-summary-card cyber-glass-card">
+          <div className="gmaps-summary-card card">
             <div className="gmaps-score-col">
               <span className="big-rating-number">{avgRating}</span>
               <div className="stars-row gold-stars">
@@ -442,14 +443,14 @@ export default function SurveyTab() {
           <AnimatePresence>
             {isAddingReview && (
               <motion.div 
-                className="add-review-card cyber-glass-card"
+                className="add-review-card card"
                 initial={{ opacity: 0, height: 0, y: -10 }}
                 animate={{ opacity: 1, height: 'auto', y: 0 }}
                 exit={{ opacity: 0, height: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="review-form-header">
-                  <h4>✍️ Đánh Giá Trải Nghiệm Website & Trạm Sử Quan AI</h4>
+                  <h4>Đánh Giá Trải Nghiệm Nền Tảng & Sử Quan AI</h4>
                   <span className="form-sub">Nhận xét của bạn sẽ được lưu và hiển thị công khai ngay lập tức</span>
                 </div>
 
@@ -570,7 +571,7 @@ export default function SurveyTab() {
 
             {/* Banner kết nối Bảng Tính Google Sheets chứa kết quả Google Form */}
             <div 
-              className="google-sheet-sync-banner cyber-glass-card" 
+              className="google-sheet-sync-banner card" 
               onClick={() => {
                 playChime(600, 'sine', 0.1);
                 setActiveView('sheet');
@@ -583,8 +584,8 @@ export default function SurveyTab() {
                 alignItems: 'center', 
                 justifyContent: 'space-between', 
                 border: '1px solid rgba(229, 169, 60, 0.35)', 
-                borderRadius: '10px', 
-                background: 'linear-gradient(135deg, rgba(229, 169, 60, 0.12), rgba(18, 20, 27, 0.9))',
+                borderRadius: '8px', 
+                background: 'var(--bg-card)',
                 flexWrap: 'wrap',
                 gap: '12px'
               }}
@@ -619,7 +620,7 @@ export default function SurveyTab() {
 
             <div className="reviews-grid">
               {reviews.map((rev) => (
-                <div key={rev.id} className="review-card cyber-glass-card">
+                <div key={rev.id} className="review-card card">
                   <div className="review-card-top">
                     {/* Avatar tròn với ký tự viết tắt */}
                     <div className="reviewer-avatar">
@@ -680,7 +681,7 @@ export default function SurveyTab() {
       {activeView === 'form' && (
         <div className="form-view-section">
           {/* Khối giới thiệu quy trình đồng bộ */}
-          <div className="survey-flow-overview cyber-glass-card">
+          <div className="survey-flow-overview card">
             <div className="flow-step-item">
               <span className="flow-num">01</span>
               <div className="flow-text">
@@ -706,7 +707,7 @@ export default function SurveyTab() {
             </div>
           </div>
 
-          <div className="survey-embed-container cyber-glass-card">
+          <div className="survey-embed-container card">
             <div className="form-embed-wrapper">
               <div className="embed-header-bar">
                 <div className="embed-info">
@@ -752,8 +753,8 @@ export default function SurveyTab() {
       {activeView === 'sheet' && (
         <div className="sheet-view-section">
           {/* Thông báo đồng bộ dữ liệu */}
-          <div className="sheet-sync-banner cyber-glass-card">
-            <div className="sync-icon-box">📊</div>
+          <div className="sheet-sync-banner card">
+            <div className="sync-icon-box"><Database size={20} className="text-gold" /></div>
             <div className="sync-info-text">
               <strong>Cơ Chế Đồng Bộ Google Form Sang Google Sheets</strong>
               <p>
@@ -780,7 +781,7 @@ export default function SurveyTab() {
             </button>
           </div>
 
-          <div className="survey-embed-container cyber-glass-card">
+          <div className="survey-embed-container card">
             <div className="sheet-embed-wrapper">
               <div className="embed-header-bar">
                 <div className="embed-info">
@@ -834,7 +835,8 @@ export default function SurveyTab() {
                           <td className="col-role"><span className="table-role-pill">{rev.role}</span></td>
                           <td className="col-rating">
                             <span className="table-star-chip">
-                              {'★'.repeat(rev.rating)}
+                              <Star size={12} fill="#C5A059" color="#C5A059" />
+                              <span>{rev.rating}/5</span>
                             </span>
                           </td>
                           <td className="col-comment">{rev.comment}</td>
@@ -867,7 +869,7 @@ export default function SurveyTab() {
                     Đang tải bảng tính Google Sheets...
                   </iframe>
                   <div className="embed-helper-footer">
-                    <span>💡 Nếu khung hiển thị báo quyền truy cập, bạn có thể bấm nút <strong>"Mở Google Sheets (Tab Mới)"</strong> ở trên để xem trực tiếp hoặc chuyển sang tab <strong>"Sổ Dữ Liệu Đồng Bộ Trực Tiếp"</strong>.</span>
+                    <span>Nếu khung hiển thị báo quyền truy cập, bạn có thể bấm nút <strong>"Mở Google Sheets (Tab Mới)"</strong> ở trên để xem trực tiếp hoặc chuyển sang tab <strong>"Sổ Dữ Liệu Đồng Bộ Trực Tiếp"</strong>.</span>
                   </div>
                 </div>
               )}

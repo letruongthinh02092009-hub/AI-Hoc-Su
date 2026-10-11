@@ -38,7 +38,7 @@ export default function FloatingAiWidget({ activeTab, onSelectTab }) {
       <AnimatePresence>
         {isOpenPopover && (
           <motion.div 
-            className="floating-ai-popover cyber-glass-card"
+            className="floating-ai-popover card"
             initial={{ opacity: 0, scale: 0.85, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.85, y: 15 }}
@@ -67,24 +67,24 @@ export default function FloatingAiWidget({ activeTab, onSelectTab }) {
                 className="quick-prompt-btn"
                 onClick={() => handleOpenAiWithPrompt('Kế sách hành quân thần tốc của vua Quang Trung ra sao?')}
               >
-                <span>⚡ Hành quân thần tốc ra Thăng Long</span>
+                <span>Hành quân thần tốc ra Thăng Long</span>
               </button>
               <button 
                 className="quick-prompt-btn"
                 onClick={() => handleOpenAiWithPrompt('Voi chiến và súng hỏa hổ Tây Sơn được trang bị thế nào?')}
               >
-                <span>🐘 Voi chiến và súng hỏa hổ Tây Sơn</span>
+                <span>Voi chiến và súng hỏa hổ Tây Sơn</span>
               </button>
               <button 
                 className="quick-prompt-btn"
                 onClick={() => handleOpenAiWithPrompt('Chiến thuật đóng cửa sông Tiền ở Rạch Gầm - Xoài Mút?')}
               >
-                <span>🌊 Trận Rạch Gầm - Xoài Mút</span>
+                <span>Trận Rạch Gầm - Xoài Mút</span>
               </button>
             </div>
 
             <button 
-              className="popover-enter-btn shimmer-cta-btn"
+              className="popover-enter-btn btn-primary"
               onClick={handleClickWidget}
             >
               <span>Vào Trạm Trò Chuyện Đầy Đủ</span>

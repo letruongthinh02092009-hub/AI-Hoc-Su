@@ -221,7 +221,7 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
     <AnimatePresence>
       <div className="modal-backdrop" onClick={onClose}>
         <motion.div 
-          className="admin-modal-card cyber-glass-card"
+          className="admin-modal-card card"
           onClick={e => e.stopPropagation()}
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -408,8 +408,8 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                         <h5 className="doc-title">{item.title}</h5>
                         <p className="doc-excerpt">{item.content.slice(0, 150)}...</p>
                         <div className="doc-source-footer">
-                          <span>📚 {item.source}</span>
-                          <span>✓ {item.authorApproved}</span>
+                          <span>Nguồn: {item.source}</span>
+                          <span>Kiểm duyệt: {item.authorApproved}</span>
                         </div>
                       </div>
                     ))}

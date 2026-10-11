@@ -9,7 +9,8 @@ import {
   Compass,
   ArrowRight,
   Shield,
-  MapPin
+  MapPin,
+  Info
 } from 'lucide-react';
 import { BATTLES_DATA } from '../data/battlesData';
 import { playChime } from '../utils/audio';
@@ -102,7 +103,7 @@ export default function BattleMapTab() {
       const popupContent = `
         <div class="tactical-popup">
           <span class="popup-zone-tag" style="background: ${zone.color}22; color: ${zone.color};">
-            ★ Vùng Chiến Lược
+            Vùng Chiến Lược
           </span>
           <h4 class="popup-zone-title">${zone.title}</h4>
           <p class="popup-zone-desc">${zone.desc}</p>
@@ -131,7 +132,7 @@ export default function BattleMapTab() {
       const lastPoint = flow.points[flow.points.length - 1];
       const arrowIcon = L.divIcon({
         className: 'tactical-arrowhead',
-        html: `<div style="color: ${flow.color}; font-size: 18px; transform: rotate(-45deg);">➤</div>`,
+        html: `<div style="color: ${flow.color}; font-size: 14px; font-weight: bold; transform: rotate(45deg);">▶</div>`,
         iconSize: [20, 20],
         iconAnchor: [10, 10]
       });
@@ -141,7 +142,7 @@ export default function BattleMapTab() {
       const popupContent = `
         <div class="tactical-popup">
           <span class="popup-flow-tag" style="color: ${flow.color};">
-            ${flow.type === 'friendly' ? '⚔ Hướng Tiến Công Tây Sơn' : '⚠ Hướng Di Chuyển Của Giặc'}
+            ${flow.type === 'friendly' ? 'Hướng Tiến Công Tây Sơn' : 'Hướng Di Chuyển Đối Phương'}
           </span>
           <h4 class="popup-zone-title">${flow.title}</h4>
           <p class="popup-zone-desc">${flow.desc}</p>
@@ -226,10 +227,10 @@ export default function BattleMapTab() {
       </div>
 
       {/* Thanh 3 Giai Đoạn Tác Chiến Nằm Ngay Trên Đầu Bản Đồ (Bấm là lia Map tức thì) */}
-      <div className="battlemap-phase-quickbar cyber-glass-card">
+      <div className="battlemap-phase-quickbar card">
         <div className="quickbar-header">
           <Compass size={17} className="text-gold" />
-          <span className="quickbar-label">3 GIAI ĐOẠN TÁC CHIẾN (BẤM ĐỂ LIA BẢN ĐỒ TỰ ĐỘNG):</span>
+          <span className="quickbar-label">3 GIAI ĐOẠN TÁC CHIẾN (BẤM ĐỂ ĐỊNH VỊ BẢN ĐỒ):</span>
         </div>
         <div className="quickbar-buttons-row">
           {battle.tactics.map((tac, idx) => {
@@ -239,7 +240,7 @@ export default function BattleMapTab() {
                 key={idx}
                 className={`quick-phase-pill-btn ${isActive ? 'active' : ''}`}
                 onClick={() => handleSelectPhase(tac, idx)}
-                title={`Bấm để bản đồ lia tới: ${tac.phase}`}
+                title={`Bấm để bản đồ định vị: ${tac.phase}`}
               >
                 <span className="pill-step-num">Giai đoạn {idx + 1}</span>
                 <span className="pill-phase-name">{tac.phase}</span>
@@ -263,31 +264,31 @@ export default function BattleMapTab() {
               className={`layer-btn ${mapLayerType === 'satellite' ? 'active' : ''}`}
               onClick={() => handleLayerChange('satellite')}
             >
-              🛰️ Vệ tinh
+              Vệ tinh
             </button>
             <button 
               className={`layer-btn ${mapLayerType === 'osm' ? 'active' : ''}`}
               onClick={() => handleLayerChange('osm')}
             >
-              🗺️ Địa hình
+              Địa hình
             </button>
           </div>
 
           <div className="map-hint-pill">
-            <span>💡 Nhấp vào nút giai đoạn ở trên hoặc mũi tên để bản đồ tự động bay tới vị trí</span>
+            <span>Nhấp vào giai đoạn hoặc mũi tên để bản đồ tự động định vị</span>
             <button className="reset-view-pill-btn" onClick={handleResetView} title="Trở về toàn cảnh">
               Toàn cảnh
             </button>
           </div>
         </div>
 
-        {/* Tactical Info Panel (3 Card Glassmorphism) */}
+        {/* Tactical Info Panel */}
         <div className="battle-sidebar-panel">
           
           {/* Card 1: Thẻ Tổng Quan & Thuyết Minh */}
-          <div className="battle-card cyber-glass-card battle-overview-card">
+          <div className="battle-card card battle-overview-card">
             <div className="card-top-row">
-              <span className="battle-era-badge">★ CHIẾN DỊCH TIÊU BIỂU</span>
+              <span className="battle-era-badge">CHIẾN DỊCH TIÊU BIỂU</span>
               <span className="battle-time-badge">{battle.time}</span>
             </div>
 
@@ -306,14 +307,14 @@ export default function BattleMapTab() {
             </div>
           </div>
 
-          {/* Card 2: Thẻ Tiến Trình Tác Chiến (Đưa lên trên để quan sát ngay không cần cuộn) */}
-          <div className="battle-card cyber-glass-card battle-stepper-card">
+          {/* Card 2: Thẻ Tiến Trình Tác Chiến */}
+          <div className="battle-card card battle-stepper-card">
             <div className="stepper-header">
               <div className="header-title-flex">
                 <Compass size={16} className="text-gold" />
                 <h4>Tiến Trình Tác Chiến 3 Giai Đoạn</h4>
               </div>
-              <span className="stepper-tip">Bấm giai đoạn để lia vị trí</span>
+              <span className="stepper-tip">Bấm giai đoạn để xem vị trí</span>
             </div>
 
             <div className="tactical-stepper-list">
@@ -342,7 +343,7 @@ export default function BattleMapTab() {
                       
                       {isActive && (
                         <div className="phase-active-focus">
-                          <span>📍 Bản đồ đã định vị trọng điểm giai đoạn này</span>
+                          <span>Đã định vị trọng điểm giai đoạn này</span>
                         </div>
                       )}
                     </div>
@@ -352,9 +353,9 @@ export default function BattleMapTab() {
             </div>
           </div>
 
-          {/* Card 3: Thẻ So Sánh Tương Quan Lực Lượng (Progress Bars) */}
+          {/* Card 3: Thẻ So Sánh Tương Quan Lực Lượng */}
           {battle.forcesComparison && (
-            <div className="battle-card cyber-glass-card battle-forces-card">
+            <div className="battle-card card battle-forces-card">
               <div className="forces-card-header">
                 <div className="header-title-flex">
                   <Swords size={16} className="text-gold" />
@@ -369,7 +370,7 @@ export default function BattleMapTab() {
                 <div className="force-bar-item">
                   <div className="force-labels">
                     <span className="force-name ally-name">
-                      ⚔️ {battle.forcesComparison.ourForces.name}
+                      {battle.forcesComparison.ourForces.name}
                     </span>
                     <strong className="force-count ally-count">
                       {battle.forcesComparison.ourForces.count}
@@ -388,7 +389,7 @@ export default function BattleMapTab() {
                 <div className="force-bar-item">
                   <div className="force-labels">
                     <span className="force-name enemy-name">
-                      ⚠ {battle.forcesComparison.enemyForces.name}
+                      {battle.forcesComparison.enemyForces.name}
                     </span>
                     <strong className="force-count enemy-count">
                       {battle.forcesComparison.enemyForces.count}
@@ -405,7 +406,7 @@ export default function BattleMapTab() {
               </div>
 
               <div className="forces-summary-callout">
-                <span className="callout-icon">💡</span>
+                <Info size={15} className="callout-icon text-gold" />
                 <p>{battle.forcesComparison.ratioNote}</p>
               </div>
             </div>
@@ -414,7 +415,7 @@ export default function BattleMapTab() {
           {/* Selected Feature Info Popup Card */}
           {selectedFeature && (
             <motion.div 
-              className="battle-card cyber-glass-card selected-flow-card"
+              className="battle-card card selected-flow-card"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
             >

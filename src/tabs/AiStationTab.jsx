@@ -23,54 +23,6 @@ const QUICK_PROMPTS = [
   "Căn nguyên Hoàng đế Quang Trung đột ngột qua đời năm 1792?"
 ];
 
-/**
- * TypewriterText - Hiệu ứng hiển thị chữ streaming từng ký tự cho phản hồi mới của AI
- */
-function TypewriterText({ text, onComplete }) {
-  const [displayedText, setDisplayedText] = useState('');
-  const textRef = useRef(text);
-  textRef.current = text;
-
-  useEffect(() => {
-    let index = 0;
-    const fullText = textRef.current;
-    
-    // Nếu text ngắn hoặc đã hiển thị hết
-    if (fullText.length < 30) {
-      setDisplayedText(fullText);
-      onComplete?.();
-      return;
-    }
-
-    const interval = setInterval(() => {
-      index += 4;
-      if (index >= fullText.length) {
-        setDisplayedText(fullText);
-        clearInterval(interval);
-        onComplete?.();
-      } else {
-        setDisplayedText(fullText.slice(0, index));
-      }
-    }, 18);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formatText = (content) => {
-    return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/\n/g, '<br>');
-  };
-
-  return (
-    <div 
-      className="chat-text-content"
-      dangerouslySetInnerHTML={{ __html: formatText(displayedText) }} 
-    />
-  );
-}
-
 const STORAGE_CHAT_KEY = 'su_ai_chat_history_v2';
 const INITIAL_BOT_MESSAGE = {
   role: 'bot',
@@ -217,34 +169,20 @@ export default function AiStationTab({ onOpenAdmin }) {
         <div className="title-divider-gold"></div>
       </div>
 
-      {/* Exhibition Context Bar */}
-      <div className="ai-telemetry-bar">
-        <div className="telemetry-item">
-          <Cpu size={15} className="telemetry-icon gold" />
-          <span>Mô hình: <strong>Google Gemini AI</strong></span>
-          <span className="live-dot-pulse" title="Sẵn sàng" />
-        </div>
-
-        <div className="telemetry-item rag-link" onClick={onOpenAdmin}>
-          <Database size={15} className="telemetry-icon crimson" />
-          <span>Kho sử liệu: <strong>{kbCount} Tài Liệu Gốc</strong></span>
-        </div>
-
-        <div className="telemetry-item author-tag">
-          <ShieldCheck size={15} className="telemetry-icon amber" />
-          <span>Biên soạn: <strong>Lê Trường Thịnh (12A8)</strong></span>
-        </div>
-      </div>
-
       {/* Parlor Container for Chat */}
-      <div className="chat-interface-card">
+      <div className="chat-interface-card card">
         {/* Chat Mini Header */}
         <div className="chat-card-top-header">
           <div className="chat-status-indicator">
-            <span className="live-dot-pulse" />
-            <span className="chat-status-text">Sử Quan Tây Sơn đang trực tuyến</span>
+            <span className="chat-status-dot" />
+            <span className="chat-status-text">Sử Quan Tây Sơn trực tuyến</span>
           </div>
-          <span className="chat-engine-chip">⚡ Google Gemini AI + RAG Google Docs + Google Search</span>
+          <div className="chat-engine-info">
+            <span className="chat-engine-chip">Google Gemini AI</span>
+            <span className="chat-source-count" onClick={onOpenAdmin} title="Kho sử liệu gốc">
+              <Database size={13} /> {kbCount} tư liệu
+            </span>
+          </div>
         </div>
 
         {/* Messages Stream */}
@@ -256,9 +194,9 @@ export default function AiStationTab({ onOpenAdmin }) {
               <motion.div 
                 key={idx}
                 className={`chat-bubble-row ${isBot ? 'bot-row' : 'user-row'}`}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
               >
                 {/* Avatar Sử Quan */}
                 <div className={`chat-avatar-wrapper ${isBot ? 'bot-avatar-wrap' : 'user-avatar-wrap'}`}>
@@ -277,28 +215,17 @@ export default function AiStationTab({ onOpenAdmin }) {
                         </span>
                       )}
                       {msg.sourceType === 'general' && (
-                        <span className="source-badge general" title="Thông tin tra cứu trực tuyến trên mạng Internet qua Google Gemini AI">
-                          <Sparkles size={12} /> Trực Tuyến & Google Gemini AI
+                        <span className="source-badge general" title="Thông tin tra cứu trực tuyến qua Google Gemini AI">
+                          <Sparkles size={12} /> Tra cứu Trực Tuyến & Gemini AI
                         </span>
                       )}
                     </div>
                   )}
 
-                  {/* Tin nhắn streaming typewriter nếu là tin nhắn mới, hoặc hiển thị ngay */}
-                  {isBot && msg.isNew ? (
-                    <TypewriterText 
-                      text={msg.text} 
-                      onComplete={() => {
-                        msg.isNew = false;
-                        scrollToBottom();
-                      }} 
-                    />
-                  ) : (
-                    <div 
-                      className="chat-text-content"
-                      dangerouslySetInnerHTML={{ __html: formatText(msg.text) }} 
-                    />
-                  )}
+                  <div 
+                    className="chat-text-content"
+                    dangerouslySetInnerHTML={{ __html: formatText(msg.text) }} 
+                  />
                 </div>
               </motion.div>
             );
@@ -308,7 +235,7 @@ export default function AiStationTab({ onOpenAdmin }) {
           {isLoading && (
             <motion.div 
               className="chat-bubble-row bot-row"
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="chat-avatar-wrapper bot-avatar-wrap">
@@ -330,9 +257,7 @@ export default function AiStationTab({ onOpenAdmin }) {
 
         {/* Quick Question Prompts */}
         <div className="quick-prompts-bar">
-          <span className="quick-label">
-            <Flame size={13} className="flame-icon" /> Gợi ý câu hỏi:
-          </span>
+          <span className="quick-label">Gợi ý câu hỏi:</span>
           <div className="prompts-slider">
             {QUICK_PROMPTS.map((prompt, idx) => (
               <button
@@ -376,6 +301,10 @@ export default function AiStationTab({ onOpenAdmin }) {
           >
             <Send size={17} />
           </button>
+        </div>
+
+        <div className="chat-academic-footer">
+          <span>Hệ thống đối chiếu sử liệu Tây Sơn · Biên soạn: Lê Trường Thịnh (Lớp 12A8 - Trường THPT Nguyễn Huệ)</span>
         </div>
       </div>
     </motion.div>

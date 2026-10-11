@@ -179,7 +179,7 @@ export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
                   }}
                 >
                   {isAdmin ? <Crown size={18} className="text-gold" /> : <Shield size={18} />}
-                  <span>{isAdmin ? '👑 Quản Trị Viên (Bấm để thoát)' : '🛡️ Chế độ Quản Trị Viên'}</span>
+                  <span>{isAdmin ? 'Quản Trị Viên (Thoát)' : 'Chế độ Quản Trị Viên'}</span>
                 </button>
               </div>
             </motion.div>

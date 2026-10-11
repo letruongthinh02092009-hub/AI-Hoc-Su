@@ -34,7 +34,7 @@ function TimelineCard3D({ event, idx }) {
   return (
     <motion.div
       ref={cardRef}
-      className="timeline-card cyber-heritage-tilt-card"
+      className="timeline-card card"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       animate={{
@@ -44,11 +44,8 @@ function TimelineCard3D({ event, idx }) {
       }}
       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
     >
-      {/* Viền sáng vàng rực bừng lên khi hover */}
-      <div className="card-border-glow-active" aria-hidden="true" />
-      
       <div className="timeline-card-header">
-        <span className="timeline-year-tag gold-shimmer-tag">{event.year}</span>
+        <span className="timeline-year-tag">{event.year}</span>
         <span className="timeline-badge heritage-badge">{event.badge}</span>
       </div>
 

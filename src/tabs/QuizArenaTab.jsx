@@ -207,11 +207,11 @@ export default function QuizArenaTab() {
 
   let rankBadge = '';
   if (percentage >= 90) {
-    rankBadge = '🏆 Đại Tướng Quân Giữ Sử Tây Sơn';
+    rankBadge = 'Đại Tướng Quân Giữ Sử Tây Sơn';
   } else if (percentage >= 70) {
-    rankBadge = '🎖️ Hộ Giá Đô Đốc Tây Sơn';
+    rankBadge = 'Hộ Giá Đô Đốc Tây Sơn';
   } else {
-    rankBadge = '📖 Dũng Sĩ Áo Vải Cần Mẫn';
+    rankBadge = 'Dũng Sĩ Áo Vải Cần Mẫn';
   }
 
   // Kiểm tra điều kiện mở khóa Giấy chứng nhận: Đã làm xong cả 3 cấp độ
@@ -344,9 +344,9 @@ export default function QuizArenaTab() {
     ctx.beginPath();
     ctx.arc(0, 0, 50, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.font = 'bold 16px "Times New Roman", serif';
+    ctx.font = 'bold 13px "Times New Roman", serif';
     ctx.textAlign = 'center';
-    ctx.fillText('★ ★ ★', 0, -22);
+    ctx.fillText('ĐẠI VIỆT', 0, -22);
     ctx.font = 'bold 15px "Times New Roman", serif';
     ctx.fillText('QUANG TRUNG', 0, 2);
     ctx.fillText('HOÀNG ĐẾ', 0, 22);
@@ -382,13 +382,13 @@ export default function QuizArenaTab() {
       <div className="quiz-progress-summary-bar">
         <div className="summary-badges-row">
           <span className={`summary-level-pill ${isLevel1Done ? 'done' : ''}`}>
-            {isLevel1Done ? '✓ Cấp I: ' + completedLevels['co-ban'] + 'đ' : '○ Cấp I: Chưa làm'}
+            {isLevel1Done ? 'Cấp I: ' + completedLevels['co-ban'] + ' điểm' : 'Cấp I: Chưa hoàn thành'}
           </span>
           <span className={`summary-level-pill ${isLevel2Done ? 'done' : ''}`}>
-            {isLevel2Done ? '✓ Cấp II: ' + completedLevels['nang-cao'] + 'đ' : '○ Cấp II: Chưa làm'}
+            {isLevel2Done ? 'Cấp II: ' + completedLevels['nang-cao'] + ' điểm' : 'Cấp II: Chưa hoàn thành'}
           </span>
           <span className={`summary-level-pill ${isLevel3Done ? 'done' : ''}`}>
-            {isLevel3Done ? '✓ Cấp III: ' + completedLevels['chuyen-sau'] + 'đ' : '○ Cấp III: Chưa làm'}
+            {isLevel3Done ? 'Cấp III: ' + completedLevels['chuyen-sau'] + ' điểm' : 'Cấp III: Chưa hoàn thành'}
           </span>
         </div>
 
@@ -434,7 +434,7 @@ export default function QuizArenaTab() {
               <div className="card-combat-stats">
                 <div className="stat-pill">
                   <span className="stat-label">Độ khó:</span>
-                  <span className="stat-stars">★☆☆☆☆</span>
+                  <span className="stat-stars">Cơ bản · 1/3</span>
                 </div>
                 <div className="stat-pill">
                   <span className="stat-label">Điểm cao nhất:</span>
@@ -475,7 +475,7 @@ export default function QuizArenaTab() {
               <div className="card-combat-stats">
                 <div className="stat-pill">
                   <span className="stat-label">Độ khó:</span>
-                  <span className="stat-stars">★★★☆☆</span>
+                  <span className="stat-stars">Nâng cao · 2/3</span>
                 </div>
                 <div className="stat-pill">
                   <span className="stat-label">Điểm cao nhất:</span>
@@ -516,7 +516,7 @@ export default function QuizArenaTab() {
               <div className="card-combat-stats">
                 <div className="stat-pill">
                   <span className="stat-label">Độ khó:</span>
-                  <span className="stat-stars">★★★★★</span>
+                  <span className="stat-stars">Chuyên sâu · 3/3</span>
                 </div>
                 <div className="stat-pill">
                   <span className="stat-label">Điểm cao nhất:</span>
@@ -535,12 +535,14 @@ export default function QuizArenaTab() {
       ) : isFinished ? (
         // Màn hình kết quả
         <motion.div 
-          className="quiz-result-card"
+          className="quiz-result-card card"
           initial={{ scale: 0.94, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="result-trophy-icon">🏆</div>
+          <div className="result-trophy-icon">
+            <Trophy size={48} className="text-gold" />
+          </div>
           <h3 className="result-title-gold">Hoàn Thành Lượt Thử Thách!</h3>
           <div className="result-score-tag">
             {score} / {totalPossible} Điểm ({percentage}%)
@@ -589,7 +591,7 @@ export default function QuizArenaTab() {
             </div>
 
             <div className="quiz-stats-group">
-              <span className="quiz-score-pill">⭐ Điểm: {score}</span>
+              <span className="quiz-score-pill"><Award size={14} /> Điểm: {score}</span>
               <span className={`quiz-streak-pill ${streak > 1 ? 'fire-streak' : ''}`}>
                 <Flame size={14} /> Chuỗi: {streak}
               </span>
@@ -671,7 +673,7 @@ export default function QuizArenaTab() {
                     {currentIndex + 1 < questionsList.length ? (
                       <>Câu tiếp theo <ArrowRight size={16} /></>
                     ) : (
-                      <>Xem tổng kết điểm số 🏆</>
+                      <>Xem tổng kết điểm số <ArrowRight size={16} /></>
                     )}
                   </button>
                 </div>
@@ -759,7 +761,7 @@ export default function QuizArenaTab() {
                     <div className="cert-bottom-signatures">
                       <div className="cert-seal-wrap">
                         <div className="imperial-red-seal">
-                          <span>★ ★ ★</span>
+                          <span>ĐẠI VIỆT</span>
                           <strong>QUANG TRUNG</strong>
                           <strong>HOÀNG ĐẾ</strong>
                           <small>1788 - 1792</small>
