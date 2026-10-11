@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   Crown,
   Swords,
-  LogOut
+  LogOut,
+  Sparkles
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
 import { playChime, getSoundEnabled, setSoundEnabled } from '../utils/audio';
@@ -31,7 +32,7 @@ const NAV_TABS = [
   { id: 'survey', label: 'Khảo Sát', icon: FileText }
 ];
 
-export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
+export default function Navbar({ activeTab, onSelectTab, onOpenAdmin, onReplayIntro }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [soundOn, setSoundOn] = useState(getSoundEnabled());
   const { isAdmin, toggleAdminModal } = useAdmin();
@@ -126,6 +127,19 @@ export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
               </button>
             )}
 
+            {/* Nút Xem lại Intro 3D Tượng đài */}
+            <button 
+              className="action-icon-btn intro-replay-btn"
+              onClick={() => {
+                playChime(700, 'triangle', 0.1);
+                onReplayIntro && onReplayIntro();
+              }}
+              title="Chiêm ngưỡng Tượng đài 3D & Màn mở đầu"
+            >
+              <Sparkles size={15} />
+              <span className="intro-btn-label">Intro 3D</span>
+            </button>
+
             <button 
               className={`action-icon-btn ${soundOn ? 'sound-on' : 'sound-off'}`}
               onClick={toggleSound}
@@ -169,6 +183,17 @@ export default function Navbar({ activeTab, onSelectTab, onOpenAdmin }) {
                     </button>
                   );
                 })}
+
+                <button
+                  className="mobile-nav-item"
+                  onClick={() => {
+                    setIsMobileOpen(false);
+                    onReplayIntro && onReplayIntro();
+                  }}
+                >
+                  <Sparkles size={18} className="text-gold" />
+                  <span>Chiêm Ngưỡng Tượng Đài 3D</span>
+                </button>
 
                 <div className="mobile-drawer-admin-divider" />
                 <button 

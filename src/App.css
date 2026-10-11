@@ -5853,4 +5853,466 @@ body {
   box-shadow: 0 4px 20px rgba(229, 169, 60, 0.45);
 }
 
+/* ==========================================================================
+   CINEMATIC 3D PARALLAX INTRO & MONUMENT STATUE STAGE
+   Phong cách Web Di sản / Game Dã sử Đỉnh cao (Chinese Cinematic Heritage Style)
+   ========================================================================== */
+.cinematic-intro-root {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0A0807;
+  color: #F0E8DC;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  perspective: 1200px;
+  user-select: none;
+}
+
+/* 1. HẬU CẢNH: Bầu trời trận mạc & Sương khói */
+.intro-bg-layer {
+  position: absolute;
+  inset: -60px;
+  pointer-events: none;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0.2, 1);
+  background: radial-gradient(circle at 50% 35%, rgba(158, 42, 43, 0.3) 0%, rgba(21, 18, 16, 0.95) 60%, #070504 100%);
+}
+
+.intro-radial-nebula {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(ellipse at center, rgba(197, 160, 89, 0.18) 0%, rgba(158, 42, 43, 0.12) 50%, transparent 80%);
+  filter: blur(50px);
+}
+
+.intro-smoke-cloud {
+  position: absolute;
+  width: 500px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(100, 40, 30, 0.15) 0%, transparent 70%);
+  filter: blur(60px);
+}
+
+.cloud-left {
+  top: 30%;
+  left: -100px;
+  animation: floatCloudLeft 16s ease-in-out infinite alternate;
+}
+
+.cloud-right {
+  bottom: 10%;
+  right: -100px;
+  animation: floatCloudRight 20s ease-in-out infinite alternate;
+}
+
+@keyframes floatCloudLeft {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(60px, -40px); }
+}
+
+@keyframes floatCloudRight {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-70px, 30px); }
+}
+
+/* 2. ÁNH SÁNG HOÀNG TRIỀU: Luồng hào quang vàng kim */
+.intro-godrays-layer {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  width: 650px;
+  height: 650px;
+  margin-left: -325px;
+  margin-top: -325px;
+  pointer-events: none;
+  z-index: 2;
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+.intro-golden-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg at 50% 50%, 
+    rgba(197, 160, 89, 0.14) 0deg, 
+    transparent 35deg, 
+    rgba(197, 160, 89, 0.2) 75deg, 
+    transparent 120deg, 
+    rgba(158, 42, 43, 0.15) 170deg, 
+    transparent 230deg, 
+    rgba(197, 160, 89, 0.22) 290deg, 
+    transparent 360deg
+  );
+  animation: slowSpinRays 50s linear infinite;
+  filter: blur(14px);
+}
+
+.intro-imperial-ring {
+  position: absolute;
+  inset: 80px;
+  border-radius: 50%;
+  border: 1px dashed rgba(197, 160, 89, 0.25);
+  box-shadow: 0 0 30px rgba(197, 160, 89, 0.15);
+  animation: slowSpinRays 90s linear infinite reverse;
+}
+
+@keyframes slowSpinRays {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 3. VÙNG TRUNG TÂM: TƯỢNG QUANG TRUNG 3D LẮC LƯ */
+.intro-monument-stage {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+  margin-top: 10px;
+  margin-bottom: 22px;
+}
+
+.intro-statue-3d-wrapper {
+  position: relative;
+  transform-style: preserve-3d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+.statue-gold-rim-glow {
+  position: absolute;
+  inset: -12px;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at center, rgba(197, 160, 89, 0.35) 0%, rgba(158, 42, 43, 0.2) 60%, transparent 80%);
+  filter: blur(20px);
+  z-index: -1;
+}
+
+.statue-sculpture-card {
+  position: relative;
+  width: 270px;
+  height: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid rgba(197, 160, 89, 0.65);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 35px rgba(197, 160, 89, 0.25);
+  background: #151210;
+}
+
+.statue-image-main {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  filter: contrast(1.18) brightness(0.96) saturate(1.05);
+  transition: transform 0.4s ease;
+}
+
+.statue-sculpture-card:hover .statue-image-main {
+  transform: scale(1.04);
+}
+
+.statue-specular-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: background 0.12s ease;
+}
+
+.statue-vignette-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 8, 7, 0.65) 100%), linear-gradient(to top, rgba(10, 8, 7, 0.85) 0%, transparent 45%);
+}
+
+.statue-plinth-base {
+  margin-top: -14px;
+  z-index: 5;
+  background: #1C1815;
+  border: 1px solid var(--accent-gold);
+  padding: 6px 18px;
+  border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+}
+
+.plinth-inscription {
+  font-family: var(--font-serif);
+  font-size: 0.74rem;
+  letter-spacing: 2px;
+  color: var(--accent-gold-light);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 4. TIỀN CẢNH: CHỮ THƯ PHÁP, LỜI HIỂU DỤ & NÚT BƯỚC VÀO */
+.intro-foreground-content {
+  position: relative;
+  z-index: 20;
+  text-align: center;
+  max-width: 680px;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+.intro-brand-header {
+  margin-bottom: 12px;
+}
+
+.intro-kicker {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.intro-hero-title {
+  font-family: var(--font-serif);
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #F0E8DC;
+  margin: 0 0 4px 0;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(197, 160, 89, 0.35);
+}
+
+.intro-sub-title {
+  font-size: 0.86rem;
+  letter-spacing: 2.5px;
+  color: var(--accent-gold-light);
+  margin: 0;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.intro-quote-scroll {
+  background: rgba(21, 18, 16, 0.88);
+  border-left: 3px solid var(--primary-crimson);
+  border-right: 3px solid var(--primary-crimson);
+  border-top: 1px solid rgba(197, 160, 89, 0.2);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+  padding: 12px 24px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  max-width: 580px;
+}
+
+.intro-proclamation {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  color: #E7DDD0;
+  margin: 0 0 6px 0;
+}
+
+.intro-quote-author {
+  font-size: 0.74rem;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+  display: block;
+}
+
+.intro-actions-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.intro-enter-btn {
+  position: relative;
+  background: linear-gradient(135deg, #B53335 0%, #9E2A2B 50%, #7A1C1D 100%);
+  border: 1px solid #DFC48A;
+  color: #FFF;
+  padding: 13px 36px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  cursor: pointer;
+  box-shadow: 0 6px 28px rgba(158, 42, 43, 0.55), 0 0 35px rgba(197, 160, 89, 0.35);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+}
+
+.intro-enter-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 38px rgba(181, 51, 53, 0.75), 0 0 45px rgba(223, 196, 138, 0.5);
+  border-color: #F0E8DC;
+}
+
+.enter-btn-flame {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: left 0.6s ease;
+}
+
+.intro-enter-btn:hover .enter-btn-flame {
+  left: 100%;
+}
+
+.enter-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.enter-sword-icon {
+  color: var(--accent-gold-light);
+}
+
+.intro-skip-btn {
+  background: transparent;
+  border: none;
+  color: #8C827A;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+  padding: 4px 8px;
+}
+
+.intro-skip-btn:hover {
+  color: var(--accent-gold-light);
+}
+
+.intro-academic-badge {
+  font-size: 0.74rem;
+  color: #736B63;
+  letter-spacing: 0.5px;
+}
+
+.intro-academic-badge strong {
+  color: var(--accent-gold);
+}
+
+/* 5. GÓC TRÊN: ÂM THANH */
+.intro-top-bar {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 50;
+}
+
+.intro-sound-toggle {
+  background: rgba(21, 18, 16, 0.75);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-gold-light);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(6px);
+}
+
+.intro-sound-toggle:hover {
+  border-color: var(--accent-gold);
+  background: rgba(28, 24, 21, 0.9);
+}
+
+/* HIỆU ỨNG CHỚP SÁNG MỞ CỔNG */
+.intro-flash-gate {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, #DFC48A 0%, #B53335 45%, #070504 100%);
+  z-index: 100000;
+  pointer-events: none;
+  animation: flashGateAnim 0.9s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+@keyframes flashGateAnim {
+  0% { opacity: 0; transform: scale(0.9); }
+  35% { opacity: 0.95; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+
+/* Nút Chiêm ngưỡng lại Intro trên Navbar */
+.intro-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(197, 160, 89, 0.12) !important;
+  border-color: var(--border-gold) !important;
+  color: var(--accent-gold-light) !important;
+}
+
+.intro-replay-btn:hover {
+  background: rgba(197, 160, 89, 0.22) !important;
+  color: #FFF !important;
+}
+
+.intro-btn-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* TỐI ƯU MÀN HÌNH DI ĐỘNG (MOBILE RESPONSIVE) */
+@media (max-width: 640px) {
+  .statue-sculpture-card {
+    width: 210px;
+    height: 270px;
+  }
+  .intro-hero-title {
+    font-size: 2rem;
+    letter-spacing: 2px;
+  }
+  .intro-sub-title {
+    font-size: 0.78rem;
+  }
+  .intro-proclamation {
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+  .intro-quote-scroll {
+    padding: 10px 16px;
+    margin-bottom: 16px;
+  }
+  .intro-enter-btn {
+    padding: 11px 26px;
+    font-size: 0.88rem;
+  }
+  .intro-top-bar {
+    top: 14px;
+    right: 14px;
+  }
+  .intro-btn-label {
+    display: none;
+  }
+}
+
+
 

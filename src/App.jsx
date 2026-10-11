@@ -15,6 +15,7 @@ import SurveyTab from './tabs/SurveyTab';
 import AmbientEmbersCanvas from './components/AmbientEmbersCanvas';
 import FloatingAiWidget from './components/FloatingAiWidget';
 import AdminPinModal from './components/AdminPinModal';
+import CinematicIntro from './components/CinematicIntro';
 import { AdminProvider } from './context/AdminContext';
 import { fetchCloudKnowledgeBase } from './services/geminiService';
 
@@ -23,6 +24,7 @@ import './App.css';
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
 
   // Tự động kéo kho tri thức đám mây (Google Docs) khi mở web trên mọi thiết bị
   useEffect(() => {
@@ -82,11 +84,19 @@ export default function App() {
         <div className="ambient-radial-glow glow-gold" aria-hidden="true" />
         <div className="heritage-pattern-overlay" aria-hidden="true" />
 
+        {/* Màn mở đầu Điện ảnh 3D Parallax & Tượng Quang Trung lắc lư */}
+        <AnimatePresence>
+          {showIntro && (
+            <CinematicIntro onEnter={() => setShowIntro(false)} />
+          )}
+        </AnimatePresence>
+
         {/* Thanh điều hướng chính */}
         <Navbar 
           activeTab={activeTab} 
           onSelectTab={handleSelectTab} 
           onOpenAdmin={() => setIsAdminOpen(true)}
+          onReplayIntro={() => setShowIntro(true)}
         />
 
         {/* Nội dung tab hiện tại */}
