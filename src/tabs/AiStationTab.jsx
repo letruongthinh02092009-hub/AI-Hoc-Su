@@ -269,12 +269,12 @@ export default function AiStationTab({ onOpenAdmin }) {
                     <div className="bot-meta-tag">
                       <span className="bot-name">Sử Quan Tây Sơn</span>
                       {msg.sourceType === 'admin' && (
-                        <span className="source-badge admin">
-                          <BookOpen size={12} /> RAG Phê Duyệt
+                        <span className="source-badge admin" title="Nội dung trích xuất trực tiếp từ Google Docs của tác giả">
+                          <BookOpen size={12} /> Google Docs Tác Giả
                         </span>
                       )}
                       {msg.sourceType === 'general' && (
-                        <span className="source-badge general">
+                        <span className="source-badge general" title="Thông tin tổng quát do Google Gemini AI tra cứu">
                           <Sparkles size={12} /> Google Gemini AI
                         </span>
                       )}

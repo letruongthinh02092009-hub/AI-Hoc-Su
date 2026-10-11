@@ -203,9 +203,9 @@ export async function sendChatMessageToGemini(userQuestion) {
   if (hasMatchedDoc) {
     ragContextPrompt = `\n\n[DỮ LIỆU ĐẶC BIỆT TỪ GOOGLE DOCS DO TÁC GIẢ (Lê Trường Thịnh - 12A8 THPT Nguyễn Huệ) CUNG CẤP]:\n` +
       matchedDocs.map(d => `✦ Tiêu đề: ${d.title}\n✦ Nguồn: ${d.source}\n✦ Nội dung: ${d.content}`).join('\n\n') +
-      `\n\nQUY TẮC BẮT BUỘC: Bạn PHẢI trả lời hoàn toàn dựa trên tư liệu trong Google Docs trên. Trình bày khoa học, chính xác, súc tích. Ở cuối câu trả lời, hãy đính kèm đúng cú pháp: "\n\n📚 *Nguồn tư liệu:* ${matchedDocs[0].source} (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)"`;
+      `\n\nQUY TẮC BẮT BUỘC: Bạn PHẢI trả lời hoàn toàn dựa trên tư liệu trong Google Docs trên. Trình bày khoa học, chính xác, súc tích. Ở cuối câu trả lời, hãy đính kèm đúng cú pháp:\n"\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)"`;
   } else {
-    ragContextPrompt = `\n\nLƯU Ý: Không có dữ liệu chuyên biệt trong kho tài liệu Google Docs cho câu hỏi này. Bạn hãy sử dụng tri thức lịch sử chuẩn xác nhất của bạn và đính kèm ở cuối câu trả lời: "\n\n🌐 *Nguồn tư liệu:* Tri thức tổng quát (Được xác thực bởi Google Gemini AI)"`;
+    ragContextPrompt = `\n\n[LƯU Ý QUAN TRỌNG VỀ NGUỒN TƯ LIỆU]: Thông tin cho câu hỏi này HIỆN CHƯA CÓ trong tài liệu Google Docs của tác giả Lê Trường Thịnh.\nBạn hãy sử dụng tri thức Lịch sử chuẩn xác của bạn (Đại Nam Thực Lục, SGK Lịch Sử) để giải đáp khoa học, khách quan cho học sinh.\n\nQUY TẮC BẮT BUỘC ĐỂ TRÁNH NHẦM LẪN: Ở cuối câu trả lời, bạn BẮT BUỘC đính kèm đúng cú pháp nguồn sau để người đọc phân biệt rõ:\n"\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử chung do Google Gemini AI đối chiếu (Chưa có trong Google Docs của tác giả)"`;
   }
 
   const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý Lịch sử thông minh, tâm lý và am tường sử sách của nền tảng Học Sử Số Hóa (Dự án số hóa di sản Lịch sử của tác giả Lê Trường Thịnh, lớp 12A8, Trường THPT Nguyễn Huệ).
@@ -252,14 +252,26 @@ TÍNH CÁCH & PHONG THÁI GIAO TIẾP:
 
     const data = await response.json();
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-      const replyText = data.candidates[0].content.parts[0].text;
+      let replyText = data.candidates[0].content.parts[0].text;
+
+      // Đảm bảo luôn có dòng nguồn rõ ràng ở cuối câu trả lời để không bị nhầm lẫn
+      if (hasMatchedDoc) {
+        if (!replyText.includes('Google Docs') && !replyText.includes('Nguồn tư liệu')) {
+          replyText += `\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8 THPT Nguyễn Huệ)`;
+        }
+      } else {
+        if (!replyText.includes('Google Gemini AI') && !replyText.includes('Nguồn tư liệu')) {
+          replyText += `\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử chung do Google Gemini AI đối chiếu (Chưa có trong Google Docs của tác giả)`;
+        }
+      }
+
       chatHistory.push({ role: "model", parts: [{ text: replyText }] });
 
       return {
         text: replyText,
         sourceType: hasMatchedDoc ? 'admin' : 'general',
         docTitle: hasMatchedDoc ? matchedDocs[0].title : null,
-        model: 'Gemini 3.5 Flash Lite'
+        model: 'Google Gemini AI'
       };
     } else {
       throw new Error('Dữ liệu phản hồi không hợp lệ');
