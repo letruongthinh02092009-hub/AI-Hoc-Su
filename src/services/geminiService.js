@@ -6,6 +6,8 @@ const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models
 const KB_STORAGE_KEY = "khkt_su_knowledge_base_v2";
 export const DEFAULT_GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzsgFMs-xMdTGE1wa0Bc9ycj0qEFz2Ga4EOqSrfKb6msLUv6WkoK1fzEmm1C-7xzp487g/exec";
 export const GAS_WEBHOOK_STORAGE_KEY = "su_gas_knowledge_webhook_url";
+export const DEFAULT_GOOGLE_DOC_ID = "1yWiKZdHJlovfvMzfBOaFTW3auEaKyKcEMBUOU68BPSE";
+export const DEFAULT_GOOGLE_DOC_URL = "https://docs.google.com/document/d/1yWiKZdHJlovfvMzfBOaFTW3auEaKyKcEMBUOU68BPSE/edit";
 
 export function getWebhookUrl() {
   try {
@@ -39,7 +41,7 @@ export function saveKnowledgeBase(items) {
   }
 }
 
-// Đồng bộ sử liệu mới lên Google Apps Script Webhook (lưu vĩnh viễn trên Google Sheets)
+// Đồng bộ sử liệu mới lên Google Apps Script Webhook
 export async function syncKnowledgeToCloud(item) {
   const url = getWebhookUrl();
   if (!url) return false;
@@ -54,7 +56,6 @@ export async function syncKnowledgeToCloud(item) {
       authorApproved: item.authorApproved || 'Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)'
     };
 
-    // Google Apps Script Web App chấp nhận text/plain để tránh lỗi CORS Preflight
     await fetch(url, {
       method: 'POST',
       headers: {
@@ -70,39 +71,124 @@ export async function syncKnowledgeToCloud(item) {
   }
 }
 
+// Tự động phân tích văn bản từ Google Docs thành các bài học cho AI
+export function parseGoogleDocTextToKnowledge(rawText) {
+  if (!rawText || !rawText.trim()) return [];
+
+  const items = [];
+
+  // 1. Nếu người dùng dùng dấu phân cách ### hoặc ===
+  if (rawText.includes('###')) {
+    const sections = rawText.split(/###\s+/);
+    for (let i = 1; i < sections.length; i++) {
+      const sec = sections[i].trim();
+      if (!sec) continue;
+      const lines = sec.split('\n');
+      const title = lines[0].trim();
+      const content = lines.slice(1).join('\n').trim();
+      if (title && content) {
+        items.push({
+          id: `gdoc-${i}`,
+          title: title,
+          category: 'Tư liệu Google Docs',
+          source: 'Google Docs - Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+          authorApproved: 'Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+          content: content
+        });
+      }
+    }
+    if (items.length > 0) return items;
+  }
+
+  // 2. Phân tách theo đoạn văn (dán tự do từ trên xuống dưới)
+  const paragraphs = rawText.split(/\n{2,}/).map(p => p.trim()).filter(p => p.length > 25);
+  if (paragraphs.length > 0) {
+    paragraphs.forEach((p, idx) => {
+      const lines = p.split('\n').map(l => l.trim()).filter(Boolean);
+      const titleCandidate = lines[0].slice(0, 80);
+      const content = lines.length > 1 ? lines.slice(1).join('\n') : p;
+      items.push({
+        id: `gdoc-p-${idx + 1}`,
+        title: titleCandidate || `Tư liệu Google Docs mục ${idx + 1}`,
+        category: 'Tư liệu Google Docs',
+        source: 'Google Docs - Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+        authorApproved: 'Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+        content: p
+      });
+    });
+    return items;
+  }
+
+  // 3. Toàn bộ tài liệu
+  return [{
+    id: 'gdoc-full',
+    title: 'Kho Sử Liệu Tây Sơn (Google Docs)',
+    category: 'Tư liệu tổng hợp',
+    source: 'Google Docs - Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+    authorApproved: 'Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+    content: rawText.trim()
+  }];
+}
+
 // Tự động kéo toàn bộ dữ liệu từ Google Docs về khi mở web trên Điện Thoại hoặc máy khác
 export async function fetchCloudKnowledgeBase() {
-  const url = getWebhookUrl();
-  if (!url) return getKnowledgeBase();
-
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
-    const result = await response.json();
+    // 1. Gọi trực tiếp API nội bộ đọc Google Docs của tác giả
+    let textContent = '';
     
-    // 1. Trường hợp Google Docs trả về mảng các bài học đã phân đoạn
-    if (result && Array.isArray(result.data) && result.data.length > 0) {
-      const current = getKnowledgeBase();
-      const existingIds = new Set(current.map(item => item.id));
-      const newItems = result.data.filter(item => !existingIds.has(item.id) && item.title && item.content);
-      
-      if (newItems.length > 0) {
-        const combined = [...newItems, ...current];
+    try {
+      const apiRes = await fetch('/api/doc', { method: 'GET' });
+      if (apiRes.ok) {
+        const apiData = await apiRes.json();
+        if (apiData && apiData.text) textContent = apiData.text;
+      }
+    } catch (e) {}
+
+    // 2. Nếu API nội bộ chưa có phản hồi, thử tải trực tiếp export txt từ Google Docs
+    if (!textContent) {
+      try {
+        const exportUrl = `https://docs.google.com/document/d/${DEFAULT_GOOGLE_DOC_ID}/export?format=txt`;
+        const directRes = await fetch(exportUrl);
+        if (directRes.ok) {
+          textContent = await directRes.text();
+        }
+      } catch (e) {}
+    }
+
+    // 3. Nếu có văn bản Google Docs: lưu trữ và nạp thẳng vào tri thức của AI
+    if (textContent && textContent.trim()) {
+      try {
+        localStorage.setItem('su_google_docs_raw_text', textContent);
+      } catch (e) {}
+
+      const parsedItems = parseGoogleDocTextToKnowledge(textContent);
+      if (parsedItems.length > 0) {
+        const current = getKnowledgeBase();
+        const nonGdoc = current.filter(item => !item.id.startsWith('gdoc-'));
+        const combined = [...parsedItems, ...nonGdoc];
         saveKnowledgeBase(combined);
         return combined;
       }
     }
 
-    // 2. Trường hợp Google Docs trả về rawText văn bản tự do
-    if (result && result.rawText && typeof result.rawText === 'string') {
-      try {
-        localStorage.setItem('su_google_docs_raw_text', result.rawText);
-      } catch (e) {}
+    // 4. Dự phòng: gọi qua Apps Script Webhook nếu có
+    const webhookUrl = getWebhookUrl();
+    if (webhookUrl) {
+      const response = await fetch(webhookUrl, { method: 'GET', headers: { 'Accept': 'application/json' } });
+      const result = await response.json();
+      if (result && Array.isArray(result.data) && result.data.length > 0) {
+        const current = getKnowledgeBase();
+        const existingIds = new Set(current.map(item => item.id));
+        const newItems = result.data.filter(item => !existingIds.has(item.id) && item.title && item.content);
+        if (newItems.length > 0) {
+          const combined = [...newItems, ...current];
+          saveKnowledgeBase(combined);
+          return combined;
+        }
+      }
     }
   } catch (e) {
-    console.log("Chưa thể kéo từ Google Docs Webhook:", e);
+    console.log("Kiểm tra đồng bộ Google Docs:", e);
   }
   return getKnowledgeBase();
 }
@@ -120,9 +206,7 @@ export function addKnowledgeItem(item) {
   current.unshift(newItem);
   saveKnowledgeBase(current);
 
-  // Tự động đẩy lên Google Docs qua Webhook
   syncKnowledgeToCloud(newItem);
-
   return newItem;
 }
 
@@ -156,18 +240,46 @@ function searchRelevantKnowledge(query) {
 
     queryWords.forEach(word => {
       if (normTitle.includes(word)) score += 4;
-      if (normContent.includes(word)) score += 1;
+      if (normContent.includes(word)) score += 2;
     });
 
     // Ưu tiên cao hơn nếu là tư liệu từ Google Docs của tác giả
     if (item.source && item.source.toLowerCase().includes('google docs')) {
-      score += 2;
+      score += 3;
     }
 
     if (score > 2) {
       matches.push({ item, score });
     }
   }
+
+  // Tra cứu thêm trong raw text nếu chưa tìm thấy
+  try {
+    const rawText = localStorage.getItem('su_google_docs_raw_text');
+    if (rawText && matches.length === 0) {
+      const paragraphs = rawText.split(/\n{2,}/);
+      for (const p of paragraphs) {
+        const normP = p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        let score = 0;
+        const queryWords = normQuery.split(/\s+/).filter(w => w.length > 1);
+        queryWords.forEach(word => {
+          if (normP.includes(word)) score += 2;
+        });
+        if (score > 2) {
+          matches.push({
+            item: {
+              id: 'gdoc-raw-matched',
+              title: 'Trích lục Google Docs của tác giả Lê Trường Thịnh',
+              source: 'Google Docs - Lê Trường Thịnh (12A8 THPT Nguyễn Huệ)',
+              content: p.trim()
+            },
+            score
+          });
+          break;
+        }
+      }
+    }
+  } catch (e) {}
 
   matches.sort((a, b) => b.score - a.score);
   return matches.slice(0, 3).map(m => m.item);

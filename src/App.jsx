@@ -22,7 +22,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // Tự động kéo kho tri thức đám mây (Google Sheets Webhook) khi mở web trên mọi thiết bị
+  // Tự động kéo kho tri thức đám mây (Google Docs) khi mở web trên mọi thiết bị
   useEffect(() => {
     fetchCloudKnowledgeBase();
   }, []);

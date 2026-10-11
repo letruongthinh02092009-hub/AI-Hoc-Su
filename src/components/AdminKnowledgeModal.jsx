@@ -13,7 +13,8 @@ import {
   FileText,
   AlertCircle,
   RefreshCw,
-  Cloud
+  Cloud,
+  ExternalLink
 } from 'lucide-react';
 import { 
   getKnowledgeBase, 
@@ -22,7 +23,8 @@ import {
   resetKnowledgeBase,
   saveKnowledgeBase,
   fetchCloudKnowledgeBase,
-  syncKnowledgeToCloud
+  syncKnowledgeToCloud,
+  DEFAULT_GOOGLE_DOC_URL
 } from '../services/geminiService';
 import { playChime, playCorrectSound, playVictorySound } from '../utils/audio';
 import mammoth from 'mammoth';
@@ -201,12 +203,12 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
       if (updated && updated.length > 0) {
         setKnowledgeList(updated);
         playVictorySound();
-        setSuccessMsg('Đã đồng bộ thành công kho tri thức từ Google Sheets!');
+        setSuccessMsg('Đã đồng bộ thành công kho tri thức từ Google Docs!');
       } else {
-        setSuccessMsg('Đã kết nối Google Sheets. Dữ liệu hiện đã đồng bộ!');
+        setSuccessMsg('Đã kết nối Google Docs. Dữ liệu hiện đã đồng bộ!');
       }
     } catch (e) {
-      setErrorMsg('Chưa thể đồng bộ: Vui lòng kiểm tra quyền truy cập Anyone của Webhook.');
+      setErrorMsg('Chưa thể đồng bộ: Vui lòng kiểm tra quyền truy cập Google Docs (Bất kỳ ai có liên kết đều có thể xem).');
     } finally {
       setIsSyncingCloud(false);
       setTimeout(() => setSuccessMsg(''), 4000);
@@ -358,9 +360,20 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
                   <div className="list-col-header">
                     <div>
                       <h4>Kho Sử Liệu Đã Nạp ({knowledgeList.length} tài liệu)</h4>
-                      <div className="cloud-sync-status-badge">
+                      <div className="cloud-sync-status-badge" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                         <Cloud size={13} className="text-emerald" />
-                        <span>Đám mây Google Docs: <strong>Đã kết nối</strong></span>
+                        <span>Google Docs: <strong>Tự động đồng bộ</strong></span>
+                        <a 
+                          href={DEFAULT_GOOGLE_DOC_URL} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="gdoc-external-link"
+                          style={{ color: '#38bdf8', display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'underline', fontSize: '11px', fontWeight: '500' }}
+                          title="Mở tài liệu Google Docs gốc của tác giả"
+                        >
+                          <span>Mở Docs</span>
+                          <ExternalLink size={11} />
+                        </a>
                       </div>
                     </div>
                     <div className="list-header-actions">
