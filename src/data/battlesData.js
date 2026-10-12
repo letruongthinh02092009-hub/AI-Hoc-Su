@@ -28,33 +28,118 @@ export const BATTLES_DATA = {
       },
       ratioNote: 'Tương quan 1 chọi gần 3 (Lấy ít địch nhiều, mưu sâu chôn vùi 5 vạn giặc trong một đêm)'
     },
+    funFacts: [
+      {
+        icon: 'Waves',
+        title: 'Lợi dụng con nước triều',
+        desc: 'Nguyễn Huệ tính toán chính xác chu kỳ triều rút sông Tiền để nhử địch vào cạm bẫy hẹp.'
+      },
+      {
+        icon: 'Flame',
+        title: 'Ống phóng Hỏa Hổ uy lực',
+        desc: 'Hàng trăm ống hỏa hổ thiêu rụi thuyền Xiêm khiến quân giặc nhảy xuống sông tán loạn.'
+      },
+      {
+        icon: 'Swords',
+        title: 'Thắng lợi trong một đêm',
+        desc: 'Toàn bộ 300 thuyền chiến và gần 5 vạn quân Xiêm bị xóa sổ chỉ trong một đêm rạng sáng 20/01/1785.'
+      }
+    ],
+    phases: [
+      {
+        label: 'Nghi binh nhử địch',
+        phase: 'Giai đoạn 1: Nghi binh nhử địch',
+        tag: 'Khởi đầu trận đánh',
+        icon: '⚔️',
+        center: [10.355, 106.275],
+        zoom: 13,
+        desc: 'Cho thuyền nhỏ ra khiêu chiến rồi giả thua rút lui theo dòng chảy, kích động tướng Xiêm Chiêu Tăng dốc toàn lực hạm đội đuổi theo vào đúng đoạn sông mai phục.',
+        miniQuiz: {
+          question: 'Tại sao Nguyễn Huệ lại cho thuyền nhỏ ra khiêu chiến rồi vờ rút lui?',
+          options: ['Do quân ít sợ hãi', 'Nghi binh nhử địch vào bẫy sông Rạch Gầm', 'Đợi viện binh từ Quy Nhơn', 'Để trinh sát ban ngày'],
+          correct: 1,
+          explain: 'Kế nghi binh giả thua khiến tướng Chiêu Tăng khinh địch, thúc toàn bộ 300 thuyền chiến tiến vào lòng sông mai phục.'
+        }
+      },
+      {
+        label: 'Khóa gọng kìm',
+        phase: 'Giai đoạn 2: Khóa chặt thế gọng kìm',
+        tag: 'Bước ngoặt then chốt',
+        icon: '🔒',
+        center: [10.335, 106.310],
+        zoom: 13,
+        desc: 'Đúng lúc nước ròng (thủy triều rút nhanh), hai đạo thủy binh Tây Sơn từ rạch Rạch Gầm và rạch Xoài Mút đồng loạt xông ra bịt kín lối tiến lẫn lối thoái của giặc.',
+        miniQuiz: {
+          question: 'Yếu tố tự nhiên nào quyết định thời điểm phát lệnh công kích của quân Tây Sơn?',
+          options: ['Gió mùa đông bắc', 'Trời đổ mưa rào', 'Nước ròng (thủy triều rút nhanh)', 'Sương mù dày đặc'],
+          correct: 2,
+          explain: 'Khi nước ròng rút nhanh, thuyền chiến lớn của giặc bị cản trở dòng chảy và mắc cạn, tạo thời cơ gọng kìm khép lại.'
+        }
+      },
+      {
+        label: 'Pháo hỏa hủy diệt',
+        phase: 'Giai đoạn 3: Pháo hỏa hủy diệt',
+        tag: 'Quyết chiến toàn thắng',
+        icon: '🔥',
+        center: [10.338, 106.320],
+        zoom: 13.5,
+        desc: 'Từ cù lao Thới Sơn và hai bờ cây cối rậm rạp, pháo binh dã chiến và ống hỏa hổ bắn xối xả chia cắt đội hình, đốt cháy và đánh chìm toàn bộ 300 chiến thuyền giặc.',
+        miniQuiz: {
+          question: 'Lực lượng pháo binh và hỏa hổ Tây Sơn được bố trí mai phục ở đâu?',
+          options: ['Cù lao Thới Sơn và hai bờ sông', 'Trên núi Bà Đen', 'Sau thành Mỹ Tho', 'Thả trôi theo bè lửa'],
+          correct: 0,
+          explain: 'Địa hình cù lao Thới Sơn rậm rạp giữa lòng sông Tiền là trận địa pháo bí mật xả đạn chia cắt đội hình thuyền giặc.'
+        }
+      }
+    ],
     tactics: [
       { 
         id: 1,
+        label: 'Nghi binh nhử địch',
         phase: 'Giai đoạn 1: Nghi binh nhử địch', 
         tag: 'Khởi đầu trận đánh',
         icon: '⚔️',
         center: [10.355, 106.275],
         zoom: 13,
-        desc: 'Cho thuyền nhỏ ra khiêu chiến rồi giả thua rút lui theo dòng chảy, kích động tướng Xiêm Chiêu Tăng dốc toàn lực hạm đội đuổi theo vào đúng đoạn sông mai phục.' 
+        desc: 'Cho thuyền nhỏ ra khiêu chiến rồi giả thua rút lui theo dòng chảy, kích động tướng Xiêm Chiêu Tăng dốc toàn lực hạm đội đuổi theo vào đúng đoạn sông mai phục.',
+        miniQuiz: {
+          question: 'Tại sao Nguyễn Huệ lại cho thuyền nhỏ ra khiêu chiến rồi vờ rút lui?',
+          options: ['Do quân ít sợ hãi', 'Nghi binh nhử địch vào bẫy sông Rạch Gầm', 'Đợi viện binh từ Quy Nhơn', 'Để trinh sát ban ngày'],
+          correct: 1,
+          explain: 'Kế nghi binh giả thua khiến tướng Chiêu Tăng khinh địch, thúc toàn bộ 300 thuyền chiến tiến vào lòng sông mai phục.'
+        }
       },
       { 
         id: 2,
+        label: 'Khóa gọng kìm',
         phase: 'Giai đoạn 2: Khóa chặt thế gọng kìm', 
         tag: 'Bước ngoặt then chốt',
         icon: '🔒',
         center: [10.335, 106.310],
         zoom: 13,
-        desc: 'Đúng lúc nước ròng (thủy triều rút nhanh), hai đạo thủy binh Tây Sơn từ rạch Rạch Gầm và rạch Xoài Mút đồng loạt xông ra bịt kín lối tiến lẫn lối thoái của giặc.' 
+        desc: 'Đúng lúc nước ròng (thủy triều rút nhanh), hai đạo thủy binh Tây Sơn từ rạch Rạch Gầm và rạch Xoài Mút đồng loạt xông ra bịt kín lối tiến lẫn lối thoái của giặc.',
+        miniQuiz: {
+          question: 'Yếu tố tự nhiên nào quyết định thời điểm phát lệnh công kích của quân Tây Sơn?',
+          options: ['Gió mùa đông bắc', 'Trời đổ mưa rào', 'Nước ròng (thủy triều rút nhanh)', 'Sương mù dày đặc'],
+          correct: 2,
+          explain: 'Khi nước ròng rút nhanh, thuyền chiến lớn của giặc bị cản trở dòng chảy và mắc cạn, tạo thời cơ gọng kìm khép lại.'
+        }
       },
       { 
         id: 3,
+        label: 'Pháo hỏa hủy diệt',
         phase: 'Giai đoạn 3: Pháo hỏa hủy diệt', 
         tag: 'Quyết chiến toàn thắng',
         icon: '🔥',
         center: [10.338, 106.320],
         zoom: 13.5,
-        desc: 'Từ cù lao Thới Sơn và hai bờ cây cối rậm rạp, pháo binh dã chiến và ống hỏa hổ bắn xối xả chia cắt đội hình, đốt cháy và đánh chìm toàn bộ 300 chiến thuyền giặc.' 
+        desc: 'Từ cù lao Thới Sơn và hai bờ cây cối rậm rạp, pháo binh dã chiến và ống hỏa hổ bắn xối xả chia cắt đội hình, đốt cháy và đánh chìm toàn bộ 300 chiến thuyền giặc.',
+        miniQuiz: {
+          question: 'Lực lượng pháo binh và hỏa hổ Tây Sơn được bố trí mai phục ở đâu?',
+          options: ['Cù lao Thới Sơn và hai bờ sông', 'Trên núi Bà Đen', 'Sau thành Mỹ Tho', 'Thả trôi theo bè lửa'],
+          correct: 0,
+          explain: 'Địa hình cù lao Thới Sơn rậm rạp giữa lòng sông Tiền là trận địa pháo bí mật xả đạn chia cắt đội hình thuyền giặc.'
+        }
       }
     ],
     // Vùng chiến lược tổng quát (Operational Areas)
@@ -161,33 +246,118 @@ export const BATTLES_DATA = {
       },
       ratioNote: 'Tương quan 1 chọi gần 3 (10 vạn quân thần tốc đè bẹp 29 vạn giặc trong 5 ngày Tết Kỷ Dậu)'
     },
+    funFacts: [
+      {
+        icon: 'Sparkles',
+        title: 'Ăn Tết sớm 30 Chạp',
+        desc: 'Quang Trung khao quân ăn Tết trước ở Tam Điệp, hẹn mùng 7 Tết sẽ vào Thăng Long ăn mừng khải hoàn.'
+      },
+      {
+        icon: 'Shield',
+        title: 'Khiên bọc rơm ướt',
+        desc: 'Cứ 20 dũng sĩ khiêng ván ghép bọc rơm ướt chắn hỏa khí súng đạn mở đường cho voi chiến công phá đồn.'
+      },
+      {
+        icon: 'Flame',
+        title: 'Hành quân thần tốc phi thường',
+        desc: 'Đại quân đi bộ từ Phú Xuân ra Thăng Long hơn 600km chỉ trong vài ngày bằng cách cáng luân phiên.'
+      }
+    ],
+    phases: [
+      {
+        label: 'Tam Điệp & Ăn Tết sớm',
+        phase: 'Giai đoạn 1: Bàn đạp Tam Điệp & Ăn Tết sớm',
+        tag: 'Xuất quân thần tốc',
+        icon: '🏕️',
+        center: [20.140, 105.930],
+        zoom: 11.5,
+        desc: 'Tập kết toàn quân tại phòng tuyến Tam Điệp – Biện Sơn, khao quân ăn Tết trước vào ngày 30 tháng Chạp, hẹn mùng 7 Tết sẽ vào Thăng Long ăn mừng khải hoàn.',
+        miniQuiz: {
+          question: 'Vua Quang Trung khao quân ăn Tết trước ở đâu và hẹn khi nào vào Thăng Long?',
+          options: ['Ở Nghệ An, hẹn rằm tháng Giêng', 'Ở Tam Điệp, hẹn mùng 7 Tết', 'Ở Thanh Hóa, hẹn mùng 1 Tết', 'Ở Phú Xuân, hẹn mùng 10'],
+          correct: 1,
+          explain: 'Vua khao quân ăn Tết sớm ở Tam Điệp – Biện Sơn ngày 30 Chạp, khẳng định chắc nịch sẽ ăn Tết chính thức tại Thăng Long vào mùng 7 Tết.'
+        }
+      },
+      {
+        label: 'Công phá Ngọc Hồi',
+        phase: 'Giai đoạn 2: Hạ đồn Hà Hồi & Công phá Ngọc Hồi',
+        tag: 'Đột phá cứ điểm thép',
+        icon: '🐘',
+        center: [20.910, 105.845],
+        zoom: 12.5,
+        desc: 'Đêm mùng 3 vây đồn Hà Hồi bằng cờ lệnh tiếng hò reo, bắt sống toàn bộ giặc. Rạng sáng mùng 5, voi chiến mang hỏa hổ cùng dũng sĩ mang khiên bọc rơm ướt xông lên bẻ gãy đồn thép Ngọc Hồi.',
+        miniQuiz: {
+          question: 'Chiến thuật độc đáo nào giúp nghĩa quân Tây Sơn vô hiệu hóa hỏa lực súng đạn tại đồn Ngọc Hồi?',
+          options: ['Đào hào ngầm', 'Dùng khiên bện rơm ướt chắn đạn', 'Chờ sương mù tan', 'Bắn tên lửa ban đêm'],
+          correct: 1,
+          explain: 'Dũng sĩ Tây Sơn ghép ván bện rơm dấp nước bên ngoài che chắn hỏa tiễn và súng đạn của quân Thanh, tạo đường cho voi chiến xông lên.'
+        }
+      },
+      {
+        label: 'Đánh úp Đống Đa',
+        phase: 'Giai đoạn 3: Đánh úp Đống Đa & Giải phóng Thăng Long',
+        tag: 'Khải hoàn Thăng Long',
+        icon: '⚡',
+        center: [21.015, 105.830],
+        zoom: 12.5,
+        desc: 'Đạo quân Đô đốc Long phối hợp nhân dân luồn sâu đánh bất ngờ vào đồn Khương Thượng – Đống Đa khiến Sầm Nghi Đống tự vẫn. Tôn Sĩ Nghị bỏ chạy đứt cầu phao sông Hồng.',
+        miniQuiz: {
+          question: 'Đạo quân của vị tướng nào đã luồn sâu đánh bất ngờ vào đồn Khương Thượng – Đống Đa?',
+          options: ['Đô đốc Long (Đặng Tiến Đông)', 'Đô đốc Bảo', 'Ngô Thì Nhậm', 'Nguyễn Nhạc'],
+          correct: 0,
+          explain: 'Đạo quân Đô đốc Long phối hợp cùng nhân dân địa phương đánh bất ngờ lúc rạng sáng, khiến tướng giặc Sầm Nghi Đống phải thắt cổ tự vẫn.'
+        }
+      }
+    ],
     tactics: [
       { 
         id: 1,
+        label: 'Tam Điệp & Ăn Tết sớm',
         phase: 'Giai đoạn 1: Bàn đạp Tam Điệp & Ăn Tết sớm', 
         tag: 'Xuất quân thần tốc',
         icon: '🏕️',
         center: [20.140, 105.930],
         zoom: 11.5,
-        desc: 'Tập kết toàn quân tại phòng tuyến Tam Điệp – Biện Sơn, khao quân ăn Tết trước vào ngày 30 tháng Chạp, hẹn mùng 7 Tết sẽ vào Thăng Long ăn mừng khải hoàn.' 
+        desc: 'Tập kết toàn quân tại phòng tuyến Tam Điệp – Biện Sơn, khao quân ăn Tết trước vào ngày 30 tháng Chạp, hẹn mùng 7 Tết sẽ vào Thăng Long ăn mừng khải hoàn.',
+        miniQuiz: {
+          question: 'Vua Quang Trung khao quân ăn Tết trước ở đâu và hẹn khi nào vào Thăng Long?',
+          options: ['Ở Nghệ An, hẹn rằm tháng Giêng', 'Ở Tam Điệp, hẹn mùng 7 Tết', 'Ở Thanh Hóa, hẹn mùng 1 Tết', 'Ở Phú Xuân, hẹn mùng 10'],
+          correct: 1,
+          explain: 'Vua khao quân ăn Tết sớm ở Tam Điệp – Biện Sơn ngày 30 Chạp, khẳng định chắc nịch sẽ ăn Tết chính thức tại Thăng Long vào mùng 7 Tết.'
+        }
       },
       { 
         id: 2,
+        label: 'Công phá Ngọc Hồi',
         phase: 'Giai đoạn 2: Hạ đồn Hà Hồi & Công phá Ngọc Hồi', 
         tag: 'Đột phá cứ điểm thép',
         icon: '🐘',
         center: [20.910, 105.845],
         zoom: 12.5,
-        desc: 'Đêm mùng 3 vây đồn Hà Hồi bằng cờ lệnh tiếng hò reo, bắt sống toàn bộ giặc. Rạng sáng mùng 5, voi chiến mang hỏa hổ cùng dũng sĩ mang khiên bọc rơm ướt xông lên bẻ gãy đồn thép Ngọc Hồi.' 
+        desc: 'Đêm mùng 3 vây đồn Hà Hồi bằng cờ lệnh tiếng hò reo, bắt sống toàn bộ giặc. Rạng sáng mùng 5, voi chiến mang hỏa hổ cùng dũng sĩ mang khiên bọc rơm ướt xông lên bẻ gãy đồn thép Ngọc Hồi.',
+        miniQuiz: {
+          question: 'Chiến thuật độc đáo nào giúp nghĩa quân Tây Sơn vô hiệu hóa hỏa lực súng đạn tại đồn Ngọc Hồi?',
+          options: ['Đào hào ngầm', 'Dùng khiên bện rơm ướt chắn đạn', 'Chờ sương mù tan', 'Bắn tên lửa ban đêm'],
+          correct: 1,
+          explain: 'Dũng sĩ Tây Sơn ghép ván bện rơm dấp nước bên ngoài che chắn hỏa tiễn và súng đạn của quân Thanh, tạo đường cho voi chiến xông lên.'
+        }
       },
       { 
         id: 3,
+        label: 'Đánh úp Đống Đa',
         phase: 'Giai đoạn 3: Đánh úp Đống Đa & Giải phóng Thăng Long', 
         tag: 'Khải hoàn Thăng Long',
         icon: '⚡',
         center: [21.015, 105.830],
         zoom: 12.5,
-        desc: 'Đạo quân Đô đốc Long phối hợp nhân dân luồn sâu đánh bất ngờ vào đồn Khương Thượng – Đống Đa khiến Sầm Nghi Đống tự vẫn. Tôn Sĩ Nghị bỏ chạy đứt cầu phao sông Hồng.' 
+        desc: 'Đạo quân Đô đốc Long phối hợp nhân dân luồn sâu đánh bất ngờ vào đồn Khương Thượng – Đống Đa khiến Sầm Nghi Đống tự vẫn. Tôn Sĩ Nghị bỏ chạy đứt cầu phao sông Hồng.',
+        miniQuiz: {
+          question: 'Đạo quân của vị tướng nào đã luồn sâu đánh bất ngờ vào đồn Khương Thượng – Đống Đa?',
+          options: ['Đô đốc Long (Đặng Tiến Đông)', 'Đô đốc Bảo', 'Ngô Thì Nhậm', 'Nguyễn Nhạc'],
+          correct: 0,
+          explain: 'Đạo quân Đô đốc Long phối hợp cùng nhân dân địa phương đánh bất ngờ lúc rạng sáng, khiến tướng giặc Sầm Nghi Đống phải thắt cổ tự vẫn.'
+        }
       }
     ],
     // Vùng chiến lược tổng quát

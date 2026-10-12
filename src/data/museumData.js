@@ -34,30 +34,33 @@ export const MUSEUM_ITEMS = [
     "title": "Sắc Lệnh & Chiếu Dùng Chữ Nôm",
     "sub": "Tuyên ngôn độc lập văn hóa và ngôn ngữ dân tộc",
     "category": "Châu bản & Chiếu chỉ",
-    "img": "./images/artifacts/chieu_chu_nom.svg",
+    "img": "./images/artifacts/chieu_chu_nom.jpg",
     "desc": "Các sắc lệnh hành chính, chiếu chỉ triều đình và đề thi tuyển chọn nhân tài bằng văn tự chữ Nôm của Hoàng đế Quang Trung.",
     "details": "Vua Quang Trung thành lập Viện Sùng Chính, giao La Sơn Phu Tử Nguyễn Thiếp dịch các sách kinh điển sang chữ Nôm, đưa chữ Nôm thành ngôn ngữ quốc gia chính thức đầu tiên trong lịch sử.",
-    "source": "Viện Nghiên cứu Hán Nôm"
+    "source": "Viện Nghiên cứu Hán Nôm",
+    "imageCredit": "Ảnh: Wikimedia Commons / CC BY-SA"
   },
   {
     "id": 5,
     "title": "Đại Pháo Thần Công Thời Tây Sơn",
     "sub": "Hỏa lực tối tân đúc bằng đồng nguyên khối",
     "category": "Hỏa khí hạng nặng",
-    "img": "./images/artifacts/dai_phao_tay_son.svg",
+    "img": "./images/artifacts/dai_phao_tay_son.jpg",
     "desc": "Khẩu pháo lệnh cỡ lớn được đúc tinh xảo với hoa văn rồng mây thời Tây Sơn, sử dụng đạn ghém và đạn cầu bằng sắt phá thành.",
     "details": "Hỏa lực pháo binh Tây Sơn vượt trội so với thời đại nhờ kỹ thuật đúc đồng truyền thống kết hợp công nghệ pháo hạm phương Tây, đóng vai trò quyết định trong các cuộc công thành và hải chiến.",
-    "source": "Bảo tàng Lịch sử Quân sự Việt Nam"
+    "source": "Bảo tàng Lịch sử Quân sự Việt Nam",
+    "imageCredit": "Ảnh: Wikimedia Commons / CC BY-SA"
   },
   {
     "id": 6,
     "title": "Chiến Bào Sạm Màu Khói Súng (Phục chế)",
     "sub": "Biểu tượng khí phách vị anh hùng áo vải",
     "category": "Trang phục hoàng gia",
-    "img": "./images/artifacts/chien_bao_quang_trung.svg",
+    "img": "./images/artifacts/placeholder.jpg",
     "desc": "Bộ hoàng bào thêu chỉ vàng óng ánh nhưng sạm đen màu thuốc súng khi nhà vua đích thân cưỡi voi xông pha trận mạc.",
     "details": "Trưa mùng 5 Tết Kỷ Dậu 1789, vua Quang Trung mặc chiếc áo bào đẫm mùi khói súng dẫn đầu đại quân tiến vào Thăng Long trong niềm hoan ca vỡ òa của muôn dân trăm họ.",
-    "source": "Trung tâm Bảo tồn Di tích Cố đô Huế"
+    "source": "Trung tâm Bảo tồn Di tích Cố đô Huế",
+    "imageCredit": "Ảnh: Tư liệu Bảo tàng / Phục chế"
   },
   {
     "id": 7,
@@ -78,5 +81,38 @@ export const MUSEUM_ITEMS = [
     "desc": "Bức ký họa do phái bộ ngoại giao Macartney của Anh thực hiện năm 1793 mô tả diện mạo, quân phục và tác phong kỷ luật của người lính thời Tây Sơn.",
     "details": "Hình vẽ cho thấy người lính Tây Sơn mặc áo giáp ngắn, đội nón chóp nhọn, tay cầm giáo dài, thể hiện vẻ khỏe khoắn, kỷ luật nghiêm minh và phong thái tự tin của quân đội một vương triều quật khởi.",
     "source": "Tư liệu Phái đoàn Ngoại giao Macartney (1793)"
+  },
+  {
+    "id": "trang-phuc-tay-son-1",
+    "title": "Trang Phục Nghĩa Quân Tây Sơn Buổi Đầu",
+    "sub": "Áo vải thô nhuộm nâu — biểu tượng \"áo vải cờ đào\"",
+    "category": "Trang phục lịch sử",
+    "img": "./images/artifacts/trang_phuc_tay_son_1.jpg",
+    "desc": "Trang phục của nghĩa quân Tây Sơn giai đoạn 1771–1785 may từ vải thô nhuộm nâu sồng, đơn giản, dễ vận động trong chiến đấu. Khăn quấn đầu màu đỏ là dấu hiệu nhận diện nghĩa quân.",
+    "details": "Bộ trang phục thể hiện triết lý \"lấy dân làm gốc\" — không dùng gấm vóc xa hoa, mọi nghĩa quân từ tướng đến lính đều mặc cùng loại vải. Sự giản dị tạo nên sức mạnh tinh thần và sự gần gũi với nhân dân.",
+    "source": "Bảo tàng Quang Trung (Bình Định)",
+    "imageCredit": "Ảnh: Tư liệu Bảo tàng Quang Trung"
+  },
+  {
+    "id": "trang-phuc-tay-son-2",
+    "title": "Chiến Bào Nghĩa Quân — Chi Tiết Nhuộm & Thêu",
+    "sub": "Kỹ thuật nhuộm chàm và thêu chỉ đỏ Bình Định",
+    "category": "Trang phục lịch sử",
+    "img": "./images/artifacts/trang_phuc_tay_son_2.jpg",
+    "desc": "Cận cảnh kỹ thuật nhuộm chàm và thêu chỉ đỏ trên chiến bào nghĩa quân. Vải nhuộm nhiều lần để có màu nâu đậm bền, viền cổ và tay áo thêu họa tiết sóng nước.",
+    "details": "Nghệ nhân Bình Định thời bấy giờ dùng lá chàm và vỏ cây trâm bầu để nhuộm. Họa tiết sóng nước và núi non ở gấu áo tượng trưng cho địa linh Tây Sơn.",
+    "source": "Bảo tàng Quang Trung — Phục chế theo tư liệu dân tộc học",
+    "imageCredit": "Ảnh: Tư liệu Bảo tàng Quang Trung"
+  },
+  {
+    "id": "trang-phuc-tay-son-3",
+    "title": "Toàn Cảnh Trang Phục Nghĩa Quân Có Giáp Trận",
+    "sub": "Giáp trận đầu tiên của quân Tây Sơn sau khi chiếm Quy Nhơn",
+    "category": "Trang phục lịch sử",
+    "img": "./images/artifacts/trang_phuc_tay_son_3.jpg",
+    "desc": "Sau khi chiếm thành Quy Nhơn (1773), nghĩa quân Tây Sơn bắt đầu dùng giáp trận cho tướng lĩnh và đội tiên phong. Giáp làm từ da trâu thuộc kỹ, đinh đồng tán.",
+    "details": "Giáp Tây Sơn có 3 loại: giáp da (phổ thông), giáp đồng (tướng), giáp sắt (tượng binh). Bộ trong ảnh là giáp da cấp tướng, phân biệt bằng 4 đinh đồng lớn và viền đỏ quanh cổ.",
+    "source": "Bảo tàng Quang Trung — Phục chế theo tranh ký họa 1793",
+    "imageCredit": "Ảnh: Bảo tàng Quang Trung"
   }
 ];

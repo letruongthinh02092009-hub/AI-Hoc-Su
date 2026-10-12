@@ -1,7 +1,18 @@
 import React from 'react';
-import { Award, BookOpen, Sparkles, Heart, Swords } from 'lucide-react';
+import { Award, Swords } from 'lucide-react';
 
-export default function Footer({ onSelectTab }) {
+export default function Footer({ onSelectTab, onReplayIntro }) {
+  const handleReplayIntro = () => {
+    try {
+      localStorage.removeItem('su_intro_seen');
+    } catch (e) {}
+    if (onReplayIntro) {
+      onReplayIntro();
+    } else {
+      window.location.reload();
+    }
+  };
+
   return (
     <footer className="footer-heritage">
       <div className="footer-top-accent"></div>
@@ -33,6 +44,7 @@ export default function Footer({ onSelectTab }) {
               <li><button onClick={() => onSelectTab('museum')}>Bảo Tàng Hiện Vật & Thuyết Minh</button></li>
               <li><button onClick={() => onSelectTab('ai-station')}>Sử Quan Ảo (Google Gemini)</button></li>
               <li><button onClick={() => onSelectTab('quiz')}>Đố Vui Lịch Sử 3 Cấp Độ</button></li>
+              <li><button onClick={() => onSelectTab('survey')}>Khảo Sát Đánh Giá Dự Án</button></li>
             </ul>
           </div>
 
@@ -60,6 +72,13 @@ export default function Footer({ onSelectTab }) {
           </div>
           <div className="footer-tech-tag">
             <span>Ứng dụng React & Google Gemini AI</span>
+            <span className="footer-dot-divider">·</span>
+            <button 
+              className="footer-link-btn" 
+              onClick={handleReplayIntro}
+            >
+              Xem lại mở đầu
+            </button>
             <span className="footer-dot-divider">·</span>
             <button 
               className="footer-ds-link" 

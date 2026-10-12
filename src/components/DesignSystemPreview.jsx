@@ -9,7 +9,8 @@ import {
   Loader2, 
   MapPin, 
   Bot, 
-  Sparkles,
+  Flame,
+  ArrowRight,
   ExternalLink
 } from 'lucide-react';
 
@@ -150,7 +151,7 @@ export default function DesignSystemPreview({ onSelectTab }) {
             </button>
 
             <button className="btn btn-bronze">
-              <Sparkles size={16} />
+              <Flame size={16} />
               <span>Nút Đồng Cổ (Accent Bronze)</span>
             </button>
 
@@ -159,7 +160,8 @@ export default function DesignSystemPreview({ onSelectTab }) {
             </button>
 
             <button className="btn-text-link">
-              <span>Liên kết văn bản →</span>
+              <span>Liên kết văn bản</span>
+              <ArrowRight size={14} aria-hidden="true" />
             </button>
           </div>
 
@@ -240,7 +242,10 @@ export default function DesignSystemPreview({ onSelectTab }) {
               <p className="ds-card-desc">
                 Tái hiện thế trận mai phục hỏa công kinh điển của danh tướng Nguyễn Huệ trên khúc sông Tiền năm 1785.
               </p>
-              <span className="btn-text-link">Xem chi tiết sa bàn →</span>
+              <span className="btn-text-link">
+                <span>Xem chi tiết sa bàn</span>
+                <ArrowRight size={14} aria-hidden="true" />
+              </span>
             </div>
 
             <div className="card card-interactive ds-sample-card">
@@ -252,7 +257,10 @@ export default function DesignSystemPreview({ onSelectTab }) {
               <p className="ds-card-desc">
                 Vũ khí dã chiến phun lửa uy lực bậc nhất thế kỷ XVIII, nỗi kinh hoàng của bộ binh và chiến lũy đối phương.
               </p>
-              <span className="btn-text-link">Khảo cứu hiện vật →</span>
+              <span className="btn-text-link">
+                <span>Khảo cứu hiện vật</span>
+                <ArrowRight size={14} aria-hidden="true" />
+              </span>
             </div>
           </div>
         </section>

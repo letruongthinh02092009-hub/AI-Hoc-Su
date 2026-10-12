@@ -66,7 +66,7 @@ export default function AdminKnowledgeModal({ isOpen, onClose }) {
       setErrorMsg('');
       playCorrectSound();
     } else {
-      setErrorMsg('Mã PIN chưa chính xác (Gợi ý: Năm đại phá quân Thanh 1789)');
+      setErrorMsg('Mã PIN chưa chính xác. Vui lòng thử lại!');
       playChime(300, 'sawtooth', 0.2);
     }
   };

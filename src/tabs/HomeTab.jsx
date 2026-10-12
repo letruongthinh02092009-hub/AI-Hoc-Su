@@ -1,15 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Trophy, Bot, Landmark, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { MapPin, Landmark, Clock, Bot, Trophy, ArrowRight } from 'lucide-react';
 import { playChime } from '../utils/audio';
-import AnimatedCounter from '../components/AnimatedCounter';
+import EmberCanvas from '../components/EmberCanvas';
+import DrumBackground from '../components/DrumBackground';
+import HeroQuoteFrame from '../components/HeroQuoteFrame';
+import HeroStatueFrame from '../components/HeroStatueFrame';
+import BackgroundMusic from '../components/BackgroundMusic';
 
 export default function HomeTab({ onSelectTab }) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.05 }
+      transition: { staggerChildren: 0.08, delayChildren: 0.04 }
     }
   };
 
@@ -30,170 +34,239 @@ export default function HomeTab({ onSelectTab }) {
       animate="visible"
       exit="hidden"
     >
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <motion.div className="hero-kicker-box" variants={itemVariants}>
-            <span className="hero-kicker-text">CÔNG TRÌNH SỐ HÓA DI SẢN · THPT NGUYỄN HUỆ</span>
-          </motion.div>
+      {/* NHẠC NỀN — tự phát khi user cho phép, dừng khi rời tab */}
+      <BackgroundMusic 
+        src="/audio/dawn_over_citadel.mp3"
+        volume={0.3}
+        showToggle={true}
+      />
 
-          {/* Hero Title */}
-          <motion.div className="hero-title-wrapper" variants={itemVariants}>
-            <h1 className="hero-title">
-              HÀO KHÍ TÂY SƠN
-            </h1>
-            <span className="hero-subtitle">
-              ANH HÙNG ÁO VẢI QUANG TRUNG – NGUYỄN HUỆ (1753 – 1792)
-            </span>
-          </motion.div>
+      {/* Cinematic Hero Section (Reference: Ornate Golden Dragon & Bronze Drum) */}
+      <section className="hero-cinematic" aria-labelledby="hero-title">
+        {/* Nền: gradient + blobs đỏ/amber + canvas hạt tàn tro */}
+        <div className="hero-bg-layers" aria-hidden="true">
+          <div className="hero-bg-gradient" />
+          <div className="hero-bg-blob-left" />
+          <div className="hero-bg-blob-right" />
+          <div className="hero-bg-blob-center" />
+          <EmberCanvas />
+        </div>
 
-          <motion.p className="hero-description" variants={itemVariants}>
-            Tái hiện không gian sử thi thế kỷ XVIII qua <strong>Sa bàn tác chiến không gian số</strong>, <strong>Bảo tàng hiện vật khảo cứu</strong> và <strong>Trí tuệ nhân tạo đối thoại lịch sử</strong>.
-          </motion.p>
+        <DrumBackground />
 
-          {/* Editorial Quote Card */}
-          <motion.div className="hero-quote-card card" variants={itemVariants}>
-            <p className="quote-text">
-              "Đánh cho để dài tóc / Đánh cho để đen răng / Đánh cho nó chích luân bất phản / Đánh cho nó phiến giáp bất hoàn / Đánh cho sử tri nam quốc anh hùng chi hữu chủ!"
+        <div className="hero-grid">
+          {/* LEFT: text column */}
+          <header className="hero-text-col">
+            <p className="hero-kicker">CÔNG TRÌNH SỐ HÓA DI SẢN · THPT NGUYỄN HUỆ</p>
+            
+            <h1 id="hero-title" className="hero-title-gold-3d">HÀO KHÍ TÂY SƠN</h1>
+            
+            <p className="hero-subtitle">Anh hùng áo vải Quang Trung – Nguyễn Huệ (1753–1792)</p>
+            
+            <p className="hero-lead">
+              Tái hiện không gian sử thi thế kỷ XVIII qua sa bàn tác chiến không gian số,
+              Bảo tàng hiện vật khảo cứu và Trí tuệ nhân tạo đối thoại lịch sử.
             </p>
-            <span className="quote-author">— Lời Hiểu Dụ Xuất Quân Thần Tốc (1788)</span>
-          </motion.div>
 
-          {/* Restrained CTAs: 1 Primary Button + 1 Secondary Text Link */}
-          <motion.div className="hero-actions" variants={itemVariants}>
-            <button 
-              className="btn btn-primary"
-              onClick={() => {
-                playChime(600, 'sine', 0.15);
-                onSelectTab('battle-map');
-              }}
-            >
-              <MapPin size={17} />
-              <span>Khám Phá Sa Bàn Chiến Trận</span>
-            </button>
+            <HeroQuoteFrame>
+              <blockquote>
+                <p>
+                  “Đánh cho để dài tóc / Đánh cho để đen răng<br />
+                  Đánh cho nó chích luân bất phản<br />
+                  Đánh cho nó phiến giáp bất hoàn<br />
+                  Đánh cho sử tri nam quốc anh hùng chi hữu chủ!”
+                </p>
+                <cite>Lời Hiểu Dụ Xuất Quân Thần Tốc (1788)</cite>
+              </blockquote>
+            </HeroQuoteFrame>
 
-            <button 
-              className="btn-text-link"
-              onClick={() => {
-                playChime(650, 'sine', 0.15);
-                onSelectTab('ai-station');
-              }}
+            <nav className="hero-cta-row" aria-label="Hành động chính">
+              <button 
+                type="button" 
+                className="btn-battle-glow"
+                onClick={() => {
+                  playChime(600, 'sine', 0.15);
+                  onSelectTab('battle-map');
+                }}
+              >
+                <MapPin size={16} aria-hidden="true" />
+                <span>Khám phá Sa Bàn Trận Đánh</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+              <button 
+                type="button" 
+                className="btn-scholar-trans"
+                onClick={() => {
+                  playChime(650, 'sine', 0.15);
+                  onSelectTab('ai-station');
+                }}
+              >
+                <span>Đàm đạo cùng Sử Quan AI</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            </nav>
+          </header>
+
+          {/* RIGHT: statue column */}
+          <figure className="hero-statue-col">
+            <HeroStatueFrame
+              badgeTop="3 Chiến Dịch Thần Tốc"
+              badgeBottom="10 Mốc Sơn Lịch Sử"
             >
-              <span>Đàm đạo cùng Sử Quan AI</span>
-              <ArrowRight size={15} />
-            </button>
-          </motion.div>
+              <img 
+                src="./images/quang_trung_statue.jpg" 
+                alt="Tượng đài Hoàng đế Quang Trung tại Bảo tàng Quang Trung, Bình Định" 
+                loading="eager" 
+              />
+            </HeroStatueFrame>
+          </figure>
         </div>
       </section>
 
-      {/* 4 Feature Pillars (Phong cách mục lục di sản đánh số 01-04) */}
+      {/* Bento Grid: 4 Trải Nghiệm Học Sử Trực Quan */}
       <section className="highlights-section">
-        <motion.div className="section-title-box" variants={itemVariants}>
-          <span className="section-kicker">CHƯƠNG MỤC KHẢO CỨU</span>
-          <h2 className="section-heading">4 TRẢI NGHIỆM HỌC SỬ TRỰC QUAN</h2>
-          <div className="title-divider-gold"></div>
+        <motion.div className="section-header-centered" variants={itemVariants}>
+          <span className="section-kicker-centered">CHƯƠNG MỤC KHẢO CỨU</span>
+          <h2 className="section-title-centered">4 TRẢI NGHIỆM HỌC SỬ TRỰC QUAN</h2>
         </motion.div>
 
-        <div className="features-grid">
+        <div className="hero-features-bento">
+          {/* Card 1: Sa Bàn Chiến Trận (Large 1x2 with Map Background) */}
           <motion.div 
-            className="feature-card card" 
+            className="bento-card bento-card-map"
             variants={itemVariants}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            onClick={() => onSelectTab('battle-map')}
+            onClick={() => {
+              playChime(600, 'sine', 0.15);
+              onSelectTab('battle-map');
+            }}
           >
-            <div className="feature-top-meta">
-              <span className="feature-index">01</span>
-              <MapPin size={20} className="feature-inline-icon text-gold" />
+            <img 
+              src="/images/artifacts/luoc_do_rach_gam.jpg" 
+              alt="Lược đồ chiến dịch Tây Sơn"
+              className="bento-card-map-bg"
+              loading="lazy"
+            />
+            <div className="bento-card-map-overlay" />
+            <div className="bento-card-map-content">
+              <div className="bento-card-content">
+                <div className="bento-card-header">
+                  <MapPin size={24} className="bento-card-icon-gold" />
+                  <h3 className="bento-card-title">Sa Bàn Chiến Trận</h3>
+                </div>
+                <p className="bento-card-desc">
+                  Mô phỏng mũi tên hành quân thần tốc, thế trận mai phục Rạch Gầm – Xoài Mút và đòn vu hồi giải phóng Thăng Long năm 1789.
+                </p>
+              </div>
+              <div className="bento-card-link">
+                <span>Khám phá sa bàn</span>
+                <ArrowRight size={16} />
+              </div>
             </div>
-            <h3>Sa Bàn Chiến Trận</h3>
-            <p>Mô phỏng mũi tên hành quân thần tốc, thế trận mai phục Rạch Gầm – Xoài Mút và đòn vu hồi giải phóng Thăng Long năm 1789.</p>
-            <span className="feature-link">
-              Xem sa bàn tác chiến <ArrowUpRight size={14} />
-            </span>
           </motion.div>
 
+          {/* Card 2: Bảo Tàng Hiện Vật Số */}
           <motion.div 
-            className="feature-card card" 
+            className="bento-card bento-card-museum"
             variants={itemVariants}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            onClick={() => onSelectTab('ai-station')}
+            onClick={() => {
+              playChime(550, 'sine', 0.15);
+              onSelectTab('museum');
+            }}
           >
-            <div className="feature-top-meta">
-              <span className="feature-index">02</span>
-              <Bot size={20} className="feature-inline-icon text-gold" />
+            <div className="bento-card-content">
+              <div className="bento-card-header">
+                <Landmark size={20} className="bento-card-icon" />
+                <h3 className="bento-card-title">Bảo Tàng Hiện Vật Số</h3>
+              </div>
+              <p className="bento-card-desc">
+                8 hiện vật quý: súng hỏa hổ, voi chiến, tiền đồng, sắc phong kèm thuyết minh.
+              </p>
             </div>
-            <h3>Trạm Sử Quan AI</h3>
-            <p>Trò chuyện tự nhiên, giải đáp mọi vấn đề về cuộc đời Nguyễn Huệ, chiến lược quân sự và đối chiếu sử liệu chính thống.</p>
-            <span className="feature-link">
-              Vào trạm đàm đạo <ArrowUpRight size={14} />
-            </span>
+            <div className="bento-card-link">
+              <span>Xem hiện vật</span>
+              <ArrowRight size={14} />
+            </div>
           </motion.div>
 
+          {/* Card 3: Biên Niên Sử 1753–1792 */}
           <motion.div 
-            className="feature-card card" 
+            className="bento-card bento-card-timeline"
             variants={itemVariants}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            onClick={() => onSelectTab('museum')}
+            onClick={() => {
+              playChime(580, 'sine', 0.15);
+              onSelectTab('timeline');
+            }}
           >
-            <div className="feature-top-meta">
-              <span className="feature-index">03</span>
-              <Landmark size={20} className="feature-inline-icon text-gold" />
+            <div className="bento-card-content">
+              <div className="bento-card-header">
+                <Clock size={20} className="bento-card-icon" />
+                <h3 className="bento-card-title">Biên Niên Sử 1753–1792</h3>
+              </div>
+              <p className="bento-card-desc">
+                10 mốc son cuộc đời Hoàng đế Quang Trung từ làng Kiên Mỹ đến đỉnh cao Ngọc Hồi – Đống Đa.
+              </p>
             </div>
-            <h3>Bảo Tàng Hiện Vật Số</h3>
-            <p>Trưng bày tư liệu quý: súng hỏa hổ, voi chiến, tiền đồng, sắc phong kèm chú giải và xuất xứ lịch sử chi tiết.</p>
-            <span className="feature-link">
-              Tham quan hiện vật <ArrowUpRight size={14} />
-            </span>
+            <div className="bento-card-link">
+              <span>Khám phá niên biểu</span>
+              <ArrowRight size={14} />
+            </div>
           </motion.div>
 
+          {/* Card 4: Trạm Sử Quan AI */}
           <motion.div 
-            className="feature-card card" 
+            className="bento-card bento-card-ai"
             variants={itemVariants}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            onClick={() => onSelectTab('quiz')}
+            onClick={() => {
+              playChime(650, 'sine', 0.15);
+              onSelectTab('ai-station');
+            }}
           >
-            <div className="feature-top-meta">
-              <span className="feature-index">04</span>
-              <Trophy size={20} className="feature-inline-icon text-gold" />
+            <div className="bento-card-content">
+              <div className="bento-card-header">
+                <Bot size={20} className="bento-card-icon" />
+                <h3 className="bento-card-title">Trạm Sử Quan AI</h3>
+              </div>
+              <p className="bento-card-desc">
+                Trò chuyện tự nhiên cùng Gemini AI về cuộc đời Nguyễn Huệ, chiến lược quân sự và trích dẫn sử liệu.
+              </p>
             </div>
-            <h3>Đấu Trường Đố Vui</h3>
-            <p>90 câu hỏi trắc nghiệm tương tác 3 cấp độ, tích lũy điểm số, đổi mới câu hỏi và nhận Giấy Chứng Nhận vinh danh.</p>
-            <span className="feature-link">
-              Khởi hành thử thách <ArrowUpRight size={14} />
-            </span>
+            <div className="bento-card-link">
+              <span>Vào trạm đàm đạo</span>
+              <ArrowRight size={14} />
+            </div>
+          </motion.div>
+
+          {/* Card 5: Đấu Trường Đố Vui */}
+          <motion.div 
+            className="bento-card bento-card-quiz"
+            variants={itemVariants}
+            onClick={() => {
+              playChime(700, 'sine', 0.15);
+              onSelectTab('quiz');
+            }}
+          >
+            <div className="bento-card-content">
+              <div className="bento-card-header">
+                <Trophy size={20} className="bento-card-icon" />
+                <h3 className="bento-card-title">Đấu Trường Đố Vui</h3>
+              </div>
+              <p className="bento-card-desc">
+                3 cấp độ thử thách, tích lũy điểm và nhận Giấy Chứng Nhận vinh danh.
+              </p>
+            </div>
+            <div className="bento-card-link">
+              <span>Tham gia thử thách</span>
+              <ArrowRight size={14} />
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Metrics Banner */}
-      <section className="metrics-banner card">
-        <div className="metrics-grid">
-          <div className="metric-box">
-            <span className="metric-number">
-              <AnimatedCounter value={10} suffix="+" duration={1200} />
-            </span>
-            <span className="metric-label">Mốc son Biên niên sử</span>
-          </div>
-          <div className="metric-box">
-            <span className="metric-number">
-              <AnimatedCounter value={2} suffix=" Đại chiến" duration={1200} />
-            </span>
-            <span className="metric-label">Chiến dịch lịch sử</span>
-          </div>
-          <div className="metric-box">
-            <span className="metric-number">
-              <AnimatedCounter value={8} suffix=" Hiện vật" duration={1200} />
-            </span>
-            <span className="metric-label">Bảo tàng số hóa</span>
-          </div>
-          <div className="metric-box">
-            <span className="metric-number">
-              <AnimatedCounter value={90} suffix=" Câu" duration={1200} />
-            </span>
-            <span className="metric-label">Thử thách kiến thức</span>
-          </div>
-        </div>
-      </section>
+      {/* Editorial Footer Quote */}
+      <motion.blockquote className="home-footer-quote" variants={itemVariants}>
+        "Dân ta phải biết sử ta / Cho tường gốc tích nước nhà Việt Nam"
+        <cite className="home-footer-author">— Hồ Chí Minh ("Lịch sử nước ta", 1942)</cite>
+      </motion.blockquote>
     </motion.div>
   );
 }

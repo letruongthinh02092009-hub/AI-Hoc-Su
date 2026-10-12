@@ -5,7 +5,7 @@ const AdminContext = createContext(null);
 const ADMIN_STORAGE_KEY = 'su_admin_mode_active';
 const DEFAULT_PIN = '1234';
 
-export function AdminProvider({ children }) {
+export function AdminProvider({ children, onOpenAdmin }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
 
@@ -52,7 +52,8 @@ export function AdminProvider({ children }) {
       setIsPinModalOpen,
       loginAdmin,
       logoutAdmin,
-      toggleAdminModal
+      toggleAdminModal,
+      onOpenAdmin
     }}>
       {children}
     </AdminContext.Provider>

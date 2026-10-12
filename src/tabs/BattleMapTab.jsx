@@ -1,34 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { 
-  Layers, 
+  X, 
+  Sparkles, 
   Swords, 
-  Crosshair, 
-  Compass,
-  ArrowRight,
-  Shield,
-  MapPin,
-  Info
+  Waves, 
+  Flame, 
+  Shield, 
+  Trophy, 
+  HelpCircle, 
+  ChevronDown, 
+  ChevronUp 
 } from 'lucide-react';
 import { BATTLES_DATA } from '../data/battlesData';
 import { playChime } from '../utils/audio';
+import Toast from '../components/Toast';
+
+const LUCIDE_ICONS = {
+  Swords,
+  Waves,
+  Flame,
+  Sparkles,
+  Shield
+};
 
 export default function BattleMapTab() {
   const [activeBattleId, setActiveBattleId] = useState('rach-gam');
   const [mapLayerType, setMapLayerType] = useState('satellite'); // 'satellite' | 'osm'
-  const [selectedFeature, setSelectedFeature] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activePhaseIndex, setActivePhaseIndex] = useState(0);
+  const [isFunFactsOpen, setIsFunFactsOpen] = useState(() => typeof window !== 'undefined' ? window.innerWidth > 1024 : true);
+  const [activeQuizPhase, setActiveQuizPhase] = useState(null);
+  const [quizState, setQuizState] = useState({ selected: null, isSubmitted: false, isCorrect: false });
+  const [score, setScore] = useState(0);
+  const [toastMessage, setToastMessage] = useState(null);
 
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const tileLayerRef = useRef(null);
   const layersGroupRef = useRef(null);
+  const viewedPhasesRef = useRef(new Set([0]));
 
   const battle = BATTLES_DATA[activeBattleId];
+  const activeBattle = battle;
+  const currentPhaseIndex = activePhaseIndex !== null ? activePhaseIndex : 0;
 
-  // Khởi tạo bản đồ Leaflet
+  // Leaflet map initialization
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -40,9 +59,11 @@ export default function BattleMapTab() {
     const map = L.map(mapContainerRef.current, {
       center: battle.center,
       zoom: battle.zoom,
-      zoomControl: true,
+      zoomControl: false,
       attributionControl: false
     });
+
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
     mapInstanceRef.current = map;
     layersGroupRef.current = L.layerGroup().addTo(map);
@@ -58,7 +79,27 @@ export default function BattleMapTab() {
     };
   }, [activeBattleId]);
 
-  // Cập nhật lớp ảnh nền (Vệ tinh / Địa hình)
+  // Fix Leaflet resize when drawer toggles
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      const timer = setTimeout(() => {
+        mapInstanceRef.current.invalidateSize();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isDrawerOpen]);
+
+  // Fix Leaflet resize on window change
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const updateTileLayer = (map, type) => {
     if (!map) return;
     if (tileLayerRef.current) {
@@ -67,10 +108,8 @@ export default function BattleMapTab() {
 
     let url = '';
     if (type === 'satellite') {
-      // Vệ tinh Esri World Imagery
       url = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
     } else {
-      // Bản đồ địa hình OpenStreetMap
       url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     }
 
@@ -85,25 +124,24 @@ export default function BattleMapTab() {
     playChime(500, 'sine', 0.1);
   };
 
-  // Vẽ các Vùng tác chiến & Mũi tên hướng tiến công
   const renderTacticalLayers = (map, battleData) => {
     if (!layersGroupRef.current) return;
     layersGroupRef.current.clearLayers();
 
-    // 1. Vẽ các Vùng tác chiến (Tactical Zones)
-    battleData.zones.forEach((zone) => {
+    // 1. Render zones (Polygons)
+    battleData.zones?.forEach((zone) => {
       const polygon = L.polygon(zone.coords, {
         color: zone.color,
         fillColor: zone.color,
-        fillOpacity: 0.22,
+        fillOpacity: 0.18,
         weight: 2,
-        dashArray: '4, 4'
+        dashArray: zone.type === 'enemy' ? '4, 4' : undefined
       });
 
       const popupContent = `
         <div class="tactical-popup">
           <span class="popup-zone-tag" style="background: ${zone.color}22; color: ${zone.color};">
-            Vùng Chiến Lược
+            ${zone.type === 'friendly' ? 'Quân Tây Sơn' : zone.type === 'enemy' ? 'Đối Phương' : 'Chiến Địa'}
           </span>
           <h4 class="popup-zone-title">${zone.title}</h4>
           <p class="popup-zone-desc">${zone.desc}</p>
@@ -112,36 +150,34 @@ export default function BattleMapTab() {
 
       polygon.bindPopup(popupContent);
       polygon.on('click', () => {
-        setSelectedFeature({ type: 'zone', data: zone });
-        playChime(620, 'triangle', 0.1);
+        playChime(600, 'sine', 0.1);
       });
 
       layersGroupRef.current.addLayer(polygon);
     });
 
-    // 2. Vẽ Mũi tên hướng tiến công (Directional Flows)
-    battleData.flows.forEach((flow) => {
+    // 2. Render directional flows (Polylines + Marker Arrow)
+    battleData.flows?.forEach((flow) => {
       const polyline = L.polyline(flow.points, {
         color: flow.color,
-        weight: 4,
-        opacity: 0.9,
-        dashArray: flow.dashArray || null
+        weight: 3.5,
+        dashArray: flow.dashArray || undefined,
+        opacity: 0.85
       });
 
-      // Tạo điểm mũi tên ở đích đến
       const lastPoint = flow.points[flow.points.length - 1];
       const arrowIcon = L.divIcon({
         className: 'tactical-arrowhead',
-        html: `<div style="color: ${flow.color}; font-size: 14px; font-weight: bold; transform: rotate(45deg);">▶</div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
+        html: `<div style="display: flex; align-items: center; justify-content: center; width: 16px; height: 16px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="${flow.color}"><path d="M5 3l14 9-14 9V3z"/></svg></div>`,
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
       });
 
       const arrowMarker = L.marker(lastPoint, { icon: arrowIcon });
 
       const popupContent = `
         <div class="tactical-popup">
-          <span class="popup-flow-tag" style="color: ${flow.color};">
+          <span class="popup-flow-tag" style="background: ${flow.color}22; color: ${flow.color};">
             ${flow.type === 'friendly' ? 'Hướng Tiến Công Tây Sơn' : 'Hướng Di Chuyển Đối Phương'}
           </span>
           <h4 class="popup-zone-title">${flow.title}</h4>
@@ -153,7 +189,6 @@ export default function BattleMapTab() {
       arrowMarker.bindPopup(popupContent);
 
       polyline.on('click', () => {
-        setSelectedFeature({ type: 'flow', data: flow });
         playChime(650, 'sine', 0.1);
       });
 
@@ -163,275 +198,320 @@ export default function BattleMapTab() {
   };
 
   const handleSwitchBattle = (id) => {
-    setSelectedFeature(null);
     setActivePhaseIndex(0);
+    viewedPhasesRef.current = new Set([0]);
+    setIsDrawerOpen(false);
+    setActiveQuizPhase(null);
     playChime(600, 'sine', 0.15);
     setActiveBattleId(id);
   };
 
-  // Kích hoạt zoom mượt mà theo từng giai đoạn
   const handleSelectPhase = (tac, idx) => {
     setActivePhaseIndex(idx);
+    setIsDrawerOpen(true);
     playChime(680, 'triangle', 0.12);
     if (mapInstanceRef.current && tac.center) {
+      const drawerWidth = window.innerWidth <= 768 ? window.innerWidth : 400;
       mapInstanceRef.current.flyTo(tac.center, tac.zoom || 13, {
         animate: true,
-        duration: 1.4
+        duration: 1.4,
+        paddingBottomRight: [drawerWidth, 0]
       });
+    }
+
+    const phases = activeBattle.phases || activeBattle.tactics;
+    const updated = new Set(viewedPhasesRef.current);
+    updated.add(idx);
+    viewedPhasesRef.current = updated;
+    if (updated.size >= phases.length) {
+      setToastMessage('🏆 Đã khám phá toàn bộ diễn biến!');
     }
   };
 
-  // Trở về góc nhìn toàn cảnh trận đánh
-  const handleResetView = () => {
-    playChime(550, 'sine', 0.1);
-    setSelectedFeature(null);
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo(battle.center, battle.zoom, {
-        animate: true,
-        duration: 1.2
-      });
+  const handlePhaseChange = (idx) => {
+    const phases = activeBattle.phases || activeBattle.tactics;
+    if (phases[idx]) {
+      handleSelectPhase(phases[idx], idx);
     }
   };
+
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+    playChime(500, 'sine', 0.1);
+  };
+
+  const handleOpenQuiz = (tac) => {
+    setActiveQuizPhase(tac);
+    setQuizState({ selected: null, isSubmitted: false, isCorrect: false });
+    playChime(650, 'sine', 0.12);
+  };
+
+  const handleSelectOption = (idx, quiz) => {
+    if (quizState.isSubmitted) return;
+    const isCorrect = idx === quiz.correct;
+    setQuizState({ selected: idx, isSubmitted: true, isCorrect });
+    if (isCorrect) {
+      playChime(750, 'triangle', 0.2);
+      setScore(prev => prev + 10);
+    } else {
+      playChime(320, 'sine', 0.15);
+    }
+  };
+
+  const phasesList = activeBattle.phases || activeBattle.tactics;
 
   return (
     <motion.div 
-      className="tab-page battlemap-page"
+      className="battle-map-page"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="section-title-box">
-        <span className="section-kicker">LƯỢC ĐỒ QUÂN SỰ TƯƠNG TÁC</span>
-        <h2 className="section-heading">SA BÀN CHIẾN TRẬN & ĐIỀU BINH TÂY SƠN</h2>
-        <p className="section-subtext">Mô phỏng các mũi tiến công thần tốc và vùng tác chiến chiến lược, phản ánh chân thực nghệ thuật bách chiến bách thắng của Hoàng đế Quang Trung.</p>
-        <div className="title-divider-gold"></div>
-      </div>
+      {/* Leaflet map */}
+      <div ref={mapContainerRef} className="leaflet-map-element" />
 
-      {/* Battle Selection Bar */}
-      <div className="battle-selector-tabs">
+      {/* Battle selector - top-left */}
+      <div className="battle-selector-bar">
         <button 
-          className={`battle-tab-btn ${activeBattleId === 'rach-gam' ? 'active' : ''}`}
+          className={`battle-selector-btn ${activeBattleId === 'rach-gam' ? 'active' : ''}`}
           onClick={() => handleSwitchBattle('rach-gam')}
         >
-          <Swords size={17} />
-          <span>Thủy Chiến Rạch Gầm – Xoài Mút (1785)</span>
+          Rạch Gầm – Xoài Mút (1785)
         </button>
         <button 
-          className={`battle-tab-btn ${activeBattleId === 'ngoc-hoi-dong-da' ? 'active' : ''}`}
+          className={`battle-selector-btn ${activeBattleId === 'ngoc-hoi-dong-da' ? 'active' : ''}`}
           onClick={() => handleSwitchBattle('ngoc-hoi-dong-da')}
         >
-          <Crosshair size={17} />
-          <span>Đại Phá Quân Thanh – Ngọc Hồi Đống Đa (1789)</span>
+          Ngọc Hồi – Đống Đa (1789)
         </button>
       </div>
 
-      {/* Thanh 3 Giai Đoạn Tác Chiến Nằm Ngay Trên Đầu Bản Đồ (Bấm là lia Map tức thì) */}
-      <div className="battlemap-phase-quickbar card">
-        <div className="quickbar-header">
-          <Compass size={17} className="text-gold" />
-          <span className="quickbar-label">3 GIAI ĐOẠN TÁC CHIẾN (BẤM ĐỂ ĐỊNH VỊ BẢN ĐỒ):</span>
+      {/* Fun Facts Panel - top left */}
+      <div className={`battle-funfacts-panel ${isFunFactsOpen ? 'open' : 'collapsed'}`}>
+        <div 
+          className="funfacts-title" 
+          onClick={() => setIsFunFactsOpen(!isFunFactsOpen)}
+          role="button"
+          tabIndex={0}
+          aria-label="Thu gọn hoặc mở rộng Sự thật thú vị"
+          style={{ cursor: 'pointer' }}
+        >
+          <Sparkles size={14} />
+          <span>Sự thật thú vị</span>
+          <span style={{ marginLeft: 'auto', opacity: 0.7 }}>
+            {isFunFactsOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </span>
         </div>
-        <div className="quickbar-buttons-row">
-          {battle.tactics.map((tac, idx) => {
-            const isActive = activePhaseIndex === idx;
-            return (
-              <button
-                key={idx}
-                className={`quick-phase-pill-btn ${isActive ? 'active' : ''}`}
-                onClick={() => handleSelectPhase(tac, idx)}
-                title={`Bấm để bản đồ định vị: ${tac.phase}`}
-              >
-                <span className="pill-step-num">Giai đoạn {idx + 1}</span>
-                <span className="pill-phase-name">{tac.phase}</span>
-                <span className="pill-phase-tag">{tac.tag}</span>
-              </button>
-            );
-          })}
-        </div>
+        {isFunFactsOpen && activeBattle.funFacts?.map((fact, i) => {
+          const Icon = LUCIDE_ICONS[fact.icon] || Sparkles;
+          return (
+            <div key={i} className="funfact-item">
+              <div className="funfact-icon"><Icon size={16} /></div>
+              <div className="funfact-content">
+                <h4>{fact.title}</h4>
+                <p>{fact.desc}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Main Workspace */}
-      <div className="battlemap-workspace">
-        {/* Leaflet Map Area */}
-        <div className="map-view-container">
-          <div ref={mapContainerRef} className="leaflet-map-element" id="leaflet-map" />
+      {/* Timeline Slider - bottom center */}
+      <div className="battle-timeline-slider">
+        <div className="timeline-labels">
+          {phasesList.map((p, i) => (
+            <span 
+              key={i} 
+              className={currentPhaseIndex === i ? 'active' : ''}
+              onClick={() => handlePhaseChange(i)}
+              style={{ cursor: 'pointer' }}
+            >
+              {p.label || `Giai đoạn ${i + 1}`}
+            </span>
+          ))}
+        </div>
+        <input 
+          type="range"
+          min="0"
+          max={phasesList.length - 1}
+          value={currentPhaseIndex}
+          onChange={(e) => handlePhaseChange(Number(e.target.value))}
+          className="timeline-range"
+          aria-label="Tiến trình trận đánh"
+        />
+      </div>
 
-          {/* Clean 2-layer switcher */}
-          <div className="map-layer-controls">
-            <span className="layer-label"><Layers size={13} /> Chế độ:</span>
-            <button 
-              className={`layer-btn ${mapLayerType === 'satellite' ? 'active' : ''}`}
-              onClick={() => handleLayerChange('satellite')}
-            >
-              Vệ tinh
-            </button>
-            <button 
-              className={`layer-btn ${mapLayerType === 'osm' ? 'active' : ''}`}
-              onClick={() => handleLayerChange('osm')}
-            >
-              Địa hình
-            </button>
+      {/* Phase pills - bottom center */}
+      <div className="battle-phase-pills">
+        {phasesList.map((tac, idx) => (
+          <button
+            key={idx}
+            className={`battle-phase-pill ${activePhaseIndex === idx ? 'active' : ''}`}
+            onClick={() => handleSelectPhase(tac, idx)}
+          >
+            Giai đoạn {idx + 1}
+          </button>
+        ))}
+      </div>
+
+      {/* Layer control - bottom right */}
+      <div className="battle-layer-control">
+        <button 
+          className={`battle-layer-btn ${mapLayerType === 'satellite' ? 'active' : ''}`}
+          onClick={() => handleLayerChange('satellite')}
+        >
+          Vệ tinh
+        </button>
+        <button 
+          className={`battle-layer-btn ${mapLayerType === 'osm' ? 'active' : ''}`}
+          onClick={() => handleLayerChange('osm')}
+        >
+          Địa hình
+        </button>
+      </div>
+
+      {/* Drawer backdrop (mobile) */}
+      <div 
+        className={`battle-drawer-backdrop ${isDrawerOpen ? 'open' : ''}`}
+        onClick={closeDrawer}
+      />
+
+      {/* Drawer trượt */}
+      <div className={`battle-drawer ${isDrawerOpen ? 'open' : ''}`}>
+        <button className="drawer-close-btn" onClick={closeDrawer} aria-label="Đóng chi tiết">
+          <X size={16} />
+        </button>
+        
+        <div className="drawer-header">
+          <span className="kicker">CHIẾN DỊCH TIÊU BIỂU</span>
+          <h2 className="drawer-title">{battle.title}</h2>
+          <p className="drawer-subtitle">{battle.subtitle}</p>
+        </div>
+
+        <div className="drawer-meta">
+          <div className="meta-item">
+            <span className="meta-label">Chỉ huy Tây Sơn</span>
+            <strong>{battle.commander}</strong>
           </div>
-
-          <div className="map-hint-pill">
-            <span>Nhấp vào giai đoạn hoặc mũi tên để bản đồ tự động định vị</span>
-            <button className="reset-view-pill-btn" onClick={handleResetView} title="Trở về toàn cảnh">
-              Toàn cảnh
-            </button>
+          <div className="meta-item">
+            <span className="meta-label">Chỉ huy đối phương</span>
+            <strong>{battle.enemyCommander}</strong>
+          </div>
+          <div className="meta-item">
+            <span className="meta-label">Thời gian</span>
+            <strong>{battle.time}</strong>
           </div>
         </div>
 
-        {/* Tactical Info Panel */}
-        <div className="battle-sidebar-panel">
-          
-          {/* Card 1: Thẻ Tổng Quan & Thuyết Minh */}
-          <div className="battle-card card battle-overview-card">
-            <div className="card-top-row">
-              <span className="battle-era-badge">CHIẾN DỊCH TIÊU BIỂU</span>
-              <span className="battle-time-badge">{battle.time}</span>
-            </div>
+        <div className="drawer-summary">
+          <p>{battle.summary}</p>
+        </div>
 
-            <h3 className="battle-main-title">{battle.title}</h3>
-            <p className="battle-subtitle-text">{battle.subtitle}</p>
+        {/* Phase details khi user click vào phase pill hoặc kéo timeline */}
+        {activePhaseIndex !== null && phasesList[activePhaseIndex] && (
+          <div className="drawer-phase-detail">
+            <span className="kicker">GIAI ĐOẠN {activePhaseIndex + 1}</span>
+            <h3>{phasesList[activePhaseIndex].phase}</h3>
+            <p>{phasesList[activePhaseIndex].desc}</p>
+            {phasesList[activePhaseIndex].miniQuiz && (
+              <button 
+                type="button"
+                className="battle-mini-quiz-btn"
+                onClick={() => handleOpenQuiz(phasesList[activePhaseIndex])}
+              >
+                <HelpCircle size={14} />
+                <span>Thử thách Trắc nghiệm (+10 điểm)</span>
+              </button>
+            )}
+          </div>
+        )}
 
-            <div className="battle-meta-grid">
-              <div className="meta-box">
-                <span className="meta-label">Chỉ huy Tây Sơn:</span>
-                <strong className="meta-val gold-accent">{battle.commander}</strong>
+        {/* Forces comparison - dạng progress bars đơn giản */}
+        {battle.forcesComparison && (
+          <div className="drawer-forces">
+            <div className="force-row">
+              <div className="force-label">
+                <span>{battle.forcesComparison.ourForces.name}</span>
+                <strong>{battle.forcesComparison.ourForces.count}</strong>
               </div>
-              <div className="meta-box">
-                <span className="meta-label">Chỉ huy giặc:</span>
-                <strong className="meta-val enemy-accent">{battle.enemyCommander}</strong>
+              <div className="force-bar">
+                <div 
+                  className="force-bar-fill ally"
+                  style={{ width: `${battle.forcesComparison.ourForces.percent}%` }}
+                />
+              </div>
+            </div>
+            <div className="force-row">
+              <div className="force-label">
+                <span>{battle.forcesComparison.enemyForces.name}</span>
+                <strong>{battle.forcesComparison.enemyForces.count}</strong>
+              </div>
+              <div className="force-bar">
+                <div 
+                  className="force-bar-fill enemy"
+                  style={{ width: `${battle.forcesComparison.enemyForces.percent}%` }}
+                />
               </div>
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Card 2: Thẻ Tiến Trình Tác Chiến */}
-          <div className="battle-card card battle-stepper-card">
-            <div className="stepper-header">
-              <div className="header-title-flex">
-                <Compass size={16} className="text-gold" />
-                <h4>Tiến Trình Tác Chiến 3 Giai Đoạn</h4>
-              </div>
-              <span className="stepper-tip">Bấm giai đoạn để xem vị trí</span>
+      {/* Mini Quiz Modal Popup */}
+      {activeQuizPhase && activeQuizPhase.miniQuiz && (
+        <div className="battle-quiz-modal-backdrop" onClick={() => setActiveQuizPhase(null)}>
+          <div className="battle-quiz-modal" onClick={e => e.stopPropagation()}>
+            <button 
+              className="battle-quiz-close" 
+              onClick={() => setActiveQuizPhase(null)}
+              aria-label="Đóng câu hỏi"
+            >
+              <X size={18} />
+            </button>
+            <div className="battle-quiz-title">
+              <Trophy size={16} />
+              <span>Thử Thách Sa Bàn · Điểm: {score}</span>
             </div>
-
-            <div className="tactical-stepper-list">
-              {battle.tactics.map((tac, idx) => {
-                const isActive = activePhaseIndex === idx;
+            <p className="battle-quiz-question">{activeQuizPhase.miniQuiz.question}</p>
+            <div className="battle-quiz-options">
+              {activeQuizPhase.miniQuiz.options.map((opt, oIdx) => {
+                let btnClass = 'battle-quiz-option-btn';
+                if (quizState.isSubmitted) {
+                  if (oIdx === activeQuizPhase.miniQuiz.correct) btnClass += ' correct';
+                  else if (oIdx === quizState.selected) btnClass += ' wrong';
+                }
                 return (
-                  <div 
-                    key={idx}
-                    className={`stepper-node-card ${isActive ? 'active' : ''}`}
-                    onClick={() => handleSelectPhase(tac, idx)}
+                  <button
+                    key={oIdx}
+                    type="button"
+                    className={btnClass}
+                    disabled={quizState.isSubmitted}
+                    onClick={() => handleSelectOption(oIdx, activeQuizPhase.miniQuiz)}
                   >
-                    <div className="node-indicator-col">
-                      <div className={`node-circle ${isActive ? 'active' : ''}`}>
-                        {tac.icon || (idx + 1)}
-                      </div>
-                      {idx < battle.tactics.length - 1 && <div className="node-line" />}
-                    </div>
-
-                    <div className="node-body">
-                      <div className="node-header-row">
-                        <span className="phase-order-badge">Giai đoạn {idx + 1}</span>
-                        <span className="phase-tag">{tac.tag}</span>
-                      </div>
-                      <h5 className="phase-title">{tac.phase}</h5>
-                      <p className="phase-desc">{tac.desc}</p>
-                      
-                      {isActive && (
-                        <div className="phase-active-focus">
-                          <span>Đã định vị trọng điểm giai đoạn này</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                    <strong>{String.fromCharCode(65 + oIdx)}.</strong> {opt}
+                  </button>
                 );
               })}
             </div>
+            {quizState.isSubmitted && (
+              <div className="battle-quiz-feedback">
+                <strong>{quizState.isCorrect ? '✅ Chính xác! (+10 điểm)' : '❌ Chưa chính xác!'}</strong>
+                <p style={{ marginTop: '4px', margin: 0 }}>{activeQuizPhase.miniQuiz.explain}</p>
+              </div>
+            )}
           </div>
-
-          {/* Card 3: Thẻ So Sánh Tương Quan Lực Lượng */}
-          {battle.forcesComparison && (
-            <div className="battle-card card battle-forces-card">
-              <div className="forces-card-header">
-                <div className="header-title-flex">
-                  <Swords size={16} className="text-gold" />
-                  <h4>Tương Quan Binh Lực & Khí Giới</h4>
-                </div>
-                <span className="forces-ratio-tag">Thế trận lấy ít địch nhiều</span>
-              </div>
-
-              {/* Progress Bars */}
-              <div className="forces-bars-box">
-                {/* Quân ta Tây Sơn */}
-                <div className="force-bar-item">
-                  <div className="force-labels">
-                    <span className="force-name ally-name">
-                      {battle.forcesComparison.ourForces.name}
-                    </span>
-                    <strong className="force-count ally-count">
-                      {battle.forcesComparison.ourForces.count}
-                    </strong>
-                  </div>
-                  <div className="progress-track">
-                    <div 
-                      className="progress-fill ally-fill"
-                      style={{ width: `${battle.forcesComparison.ourForces.percent}%` }}
-                    />
-                  </div>
-                  <span className="force-desc">{battle.forcesComparison.ourForces.details}</span>
-                </div>
-
-                {/* Quân địch */}
-                <div className="force-bar-item">
-                  <div className="force-labels">
-                    <span className="force-name enemy-name">
-                      {battle.forcesComparison.enemyForces.name}
-                    </span>
-                    <strong className="force-count enemy-count">
-                      {battle.forcesComparison.enemyForces.count}
-                    </strong>
-                  </div>
-                  <div className="progress-track">
-                    <div 
-                      className="progress-fill enemy-fill"
-                      style={{ width: `${battle.forcesComparison.enemyForces.percent}%` }}
-                    />
-                  </div>
-                  <span className="force-desc">{battle.forcesComparison.enemyForces.details}</span>
-                </div>
-              </div>
-
-              <div className="forces-summary-callout">
-                <Info size={15} className="callout-icon text-gold" />
-                <p>{battle.forcesComparison.ratioNote}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Selected Feature Info Popup Card */}
-          {selectedFeature && (
-            <motion.div 
-              className="battle-card card selected-flow-card"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className="selected-card-header">
-                <MapPin size={16} className="text-gold" />
-                <strong>Chi tiết: {selectedFeature.data.title}</strong>
-              </div>
-              <p className="selected-card-desc">{selectedFeature.data.desc}</p>
-              <button className="clear-selection-btn" onClick={() => setSelectedFeature(null)}>
-                Đóng chi tiết
-              </button>
-            </motion.div>
-          )}
-
         </div>
-      </div>
+      )}
+
+      {/* Achievement Toast */}
+      {toastMessage && (
+        <Toast 
+          message={toastMessage} 
+          type="success" 
+          onClose={() => setToastMessage(null)} 
+        />
+      )}
     </motion.div>
   );
 }

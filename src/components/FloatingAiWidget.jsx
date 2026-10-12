@@ -6,8 +6,8 @@ import { playChime } from '../utils/audio';
 export default function FloatingAiWidget({ activeTab, onSelectTab }) {
   const [isOpenPopover, setIsOpenPopover] = useState(false);
 
-  // Không hiển thị widget nếu đang ở tab Sử Quan AI
-  const isAlreadyInAiTab = activeTab === 'ai-station';
+  // Không hiển thị widget nếu đang ở tab Sử Quan AI hoặc Sa Bàn (tránh che khuất bản đồ và nút điều khiển)
+  const isAlreadyInAiTab = activeTab === 'ai-station' || activeTab === 'battle-map';
 
   const handleClickWidget = () => {
     if (isAlreadyInAiTab) {

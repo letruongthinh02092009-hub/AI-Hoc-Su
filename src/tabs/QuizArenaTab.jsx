@@ -9,18 +9,55 @@ import {
   RotateCcw, 
   ArrowRight, 
   Award, 
-  HelpCircle,
   Sparkles,
-  Shield,
-  Swords,
-  Crown,
   Download,
   X,
-  FileCheck,
-  UserCheck
+  Swords,
+  Star,
+  Shield,
+  Zap,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import { QUIZ_QUESTIONS } from '../data/quizData';
 import { playCorrectSound, playWrongSound, playVictorySound, playChime } from '../utils/audio';
+import { generateCertificateCanvas } from '../utils/certificateGenerator';
+
+const LEVELS_DATA = [
+  {
+    key: 'co-ban',
+    numeral: 'Ⅰ',
+    title: 'Khởi Khái Môn',
+    subtitle: 'Nền Tảng & Thân Thế',
+    category: 'Cấp độ Nền tảng',
+    badgeText: 'Thử Thách Nhập Môn',
+    desc: 'Khởi nguồn từ hào khí áo vải cờ đào làng Kiên Mỹ, thử thách tri thức nền tảng về ba anh em Tây Sơn và những bước đầu dựng cờ cứu dân.',
+    icon: Flame,
+    colorAccent: '#FFD700'
+  },
+  {
+    key: 'nang-cao',
+    numeral: 'Ⅱ',
+    title: 'Binh Pháp Khắc Địch',
+    subtitle: 'Nghệ Thuật Quân Sự',
+    category: 'Cấp độ Trung cấp',
+    badgeText: 'Thao Lược Chiến Trận',
+    desc: 'Khảo sát tài thao lược thần tốc, thủy chiến Rạch Gầm – Xoài Mút, đại phá 29 vạn quân Thanh và kỹ thuật tác chiến đỉnh cao.',
+    icon: Swords,
+    colorAccent: '#E5A93C'
+  },
+  {
+    key: 'chuyen-sau',
+    numeral: 'Ⅲ',
+    title: 'Kỳ Tài Vương Triều',
+    subtitle: 'Chính Trị & Canh Tân',
+    category: 'Cấp độ Chuyên sâu',
+    badgeText: 'Đỉnh Cao Sử Học',
+    desc: 'Khảo cứu chính sách dùng chữ Nôm, canh tân nông nghiệp, đúc tiền Quang Trung Thông Bảo và tầm nhìn vượt thời đại của vị Hoàng đế.',
+    icon: Trophy,
+    colorAccent: '#FFB800'
+  }
+];
 
 // Hàm xáo trộn và chọn 10 câu hỏi MỚI KHÔNG TRÙNG với lượt vừa làm
 function prepareShuffledQuiz(levelKey, count = 10, excludedQuestionTexts = []) {
@@ -225,139 +262,17 @@ export default function QuizArenaTab() {
     (completedLevels['nang-cao'] || 0) + 
     (completedLevels['chuyen-sau'] || 0);
 
-  // Xuất Giấy Chứng Nhận ra ảnh PNG bằng HTML5 Canvas
+  // Xuất Giấy Chứng Nhận ra ảnh PNG bằng module Canvas độc lập
   const handleDownloadCertificate = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1600;
-    canvas.height = 1100;
-    const ctx = canvas.getContext('2d');
-
-    // Nền giấy lụa hoàng gia
-    ctx.fillStyle = '#FAF7F0';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Khung viền ngoài màu son đậm (Vermilion Lacquer)
-    ctx.strokeStyle = '#9E2A2B';
-    ctx.lineWidth = 14;
-    ctx.strokeRect(36, 36, canvas.width - 72, canvas.height - 72);
-
-    // Khung viền chỉ vàng kim (Metallic Gold)
-    ctx.strokeStyle = '#C5A059';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(52, 52, canvas.width - 104, canvas.height - 104);
-
-    // Hoa văn 4 góc truyền thống
-    const drawCorner = (x, y, flipX, flipY) => {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(flipX, flipY);
-      ctx.strokeStyle = '#C5A059';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, 40);
-      ctx.lineTo(0, 0);
-      ctx.lineTo(40, 0);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(20, 20, 10, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    };
-    drawCorner(70, 70, 1, 1);
-    drawCorner(canvas.width - 70, 70, -1, 1);
-    drawCorner(70, canvas.height - 70, 1, -1);
-    drawCorner(canvas.width - 70, canvas.height - 70, -1, -1);
-
-    // Quốc hiệu tiêu ngữ
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 24px "Times New Roman", serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', canvas.width / 2, 115);
-    ctx.font = 'italic 20px "Times New Roman", serif';
-    ctx.fillText('Độc lập – Tự do – Hạnh phúc', canvas.width / 2, 148);
-
-    // Dải phân cách hoa văn vàng
-    ctx.strokeStyle = '#C5A059';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 140, 168);
-    ctx.lineTo(canvas.width / 2 + 140, 168);
-    ctx.stroke();
-
-    // Tiêu đề Giấy Chứng Nhận
-    ctx.fillStyle = '#9E2A2B';
-    ctx.font = 'bold 50px "Times New Roman", Georgia, serif';
-    ctx.fillText('GIẤY CHỨNG NHẬN VINH DANH', canvas.width / 2, 245);
-
-    ctx.fillStyle = '#C5A059';
-    ctx.font = 'bold 26px "Times New Roman", serif';
-    ctx.fillText('AM HIỂU LỊCH SỬ PHONG TRÀO TÂY SƠN', canvas.width / 2, 290);
-
-    // Nội dung vinh danh
-    ctx.fillStyle = '#44403C';
-    ctx.font = '22px "Times New Roman", serif';
-    ctx.fillText('Hội đồng Khảo cứu & Giáo dục Di sản Kỹ thuật số trân trọng chứng nhận:', canvas.width / 2, 360);
-
-    // Tên học sinh
-    ctx.fillStyle = '#9E2A2B';
-    ctx.font = 'bold 44px "Times New Roman", Georgia, serif';
-    ctx.fillText(studentName || 'Lê Trường Thịnh', canvas.width / 2, 425);
-
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 22px "Times New Roman", serif';
-    ctx.fillText('Lớp 12A8 — Trường THPT Nguyễn Huệ', canvas.width / 2, 470);
-
-    ctx.fillStyle = '#44403C';
-    ctx.font = '22px "Times New Roman", serif';
-    ctx.fillText('Đã hoàn thành xuất sắc toàn bộ 3 cấp độ thử thách Đấu trường Sử học Tây Sơn:', canvas.width / 2, 530);
-    ctx.fillText('• Khởi Khái Môn (Cơ bản)   • Binh Pháp Khắc Địch (Nâng cao)   • Kỳ Tài Vương Triều (Chuyên sâu)', canvas.width / 2, 565);
-
-    // Bảng thành tích
-    ctx.fillStyle = '#1C1917';
-    ctx.font = 'bold 24px "Times New Roman", serif';
-    ctx.fillText(`Tổng điểm tích lũy: ${totalAllScore} / 300 Điểm`, canvas.width / 2, 630);
-    ctx.fillStyle = '#15803D';
-    ctx.fillText('Danh hiệu phong tặng: THỦ KHOA SỬ HỌC TÂY SƠN (XUẤT SẮC)', canvas.width / 2, 670);
-
-    // Ngày tháng
-    const today = new Date();
-    const dateStr = `Ngày ${today.getDate()} tháng ${today.getMonth() + 1} năm ${today.getFullYear()}`;
-    ctx.fillStyle = '#44403C';
-    ctx.font = 'italic 20px "Times New Roman", serif';
-    ctx.fillText(dateStr, canvas.width - 320, 770);
-
-    ctx.font = 'bold 22px "Times New Roman", serif';
-    ctx.fillText('BAN KHẢO CỨU SỬ HỌC', canvas.width - 320, 810);
-    ctx.font = 'italic 18px "Times New Roman", serif';
-    ctx.fillText('(Ký tên và chứng thực)', canvas.width - 320, 840);
-
-    // Mộc đỏ triều Quang Trung
-    ctx.save();
-    ctx.translate(canvas.width - 320, 920);
-    ctx.strokeStyle = '#DC2626';
-    ctx.fillStyle = '#DC2626';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(0, 0, 58, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, 50, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.font = 'bold 13px "Times New Roman", serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('ĐẠI VIỆT', 0, -22);
-    ctx.font = 'bold 15px "Times New Roman", serif';
-    ctx.fillText('QUANG TRUNG', 0, 2);
-    ctx.fillText('HOÀNG ĐẾ', 0, 22);
-    ctx.font = '10px "Times New Roman", serif';
-    ctx.fillText('1788 - 1792', 0, 38);
-    ctx.restore();
-
-    // Kích hoạt tải ảnh về máy
-    const dataUrl = canvas.toDataURL('image/png');
+    const safeName = (studentName || 'Lê Trường Thịnh').trim();
+    const dataUrl = generateCertificateCanvas({
+      studentName: safeName,
+      totalScore: totalAllScore,
+      rankTitle: 'THỦ KHOA SỬ HỌC TÂY SƠN (XUẤT SẮC)'
+    });
+    const filename = `Giay_Chung_Nhan_Tay_Son_${safeName.replace(/[^\p{L}\p{N}\s_-]/gu, '').replace(/\s+/g, '_') || 'HocSinh'}.png`;
     const link = document.createElement('a');
-    link.download = `Giay_Chung_Nhan_Tay_Son_${(studentName || 'HocSinh').replace(/\s+/g, '_')}.png`;
+    link.download = filename;
     link.href = dataUrl;
     link.click();
     playChime(750, 'sine', 0.2);
@@ -374,8 +289,10 @@ export default function QuizArenaTab() {
       <div className="section-title-box">
         <span className="section-kicker">ĐẤU TRƯỜNG TRI THỨC GAMIFIED</span>
         <h2 className="section-heading">THỬ THÁCH SỬ HỌC TÂY SƠN</h2>
-        <p className="section-subtext">Hệ thống 90 câu hỏi trắc nghiệm tương tác 3 cấp độ (mỗi lượt tự động đổi 10 câu mới). Hoàn thành cả 3 cấp độ để nhận Giấy Chứng Nhận vinh danh.</p>
-        <div className="title-divider-gold"></div>
+        <p className="section-subtext">
+          Hệ thống 90 câu hỏi trắc nghiệm tương tác 3 cấp độ (mỗi lượt tự động đổi 10 câu mới). Hoàn thành cả 3 cấp độ để nhận Giấy Chứng Nhận vinh danh.
+        </p>
+        <div className="title-divider-gold" />
       </div>
 
       {/* Thanh trạng thái hoàn thành 3 cấp độ & nút nhận Giấy chứng nhận */}
@@ -407,130 +324,91 @@ export default function QuizArenaTab() {
       </div>
 
       {!isPlaying ? (
-        // Màn hình chọn cấp độ
-        <div className="quiz-levels-picker">
-          {/* Card 1: Khởi Khái Môn (Cơ bản) */}
-          <motion.div 
-            className="level-card character-card card-emerald" 
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            onClick={() => handleStartLevel('co-ban')}
-          >
-            <div className="card-character-header">
-              <div className="character-avatar-frame avatar-emerald">
-                <Shield size={26} />
-              </div>
-              <div className="embossed-metal-badge badge-emerald">
-                <span>CẤP ĐỘ I</span>
-              </div>
-            </div>
+        // Màn hình chọn cấp độ: 3 Thẻ Bài 3D Sưu Tầm với hiệu ứng vệt quét ánh kim Sweep Shimmer
+        <div className="quiz-level-grid-3d">
+          {LEVELS_DATA.map((lvl) => {
+            const userScore = completedLevels[lvl.key];
+            const isDone = userScore !== null;
+            const starsEarned = !isDone ? 0 : userScore >= 90 ? 3 : userScore >= 70 ? 2 : 1;
+            const IconComp = lvl.icon;
 
-            <div className="character-card-body">
-              <span className="character-rank-title">DŨNG SĨ TIÊN PHONG</span>
-              <h3 className="character-level-name">Khởi Khái Môn (Cơ Bản)</h3>
-              <p className="character-desc">
-                10 câu hỏi nền tảng (tự động đổi 10 câu mới khi làm lại): năm sinh, quê hương, khởi nghĩa Tây Sơn Thượng Đạo.
-              </p>
+            return (
+              <motion.div 
+                key={lvl.key}
+                className={`quiz-card-3d ${isDone ? 'card-completed' : ''}`}
+                whileHover={{ y: -8, scale: 1.02 }}
+                transition={{ duration: 0.25 }}
+                onClick={() => handleStartLevel(lvl.key)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Bắt đầu thử thách ${lvl.title}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleStartLevel(lvl.key);
+                  }
+                }}
+              >
+                {/* Vệt kim loại quét qua mặt thẻ */}
+                <div className="card-shimmer-sweep" aria-hidden="true" />
 
-              <div className="card-combat-stats">
-                <div className="stat-pill">
-                  <span className="stat-label">Độ khó:</span>
-                  <span className="stat-stars">Cơ bản · 1/3</span>
+                {/* Huy hiệu đỉnh đầu thẻ bài */}
+                <div className="quiz-card-top-crest">
+                  <div className="numeral-seal">
+                    <span className="numeral-text">{lvl.numeral}</span>
+                  </div>
+                  <span className="level-badge-tag">{lvl.badgeText}</span>
                 </div>
-                <div className="stat-pill">
-                  <span className="stat-label">Điểm cao nhất:</span>
-                  <span className="stat-num">{completedLevels['co-ban'] !== null ? `${completedLevels['co-ban']}/100đ` : 'Chưa thi'}</span>
+
+                {/* Biểu tượng đại diện cấp độ */}
+                <div className="quiz-card-icon-emblem">
+                  <IconComp size={36} color={lvl.colorAccent} />
                 </div>
-              </div>
-            </div>
 
-            <div className="character-card-footer">
-              <span className="level-start-btn btn-emerald-theme">
-                Bắt đầu xuất trận <ArrowRight size={15} />
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Card 2: Binh Pháp Khắc Địch (Nâng cao) */}
-          <motion.div 
-            className="level-card character-card card-gold" 
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            onClick={() => handleStartLevel('nang-cao')}
-          >
-            <div className="card-character-header">
-              <div className="character-avatar-frame avatar-gold">
-                <Swords size={26} />
-              </div>
-              <div className="embossed-metal-badge badge-gold">
-                <span>CẤP ĐỘ II</span>
-              </div>
-            </div>
-
-            <div className="character-card-body">
-              <span className="character-rank-title">ĐÔ ĐỐC TỔNG BINH</span>
-              <h3 className="character-level-name">Binh Pháp Khắc Địch (Nâng Cao)</h3>
-              <p className="character-desc">
-                10 câu hỏi nghệ thuật quân sự: hành quân thần tốc, súng hỏa hổ, kế lui quân Tam Điệp và công phá Ngọc Hồi.
-              </p>
-
-              <div className="card-combat-stats">
-                <div className="stat-pill">
-                  <span className="stat-label">Độ khó:</span>
-                  <span className="stat-stars">Nâng cao · 2/3</span>
+                {/* Tiêu đề & Cấp độ */}
+                <div className="quiz-card-header-info">
+                  <span className="quiz-card-category-sub">{lvl.category}</span>
+                  <h3 className="quiz-card-title-serif">{lvl.title}</h3>
+                  <p className="quiz-card-subtitle-tag">{lvl.subtitle}</p>
                 </div>
-                <div className="stat-pill">
-                  <span className="stat-label">Điểm cao nhất:</span>
-                  <span className="stat-num">{completedLevels['nang-cao'] !== null ? `${completedLevels['nang-cao']}/100đ` : 'Chưa thi'}</span>
+
+                {/* Mô tả ngắn cấp độ */}
+                <p className="quiz-card-description">{lvl.desc}</p>
+
+                {/* Trạng thái sao & điểm số */}
+                <div className="quiz-card-status-box">
+                  <div className="card-stars-row">
+                    {[1, 2, 3].map((starIdx) => (
+                      <Star 
+                        key={starIdx} 
+                        size={16} 
+                        className={`star-icon ${starIdx <= starsEarned ? 'earned' : 'empty'}`}
+                        fill={starIdx <= starsEarned ? '#FFD700' : 'none'}
+                      />
+                    ))}
+                  </div>
+
+                  <span className="card-status-label">
+                    {isDone ? `Điểm cao: ${userScore}/100` : 'Sẵn sàng khiêu chiến'}
+                  </span>
                 </div>
-              </div>
-            </div>
 
-            <div className="character-card-footer">
-              <span className="level-start-btn btn-gold-theme">
-                Thử sức điều binh <ArrowRight size={15} />
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Card 3: Kỳ Tài Vương Triều (Chuyên sâu) */}
-          <motion.div 
-            className="level-card character-card card-crimson" 
-            whileHover={{ y: -6, transition: { duration: 0.2 } }}
-            onClick={() => handleStartLevel('chuyen-sau')}
-          >
-            <div className="card-character-header">
-              <div className="character-avatar-frame avatar-crimson">
-                <Crown size={26} />
-              </div>
-              <div className="embossed-metal-badge badge-crimson">
-                <span>CẤP ĐỘ III</span>
-              </div>
-            </div>
-
-            <div className="character-card-body">
-              <span className="character-rank-title">MINH QUÂN HOÀNG ĐẾ</span>
-              <h3 className="character-level-name">Kỳ Tài Vương Triều (Chuyên Sâu)</h3>
-              <p className="character-desc">
-                10 câu hỏi chuyên sâu: dòng dõi họ Hồ, chính sách chữ Nôm, bang giao Mãn Thanh, bản đồ và y sử.
-              </p>
-
-              <div className="card-combat-stats">
-                <div className="stat-pill">
-                  <span className="stat-label">Độ khó:</span>
-                  <span className="stat-stars">Chuyên sâu · 3/3</span>
-                </div>
-                <div className="stat-pill">
-                  <span className="stat-label">Điểm cao nhất:</span>
-                  <span className="stat-num">{completedLevels['chuyen-sau'] !== null ? `${completedLevels['chuyen-sau']}/100đ` : 'Chưa thi'}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="character-card-footer">
-              <span className="level-start-btn btn-crimson-theme">
-                Chinh phục đỉnh cao <ArrowRight size={15} />
-              </span>
-            </div>
-          </motion.div>
+                {/* Nút Tham Chiến phát sáng */}
+                <button 
+                  type="button" 
+                  className="quiz-card-launch-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleStartLevel(lvl.key);
+                  }}
+                >
+                  <Swords size={16} />
+                  <span>Tham Chiến</span>
+                  <ArrowRight size={16} />
+                </button>
+              </motion.div>
+            );
+          })}
         </div>
       ) : isFinished ? (
         // Màn hình kết quả
@@ -541,7 +419,7 @@ export default function QuizArenaTab() {
           transition={{ duration: 0.3 }}
         >
           <div className="result-trophy-icon">
-            <Trophy size={48} className="text-gold" />
+            <Trophy size={64} strokeWidth={1.5} />
           </div>
           <h3 className="result-title-gold">Hoàn Thành Lượt Thử Thách!</h3>
           <div className="result-score-tag">
@@ -658,146 +536,99 @@ export default function QuizArenaTab() {
                   className="quiz-explanation-box"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <div className="exp-header">
-                    <Sparkles size={16} className="exp-icon" />
-                    <strong>Kiểm chứng sử liệu Tây Sơn:</strong>
+                  <div className="explanation-title">
+                    <Sparkles size={16} /> Kiểm chứng sử liệu Tây Sơn
                   </div>
-                  <p className="exp-text">{currentQ.explanation}</p>
+                  <p className="explanation-content">{currentQ.explain || currentQ.explanation}</p>
+                  
+                  <div className="explanation-actions">
+                    <button 
+                      className="btn btn-primary"
+                      onClick={handleNext}
+                    >
+                      <span>{currentIndex + 1 < questionsList.length ? 'Câu tiếp theo' : 'Xem tổng kết điểm'}</span>
+                      <ArrowRight size={16} />
+                    </button>
+                  </div>
                 </motion.div>
-              )}
-
-              {isAnswered && (
-                <div className="quiz-action-next-wrap">
-                  <button className="btn btn-primary next-btn" onClick={handleNext}>
-                    {currentIndex + 1 < questionsList.length ? (
-                      <>Câu tiếp theo <ArrowRight size={16} /></>
-                    ) : (
-                      <>Xem tổng kết điểm số <ArrowRight size={16} /></>
-                    )}
-                  </button>
-                </div>
               )}
             </motion.div>
           </AnimatePresence>
         </div>
       )}
 
-      {/* CỬA SỔ MODAL GIẤY CHỨNG NHẬN VINH DANH */}
+      {/* Modal hiển thị và tải Giấy Chứng Nhận */}
       <AnimatePresence>
         {showCertificateModal && (
-          <div className="modal-backdrop" onClick={() => setShowCertificateModal(false)}>
+          <motion.div 
+            className="certificate-modal-wrapper"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowCertificateModal(false)}
+          >
             <motion.div 
-              className="certificate-modal-wrapper"
+              className="certificate-modal-box"
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 20 }}
-              transition={{ duration: 0.25 }}
             >
+              <button 
+                className="cert-modal-close" 
+                onClick={() => setShowCertificateModal(false)}
+                aria-label="Đóng giấy chứng nhận"
+              >
+                <X size={20} />
+              </button>
+
               <div className="cert-modal-header">
-                <div className="cert-header-title">
-                  <Award size={22} className="text-gold" />
-                  <strong>Giấy Chứng Nhận Vinh Danh Lịch Sử Tây Sơn</strong>
-                </div>
-                <button 
-                  className="close-modal-btn" 
-                  onClick={() => setShowCertificateModal(false)}
-                  title="Đóng"
-                >
-                  <X size={20} />
-                </button>
+                <Award size={36} className="cert-modal-gold-icon" />
+                <h3 className="cert-modal-title">GIẤY CHỨNG NHẬN VINH DANH</h3>
+                <p className="cert-modal-sub">Hoàn thành xuất sắc toàn bộ 3 cấp độ Đấu trường Sử học Tây Sơn</p>
               </div>
 
-              {/* Tùy chỉnh tên học sinh hiển thị trên Giấy Chứng Nhận */}
-              <div className="cert-name-input-bar">
-                <label>Họ và tên của bạn hiển thị trên Giấy Chứng Nhận:</label>
+              <div className="cert-name-input-group">
+                <label htmlFor="student-name-input">Họ và tên học sinh nhận bằng:</label>
                 <input 
+                  id="student-name-input"
                   type="text" 
+                  className="cert-name-field"
                   value={studentName}
                   onChange={(e) => {
-                    setStudentName(e.target.value);
+                    const val = e.target.value;
+                    setStudentName(val);
                     try {
-                      localStorage.setItem('su_student_name_v2', e.target.value);
+                      localStorage.setItem('su_student_name_v2', val);
                     } catch (err) {}
                   }}
-                  placeholder="Nhập họ và tên học sinh..."
+                  placeholder="Nhập họ và tên của bạn..."
                 />
               </div>
 
-              {/* Bản xem trước Giấy chứng nhận hoàng gia */}
-              <div className="certificate-parchment-preview">
-                <div className="cert-inner-border">
-                  <div className="cert-republic-header">
-                    <h4>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</h4>
-                    <p>Độc lập – Tự do – Hạnh phúc</p>
-                    <div className="cert-divider-line"></div>
-                  </div>
-
-                  <div className="cert-main-body">
-                    <h2 className="cert-main-title">GIẤY CHỨNG NHẬN VINH DANH</h2>
-                    <h3 className="cert-sub-title">AM HIỂU LỊCH SỬ PHONG TRÀO TÂY SƠN</h3>
-
-                    <p className="cert-grant-text">Hội đồng Khảo cứu & Giáo dục Di sản Kỹ thuật số trân trọng chứng nhận:</p>
-
-                    <h1 className="cert-student-name">{studentName || 'Lê Trường Thịnh'}</h1>
-                    <p className="cert-class-name">Học sinh Lớp 12A8 — Trường THPT Nguyễn Huệ</p>
-
-                    <p className="cert-desc-text">
-                      Đã hoàn thành xuất sắc toàn bộ 3 cấp độ khảo cứu chuyên sâu lịch sử Tây Sơn Tam Kiệt và triều đại Hoàng đế Quang Trung.
-                    </p>
-
-                    <div className="cert-stats-grid">
-                      <div className="cert-stat-item">
-                        <span>Tổng điểm tích lũy:</span>
-                        <strong>{totalAllScore} / 300 Điểm</strong>
-                      </div>
-                      <div className="cert-stat-item">
-                        <span>Xếp loại danh hiệu:</span>
-                        <strong className="text-gold">Thủ Khoa Sử Học Tây Sơn</strong>
-                      </div>
-                    </div>
-
-                    <div className="cert-bottom-signatures">
-                      <div className="cert-seal-wrap">
-                        <div className="imperial-red-seal">
-                          <span>ĐẠI VIỆT</span>
-                          <strong>QUANG TRUNG</strong>
-                          <strong>HOÀNG ĐẾ</strong>
-                          <small>1788 - 1792</small>
-                        </div>
-                      </div>
-
-                      <div className="cert-signature-box">
-                        <p className="cert-date-text">
-                          {`Ngày ${new Date().getDate()} tháng ${new Date().getMonth() + 1} năm ${new Date().getFullYear()}`}
-                        </p>
-                        <strong>BAN KHẢO CỨU SỬ HỌC</strong>
-                        <p className="cert-sign-sub">(Ký tên và đóng dấu điện tử)</p>
-                      </div>
-                    </div>
-                  </div>
+              <div className="cert-preview-card">
+                <div className="cert-preview-inner">
+                  <span className="cert-seal-text">TRIỀU ĐẠI TÂY SƠN · VINH DANH SỬ HỌC</span>
+                  <h4 className="cert-recipient-name">{studentName || 'Lê Trường Thịnh'}</h4>
+                  <p className="cert-desc-text">
+                    Đã hoàn thành xuất sắc 3 cấp độ khảo thí với tổng điểm <strong>{totalAllScore} / 300 điểm</strong>.
+                  </p>
+                  <span className="cert-badge-rank">DANH HIỆU: THỦ KHOA SỬ HỌC TÂY SƠN (XUẤT SẮC)</span>
                 </div>
               </div>
 
-              {/* Thanh nút hành động */}
-              <div className="cert-modal-actions">
+              <div className="cert-modal-footer">
                 <button 
-                  className="btn btn-secondary" 
-                  onClick={() => setShowCertificateModal(false)}
-                >
-                  Đóng
-                </button>
-                <button 
-                  className="btn-download-cert" 
+                  className="btn btn-primary"
                   onClick={handleDownloadCertificate}
                 >
-                  <Download size={18} />
-                  <span>Tải Giấy Chứng Nhận Về Máy (Ảnh PNG)</span>
+                  <Download size={16} /> Tải Giấy Chứng Nhận (Ảnh PNG HD)
                 </button>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </motion.div>

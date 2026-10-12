@@ -58,7 +58,7 @@ export default function AdminPinModal() {
               <KeyRound size={18} className="pin-input-icon" />
               <input 
                 type="password" 
-                placeholder="Nhập mã PIN (Mặc định: 1234)"
+                placeholder="Nhập mã PIN bảo mật..."
                 value={pin}
                 onChange={e => setPin(e.target.value)}
                 autoFocus
@@ -69,7 +69,7 @@ export default function AdminPinModal() {
             {error && (
               <div className="pin-error-notice">
                 <AlertCircle size={14} />
-                <span>Mã PIN không chính xác. Vui lòng thử lại! (Gợi ý: 1234)</span>
+                <span>Mã PIN không chính xác. Vui lòng thử lại!</span>
               </div>
             )}
 

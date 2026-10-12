@@ -16,7 +16,6 @@ import {
   Send,
   PlusCircle,
   Award,
-  Sparkles,
   ArrowRight,
   Trash2,
   RotateCcw,
@@ -364,7 +363,7 @@ export default function SurveyTab() {
               )}
 
               <div className="dialog-btn-row">
-                <button type="submit" className="btn btn-primary shimmer-cta-btn">
+                <button type="submit" className="btn btn-primary">
                   Lưu & Áp Dụng Ngay
                 </button>
                 <button 
@@ -426,7 +425,7 @@ export default function SurveyTab() {
             {/* Nút Kêu Gọi Viết Đánh Giá */}
             <div className="gmaps-action-col">
               <button 
-                className="btn-write-review shimmer-cta-btn"
+                className="btn-write-review"
                 onClick={() => {
                   playChime(680, 'triangle', 0.12);
                   setIsAddingReview(prev => !prev);
@@ -525,7 +524,7 @@ export default function SurveyTab() {
                   )}
 
                   <div className="review-submit-row">
-                    <button type="submit" className="btn btn-primary shimmer-cta-btn">
+                    <button type="submit" className="btn btn-primary">
                       <Send size={15} />
                       <span>Đăng Đánh Giá Lên Bảng Tin</span>
                     </button>
@@ -689,7 +688,9 @@ export default function SurveyTab() {
                 <p>Học sinh & thầy cô hoàn thành phiếu đánh giá trực tuyến</p>
               </div>
             </div>
-            <div className="flow-divider-arrow">→</div>
+            <div className="flow-divider-arrow" aria-hidden="true">
+              <ArrowRight size={18} />
+            </div>
             <div className="flow-step-item">
               <span className="flow-num">02</span>
               <div className="flow-text">
@@ -697,7 +698,9 @@ export default function SurveyTab() {
                 <p>Toàn bộ thông tin điền được lưu an toàn sang Google Sheets</p>
               </div>
             </div>
-            <div className="flow-divider-arrow">→</div>
+            <div className="flow-divider-arrow" aria-hidden="true">
+              <ArrowRight size={18} />
+            </div>
             <div className="flow-step-item">
               <span className="flow-num">03</span>
               <div className="flow-text">
@@ -851,7 +854,7 @@ export default function SurveyTab() {
                   </table>
                   <div className="table-summary-footer">
                     <span>Tổng cộng: <strong>{reviews.length} phiếu khảo sát</strong></span>
-                    <span>Đánh giá trung bình: <strong>{averageRating}/5 sao</strong></span>
+                    <span>Đánh giá trung bình: <strong>{avgRating}/5 sao</strong></span>
                   </div>
                 </div>
               ) : (

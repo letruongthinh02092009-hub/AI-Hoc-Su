@@ -1,4 +1,4 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 .pnp
 .pnp.js
@@ -29,3 +29,10 @@ pnpm-debug.log*
 *.sw?
 .DS_Store
 Thumbs.db
+
+# Workspace artifacts & scratch
+scratch/
+.agent/
+verified_*.png
+17918047*.jpg
+Dawn_Over_the_Citadel.mp*

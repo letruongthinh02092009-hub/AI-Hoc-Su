@@ -25,7 +25,20 @@ import './App.css';
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      return !sessionStorage.getItem('su_intro_seen_session');
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const handleIntroComplete = () => {
+    try {
+      sessionStorage.setItem('su_intro_seen_session', 'v1');
+    } catch (e) {}
+    setShowIntro(false);
+  };
 
   // Tự động kéo kho tri thức đám mây (Google Docs) khi mở web trên mọi thiết bị
   useEffect(() => {
@@ -58,13 +71,13 @@ export default function App() {
       case 'home':
         return <HomeTab onSelectTab={handleSelectTab} />;
       case 'timeline':
-        return <TimelineTab />;
+        return <TimelineTab onSelectTab={handleSelectTab} />;
       case 'battle-map':
         return <BattleMapTab />;
       case 'museum':
         return <MuseumTab />;
       case 'ai-station':
-        return <AiStationTab onOpenAdmin={() => setIsAdminOpen(true)} />;
+        return <AiStationTab />;
       case 'quiz':
         return <QuizArenaTab />;
       case 'survey':
@@ -77,20 +90,20 @@ export default function App() {
   };
 
   return (
-    <AdminProvider>
+    <AdminProvider onOpenAdmin={() => setIsAdminOpen(true)}>
       <div className="app-container">
         {/* Hiệu ứng tàn tro lửa lơ lửng 60fps */}
         <AmbientEmbersCanvas />
 
         {/* Lớp nền đa tầng: Đốm sáng Crimson & Gold mờ ảo tạo chiều sâu 3D */}
-        <div className="ambient-radial-glow glow-crimson" aria-hidden="true" />
-        <div className="ambient-radial-glow glow-gold" aria-hidden="true" />
+        <div className="ambient-radial-glow ambient-radial-crimson" aria-hidden="true" />
+        <div className="ambient-radial-glow ambient-radial-gold" aria-hidden="true" />
         <div className="heritage-pattern-overlay" aria-hidden="true" />
 
         {/* Màn mở đầu Điện ảnh 3D Parallax & Tượng Quang Trung lắc lư */}
         <AnimatePresence>
           {showIntro && (
-            <CinematicIntro onEnter={() => setShowIntro(false)} />
+            <CinematicIntro onComplete={handleIntroComplete} />
           )}
         </AnimatePresence>
 
@@ -99,7 +112,6 @@ export default function App() {
           activeTab={activeTab} 
           onSelectTab={handleSelectTab} 
           onOpenAdmin={() => setIsAdminOpen(true)}
-          onReplayIntro={() => setShowIntro(true)}
         />
 
         {/* Nội dung tab hiện tại */}
@@ -110,7 +122,12 @@ export default function App() {
         </main>
 
         {/* Footer ghi nhận bản quyền chính thức */}
-        <Footer onSelectTab={handleSelectTab} />
+        {!['battle-map', 'ai-station'].includes(activeTab) && (
+          <Footer 
+            onSelectTab={handleSelectTab} 
+            onReplayIntro={() => setShowIntro(true)} 
+          />
+        )}
 
         {/* Quả cầu Sử Quan AI trôi nổi góc dưới */}
         <FloatingAiWidget 
