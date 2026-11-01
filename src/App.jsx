@@ -132,14 +132,18 @@ export default function App() {
           />
         )}
 
-        {/* Quả cầu Sử Quan AI trôi nổi góc dưới */}
-        <FloatingAiWidget 
-          activeTab={activeTab} 
-          onSelectTab={handleSelectTab} 
-        />
+        {/* Quả cầu Sử Quan AI trôi nổi góc dưới (ẩn khi ở tab AI hoặc Sa Bàn) */}
+        {!['ai-station', 'battle-map'].includes(activeTab) && (
+          <FloatingAiWidget 
+            activeTab={activeTab} 
+            onSelectTab={handleSelectTab} 
+          />
+        )}
 
         {/* Bong bóng liên hệ Facebook & Gmail nổi cạnh phải màn hình (ẩn khi vào tab AI) */}
-        <ContactBubbleWidget activeTab={activeTab} />
+        {activeTab !== 'ai-station' && (
+          <ContactBubbleWidget activeTab={activeTab} />
+        )}
 
         {/* Bảng điều khiển Quản trị Toàn diện (Admin Control Center) */}
         <AdminKnowledgeModal 
