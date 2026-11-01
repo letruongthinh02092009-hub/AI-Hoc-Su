@@ -14,8 +14,7 @@ import {
   Key,
   X,
   CheckCircle,
-  Clock,
-  Activity
+  Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
@@ -23,9 +22,7 @@ import {
   resetChatHistory, 
   getKnowledgeBase, 
   getGeminiApiKey, 
-  saveGeminiApiKey,
-  getRemainingApiQuota,
-  DAILY_API_QUOTA
+  saveGeminiApiKey
 } from '../services/geminiService';
 import { playChime, playCorrectSound } from '../utils/audio';
 import { useAdmin } from '../context/AdminContext';
@@ -68,7 +65,6 @@ export default function AiStationTab() {
     }
   });
   const [keySavedMsg, setKeySavedMsg] = useState('');
-  const [remainingQuota, setRemainingQuota] = useState(() => getRemainingApiQuota());
 
   // Cơ chế chống spam tiết kiệm token: 5 giây đếm ngược giữa các lần gửi
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
@@ -180,7 +176,6 @@ export default function AiStationTab() {
       ]);
     } finally {
       setIsLoading(false);
-      setRemainingQuota(getRemainingApiQuota());
     }
   };
 
@@ -242,18 +237,6 @@ export default function AiStationTab() {
           </div>
         </div>
         <div className="ai-chat-header-right">
-          {/* Huy hiệu số lượt gọi API còn lại trong ngày của toàn hệ thống (500 lượt/ngày) */}
-          <div 
-            className="api-quota-badge" 
-            title={`Hạn ngạch Google Gemini AI (Toàn hệ thống): Còn ${remainingQuota.toLocaleString('vi-VN')} / ${DAILY_API_QUOTA.toLocaleString('vi-VN')} lượt gọi miễn phí hôm nay (Tự động làm mới mỗi ngày)`}
-          >
-            <Activity size={12} className="quota-pulse-icon" />
-            <span className="quota-text">
-              <strong className="quota-number">{remainingQuota.toLocaleString('vi-VN')}</strong>
-              <span className="quota-unit"> lượt/ngày</span>
-            </span>
-          </div>
-
           <button 
             className="btn-chat-header-action" 
             onClick={onOpenAdmin}
