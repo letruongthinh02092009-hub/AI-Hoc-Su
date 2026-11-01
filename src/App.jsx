@@ -138,8 +138,8 @@ export default function App() {
           onSelectTab={handleSelectTab} 
         />
 
-        {/* Bong bóng liên hệ Facebook & Gmail nổi cạnh phải màn hình */}
-        <ContactBubbleWidget />
+        {/* Bong bóng liên hệ Facebook & Gmail nổi cạnh phải màn hình (ẩn khi vào tab AI) */}
+        <ContactBubbleWidget activeTab={activeTab} />
 
         {/* Bảng điều khiển Quản trị Toàn diện (Admin Control Center) */}
         <AdminKnowledgeModal 

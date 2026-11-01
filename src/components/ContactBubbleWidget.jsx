@@ -7,9 +7,14 @@ import { playChime, playCorrectSound } from '../utils/audio';
 const FB_URL = "https://www.facebook.com/letruongthinh.02092009?mibextid=wwXIfr&rdid=yWcReV2kt8J3mlg1&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F18ftPPDFTS%2F%3Fmibextid%3DwwXIfr#";
 const GMAIL_ADDRESS = "letruongthinh02092009@gmail.com";
 
-export default function ContactBubbleWidget() {
+export default function ContactBubbleWidget({ activeTab }) {
   const [isOpen, setIsOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+
+  // Không hiển thị widget khi đang ở tab Sử Quan AI để tránh che khuất khung chat trên mobile
+  if (activeTab === 'ai-station') {
+    return null;
+  }
 
   // Phân biệt thao tác Kéo thả (Drag) và Nhấp chuột (Click)
   const isDraggingRef = useRef(false);

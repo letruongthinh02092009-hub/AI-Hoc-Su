@@ -13,8 +13,10 @@ import {
   Award,
   Key,
   X,
-  CheckCircle
+  CheckCircle,
+  Clock
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { sendChatMessageToGemini, resetChatHistory, getKnowledgeBase, getGeminiApiKey, saveGeminiApiKey } from '../services/geminiService';
 import { playChime, playCorrectSound } from '../utils/audio';
 import { useAdmin } from '../context/AdminContext';
@@ -57,6 +59,24 @@ export default function AiStationTab() {
     }
   });
   const [keySavedMsg, setKeySavedMsg] = useState('');
+
+  // Cơ chế chống spam tiết kiệm token: 5 giây đếm ngược giữa các lần gửi
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const lastSentTimestampRef = useRef(0);
+
+  useEffect(() => {
+    if (cooldownSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setCooldownSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownSeconds]);
 
   const handleSaveKey = (e) => {
     e?.preventDefault();
@@ -102,6 +122,21 @@ export default function AiStationTab() {
   const handleSend = async (questionText = null) => {
     const textToSend = (typeof questionText === 'string' ? questionText : input).trim();
     if (!textToSend || isLoading) return;
+
+    // Chống spam: giới hạn tối thiểu 5s được gửi 1 lần để tiết kiệm token
+    const now = Date.now();
+    const elapsed = (now - lastSentTimestampRef.current) / 1000;
+    if (lastSentTimestampRef.current !== 0 && elapsed < 5) {
+      const remaining = Math.ceil(5 - elapsed);
+      playChime(350, 'sine', 0.08);
+      toast.warning(`⏳ Chống spam token: Vui lòng đợi ${remaining}s trước khi gửi tiếp!`, {
+        description: 'Khoảng cách tối thiểu giữa 2 câu hỏi là 5 giây để bảo toàn tài nguyên AI.'
+      });
+      return;
+    }
+
+    lastSentTimestampRef.current = now;
+    setCooldownSeconds(5);
 
     playChime(600, 'sine', 0.1);
     setInput('');
@@ -184,15 +219,16 @@ export default function AiStationTab() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
     >
-      {/* Thin header 48px với phong cách Hoàng gia */}
+      {/* Thin header 48-52px với phong cách Hoàng gia */}
       <header className="ai-chat-header">
         <div className="ai-chat-header-left">
           <div className="imperial-seal-icon-mini" title="Triện Sử Quan Tây Sơn">
             <span className="seal-char-mini">史</span>
           </div>
-          <span className="ai-chat-header-title">Sử Quan Tây Sơn</span>
-          <span className="ai-chat-header-divider">·</span>
-          <span className="ai-chat-header-meta">Mô hình Google Gemini AI</span>
+          <div className="ai-chat-title-wrapper">
+            <span className="ai-chat-header-title">Sử Quan Tây Sơn</span>
+            <span className="ai-chat-header-meta">Gemini AI</span>
+          </div>
         </div>
         <div className="ai-chat-header-right">
           <button 
@@ -201,8 +237,8 @@ export default function AiStationTab() {
             aria-label="Mở kho sử liệu đối soát"
             title="Đối soát kho sử liệu gốc"
           >
-            <Database size={15} />
-            <span className="kb-count-label">{kbCount} tư liệu</span>
+            <Database size={14} />
+            <span className="kb-count-label"><strong>{kbCount}</strong> <span className="kb-count-text">tư liệu</span></span>
           </button>
           {isAdmin && (
             <button 
@@ -216,17 +252,17 @@ export default function AiStationTab() {
               aria-label="Cài đặt Gemini API Key (Quản trị)"
               title="Cài đặt Gemini API Key (Quản trị)"
             >
-              <Key size={15} />
-              <span className="kb-count-label">API Key</span>
+              <Key size={14} />
+              <span className="kb-count-label">Key</span>
             </button>
           )}
           <button 
-            className="btn-chat-header-action" 
+            className="btn-chat-header-action btn-clear-chat" 
             onClick={handleClearChat}
             aria-label="Xóa lịch sử trò chuyện"
             title="Làm mới cuộc trò chuyện"
           >
-            <RotateCcw size={15} />
+            <RotateCcw size={14} />
           </button>
         </div>
       </header>
@@ -330,7 +366,7 @@ export default function AiStationTab() {
           <input
             type="text"
             className="ai-input-field"
-            placeholder="Hỏi Sử Quan về thân thế Nguyễn Huệ, chiến dịch Rạch Gầm, Ngọc Hồi..."
+            placeholder={cooldownSeconds > 0 ? `Đang chờ ${cooldownSeconds}s chống spam...` : "Hỏi Sử Quan về thân thế Nguyễn Huệ, chiến dịch Rạch Gầm..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -339,12 +375,17 @@ export default function AiStationTab() {
           />
           <button
             type="button"
-            className="ai-send-btn-gold"
+            className={`ai-send-btn-gold ${cooldownSeconds > 0 ? 'is-cooldown' : ''}`}
             onClick={() => handleSend()}
-            disabled={!input.trim() || isLoading}
-            aria-label="Gửi câu hỏi"
+            disabled={!input.trim() || isLoading || cooldownSeconds > 0}
+            aria-label={cooldownSeconds > 0 ? `Chờ ${cooldownSeconds} giây` : "Gửi câu hỏi"}
+            title={cooldownSeconds > 0 ? `Chống spam: Chờ ${cooldownSeconds}s để gửi tiếp` : "Gửi câu hỏi"}
           >
-            <Send size={16} />
+            {cooldownSeconds > 0 ? (
+              <span className="cooldown-timer-badge">{cooldownSeconds}s</span>
+            ) : (
+              <Send size={16} />
+            )}
           </button>
         </div>
       </div>
