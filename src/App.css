@@ -2217,6 +2217,49 @@ h3 {
   flex-shrink: 0;
 }
 
+.api-quota-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--radius-full);
+  color: #34D399;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  cursor: help;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.api-quota-badge:hover {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+.quota-pulse-icon {
+  color: #10B981;
+  animation: pulseQuota 2.5s infinite;
+}
+
+@keyframes pulseQuota {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.9); }
+}
+
+.quota-number {
+  font-weight: 700;
+  color: #6EE7B7;
+}
+
+.quota-unit {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
 .btn-chat-header-action {
   display: inline-flex;
   align-items: center;
@@ -6900,6 +6943,16 @@ h3 {
 
   .ai-chat-header-right {
     gap: 5px;
+  }
+
+  .api-quota-badge {
+    padding: 3px 7px;
+    font-size: 11px;
+    gap: 3px;
+  }
+
+  .api-quota-badge .quota-unit {
+    display: none;
   }
 
   .btn-chat-header-action {

@@ -35,6 +35,48 @@ export function saveGeminiApiKey(key) {
     return false;
   }
 }
+
+export const DAILY_API_QUOTA = 1500;
+const API_USAGE_STORAGE_KEY = "su_gemini_daily_usage_v1";
+
+/**
+ * Lấy số lượt gọi API còn lại trong ngày hôm nay (tự động reset theo ngày UTC)
+ */
+export function getRemainingApiQuota() {
+  try {
+    const today = new Date().toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const stored = localStorage.getItem(API_USAGE_STORAGE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored);
+      if (data.date === today) {
+        return Math.max(0, DAILY_API_QUOTA - (data.count || 0));
+      }
+    }
+  } catch (e) {}
+  return DAILY_API_QUOTA;
+}
+
+/**
+ * Ghi nhận 1 lượt gọi API thành công
+ */
+export function recordApiCallUsage() {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const stored = localStorage.getItem(API_USAGE_STORAGE_KEY);
+    let count = 0;
+    if (stored) {
+      const data = JSON.parse(stored);
+      if (data.date === today) {
+        count = data.count || 0;
+      }
+    }
+    count += 1;
+    localStorage.setItem(API_USAGE_STORAGE_KEY, JSON.stringify({ date: today, count }));
+    return Math.max(0, DAILY_API_QUOTA - count);
+  } catch (e) {
+    return DAILY_API_QUOTA;
+  }
+}
 export const DEFAULT_GAS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzsgFMs-xMdTGE1wa0Bc9ycj0qEFz2Ga4EOqSrfKb6msLUv6WkoK1fzEmm1C-7xzp487g/exec";
 export const GAS_WEBHOOK_STORAGE_KEY = "su_gas_knowledge_webhook_url";
 export const DEFAULT_GOOGLE_DOC_ID = "1yWiKZdHJlovfvMzfBOaFTW3auEaKyKcEMBUOU68BPSE";
@@ -498,6 +540,7 @@ PHONG THÁI GIAO TIẾP:
         }
       }
 
+      recordApiCallUsage();
       chatHistory.push({ role: "model", parts: [{ text: replyText }] });
 
       return {
