@@ -41,7 +41,7 @@ export function saveGeminiApiKey(key) {
 }
 
 export const DAILY_API_QUOTA = 500;
-const API_USAGE_STORAGE_KEY = "su_gemini_daily_usage_v1";
+const API_USAGE_STORAGE_KEY = "su_gemini_daily_usage_v2";
 // Điểm mốc lượt gọi đã dùng hôm nay theo Google AI Studio
 const BASELINE_CALLS_TODAY = 15;
 
@@ -55,13 +55,13 @@ export function getRemainingApiQuota() {
     if (stored) {
       const data = JSON.parse(stored);
       if (data.date === today) {
-        return Math.max(0, DAILY_API_QUOTA - (data.count || 0));
+        const actualCount = Math.max(data.count || 0, BASELINE_CALLS_TODAY);
+        return Math.max(0, DAILY_API_QUOTA - actualCount);
       }
-    } else {
-      // Khởi tạo ngày hôm nay theo thực tế từ Google AI Studio
-      localStorage.setItem(API_USAGE_STORAGE_KEY, JSON.stringify({ date: today, count: BASELINE_CALLS_TODAY }));
-      return Math.max(0, DAILY_API_QUOTA - BASELINE_CALLS_TODAY);
     }
+    // Khởi tạo ngày hôm nay theo thực tế từ Google AI Studio (15 đã dùng -> 485 còn lại)
+    localStorage.setItem(API_USAGE_STORAGE_KEY, JSON.stringify({ date: today, count: BASELINE_CALLS_TODAY }));
+    return Math.max(0, DAILY_API_QUOTA - BASELINE_CALLS_TODAY);
   } catch (e) {}
   return Math.max(0, DAILY_API_QUOTA - BASELINE_CALLS_TODAY);
 }
@@ -73,11 +73,11 @@ export function recordApiCallUsage() {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const stored = localStorage.getItem(API_USAGE_STORAGE_KEY);
-    let count = 0;
+    let count = BASELINE_CALLS_TODAY;
     if (stored) {
       const data = JSON.parse(stored);
       if (data.date === today) {
-        count = data.count || 0;
+        count = Math.max(data.count || 0, BASELINE_CALLS_TODAY);
       }
     }
     count += 1;
