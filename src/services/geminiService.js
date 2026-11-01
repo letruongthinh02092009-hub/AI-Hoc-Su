@@ -5,9 +5,9 @@ export const DEFAULT_GEMINI_API_KEY = (typeof import.meta !== 'undefined' && imp
   ? import.meta.env.VITE_GEMINI_API_KEY.trim()
   : ["AQ", "Ab8RN6JFGw7xL41BV0RieFYGT8TmgFDeErYV9bcfQrCf3DZuDQ"].join(".");
 export const API_KEY_STORAGE_KEY = "su_gemini_api_key";
-const PRIMARY_MODEL = "gemini-1.5-flash";
-const FALLBACK_MODEL = "gemini-2.0-flash";
-const BACKUP_MODEL = "gemini-1.5-pro";
+const PRIMARY_MODEL = "gemini-3.5-flash-lite";
+const FALLBACK_MODEL = "gemini-flash-latest";
+const BACKUP_MODEL = "gemini-3.8-flash";
 const KB_STORAGE_KEY = "khkt_su_knowledge_base_v2";
 
 export function getGeminiApiKey() {

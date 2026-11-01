@@ -192,7 +192,7 @@ export default function AiStationTab() {
           </div>
           <span className="ai-chat-header-title">Sử Quan Tây Sơn</span>
           <span className="ai-chat-header-divider">·</span>
-          <span className="ai-chat-header-meta">Mô hình Google Gemini 2.0</span>
+          <span className="ai-chat-header-meta">Mô hình Google Gemini AI</span>
         </div>
         <div className="ai-chat-header-right">
           <button 
