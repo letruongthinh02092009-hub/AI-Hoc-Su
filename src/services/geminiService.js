@@ -42,6 +42,8 @@ export function saveGeminiApiKey(key) {
 
 export const DAILY_API_QUOTA = 500;
 const API_USAGE_STORAGE_KEY = "su_gemini_daily_usage_v1";
+// Điểm mốc lượt gọi đã dùng hôm nay theo Google AI Studio
+const BASELINE_CALLS_TODAY = 15;
 
 /**
  * Lấy số lượt gọi API còn lại trong ngày hôm nay (tự động reset theo ngày UTC)
@@ -55,9 +57,13 @@ export function getRemainingApiQuota() {
       if (data.date === today) {
         return Math.max(0, DAILY_API_QUOTA - (data.count || 0));
       }
+    } else {
+      // Khởi tạo ngày hôm nay theo thực tế từ Google AI Studio
+      localStorage.setItem(API_USAGE_STORAGE_KEY, JSON.stringify({ date: today, count: BASELINE_CALLS_TODAY }));
+      return Math.max(0, DAILY_API_QUOTA - BASELINE_CALLS_TODAY);
     }
   } catch (e) {}
-  return DAILY_API_QUOTA;
+  return Math.max(0, DAILY_API_QUOTA - BASELINE_CALLS_TODAY);
 }
 
 /**
