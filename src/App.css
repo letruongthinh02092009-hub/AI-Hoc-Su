@@ -139,6 +139,8 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -148,7 +150,11 @@ body {
   line-height: 1.65;
   letter-spacing: 0.005em;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
+  max-width: 100vw;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Strict A11y Focus-Visible Ring */
@@ -587,8 +593,12 @@ h3 {
    -------------------------------------------------------------------------- */
 .app-container {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
 }
 
 /* Ambient Subtle Backdrops — Quiet museum depth */
@@ -5828,6 +5838,13 @@ h3 {
   }
   .hero-quote-frame {
     padding: var(--space-4) var(--space-5);
+  }
+  .hero-statue-col {
+    max-width: 280px;
+    margin: 0 auto 24px;
+  }
+  .statue-image-container-editorial img {
+    max-height: 320px;
   }
   .scroll-rod-left,
   .scroll-rod-right {
