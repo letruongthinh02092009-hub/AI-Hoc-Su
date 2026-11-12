@@ -24,16 +24,52 @@ import { fetchCloudKnowledgeBase } from './services/geminiService';
 
 import './App.css';
 
+/**
+ * Multi-dimensional mobile device detection:
+ * Evaluates viewport width (<= 768px), landscape height (<= 500px on touch),
+ * touch capabilities (navigator.maxTouchPoints > 0, ontouchstart),
+ * CSS coarse pointer media query, and mobile User-Agent.
+ */
+export function isMobileDevice() {
+  if (typeof window === 'undefined') return false;
+
+  // 1. Portrait mobile & small tablet width
+  if (window.innerWidth <= 768) return true;
+
+  // 2. Touch capability
+  const isTouchCapable = 
+    ('ontouchstart' in window) ||
+    (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) ||
+    (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches);
+
+  // 3. Landscape phone (short viewport height with touch capability)
+  if (isTouchCapable && window.innerHeight <= 500) {
+    return true;
+  }
+
+  // 4. Mobile User-Agent regex
+  const ua = (typeof navigator !== 'undefined' && navigator.userAgent) ? navigator.userAgent : '';
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  if (isMobileUA && (isTouchCapable || window.innerWidth <= 1024)) {
+    return true;
+  }
+
+  // 5. Coarse pointer with no hover on tablet / mobile devices
+  if (typeof window.matchMedia === 'function' && 
+      window.matchMedia('(hover: none) and (pointer: coarse) and (max-width: 1024px)').matches) {
+    return true;
+  }
+
+  return false;
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(() => {
     try {
-      // Trên thiết bị di động (màn hình < 768px), bỏ qua intro để vào thẳng giao diện mượt mà
-      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-        return false;
-      }
-      return !sessionStorage.getItem('su_intro_seen_session');
+      // Synchronously bypass intro on mobile with zero flash or delay
+      return !isMobileDevice() && !sessionStorage.getItem('su_intro_seen_session');
     } catch (e) {
       return false;
     }
@@ -132,7 +168,10 @@ export default function App() {
         {!['battle-map', 'ai-station'].includes(activeTab) && (
           <Footer 
             onSelectTab={handleSelectTab} 
-            onReplayIntro={() => setShowIntro(true)} 
+            onReplayIntro={() => {
+              if (isMobileDevice()) return;
+              setShowIntro(true);
+            }} 
           />
         )}
 

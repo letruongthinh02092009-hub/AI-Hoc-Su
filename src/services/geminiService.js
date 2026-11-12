@@ -10,8 +10,8 @@ export const API_KEY_STORAGE_KEY = "su_gemini_api_key";
 // 2. Gemini 3.1 Flash Lite: Dự phòng tin cậy 1
 // 3. Gemini 3.8 Flash Lite TTS / Gemini 3.5 Flash: Dự phòng tin cậy 2
 const PRIMARY_MODEL = "gemini-3.5-flash-lite";
-const FALLBACK_MODEL = "gemini-3.1-flash-lite";
-const BACKUP_MODEL = "gemini-3.5-flash";
+const FALLBACK_MODEL = "gemini-3.5-flash";
+const BACKUP_MODEL = "gemini-flash-lite-latest";
 const KB_STORAGE_KEY = "khkt_su_knowledge_base_v2";
 
 export function getGeminiApiKey() {
@@ -437,6 +437,47 @@ export function resetChatHistory() {
   chatHistory = [];
 }
 
+/**
+ * Định dạng tóm lược tri thức ngoại tuyến cô đọng (tránh đổ nguyên khối văn bản thô)
+ */
+export function formatOfflineKnowledgeSummary(matchedDoc) {
+  if (!matchedDoc || !matchedDoc.content) return '';
+
+  const cleanContent = matchedDoc.content.replace(/\r\n/g, '\n').trim();
+  const paragraphs = cleanContent.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+
+  let formattedSummary = '';
+
+  // 1. Nếu tài liệu ngắn sẵn (dưới 3 đoạn và dưới 400 ký tự)
+  if (paragraphs.length <= 2 && cleanContent.length < 400) {
+    formattedSummary = cleanContent;
+  } else {
+    // 2. Trích chọn 2 đoạn đầu tiên
+    const topParagraphs = paragraphs.slice(0, 2);
+    const combinedLength = topParagraphs.join('\n\n').length;
+
+    // 3. Nếu đoạn văn vẫn dài vượt quá 500 ký tự, trích lọc 3-4 câu trọng tâm thành gạch đầu dòng nổi bật
+    if (combinedLength > 500) {
+      const sentences = cleanContent
+        .split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 15);
+      formattedSummary = sentences.slice(0, 3).map(s => `• ${s}`).join('\n\n');
+    } else {
+      formattedSummary = topParagraphs.join('\n\n');
+    }
+  }
+
+  const docTitle = matchedDoc.title || 'Kho sử liệu Tây Sơn';
+  const docSource = matchedDoc.source || 'Kho tư liệu Tây Sơn (Biên soạn: Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ)';
+
+  return `📜 **Sử Quan AI Tây Sơn (Tóm lược cốt lõi sử liệu):**\n\n` +
+    `Theo khảo cứu từ sử liệu *"**${docTitle}**"*, những điểm trọng yếu gồm có:\n\n` +
+    formattedSummary +
+    `\n\n*(Hệ thống ngoại tuyến đã tự động chắt lọc các điểm cốt lõi nhất để giải đáp nhanh gọn cho bạn).*` +
+    `\n\n📚 *Nguồn tư liệu:* ${docSource}`;
+}
+
 // 3. Hàm gửi truy vấn tới Gemini: Ưu tiên Bậc 1 Google Docs -> Tự động Bậc 2 Google Search Trực Tuyến
 export async function sendChatMessageToGemini(userQuestion) {
   // Lọc từ ngữ thô tục
@@ -460,29 +501,38 @@ export async function sendChatMessageToGemini(userQuestion) {
   if (hasMatchedDoc) {
     ragContextPrompt = `\n\n[TƯ LIỆU THAM KHẢO TỪ GOOGLE DOCS (Biên soạn: Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ)]:\n` +
       matchedDocs.map(d => `✦ ${d.title}: ${d.content}`).join('\n\n') +
-      `\n\nQUY TẮC BẮT BUỘC KHI DÙNG TƯ LIỆU:
-- TUYỆT ĐỐI KHÔNG COPY NGUYÊN VĂN cả đoạn dài hay bê nguyên xi văn bản vào câu trả lời.
-- BẮT BUỘC PHẢI CHỌN LỌC, ĐỌC HIỂU VÀ TỰ ĐIỀU CHỈNH: Chỉ trích lọc đúng ý người dùng đang hỏi, tóm tắt cô đọng, diễn đạt bằng lời văn sử quan mạch lạc, sắc sảo.
-- Nếu câu hỏi hỏi một ý cụ thể (ví dụ: vũ khí, thời gian, ý nghĩa...), chỉ trả lời đúng ý đó, không tuôn ra toàn bộ bài viết không liên quan.
-- Ở cuối câu trả lời, đính kèm nguồn:
+      `\n\nQUY TẮC BẮT BUỘC KHI TRẢ LỜI TỪ TƯ LIỆU LỊCH SỬ TÂY SƠN:
+- ĐỌC HIỂU, CHẮT LỌC VÀ TỰ TỔNG HỢP: Hãy đọc hiểu toàn bộ tư liệu được cung cấp, chắt lọc chính xác các điểm cốt lõi để trả lời đúng trọng tâm câu hỏi của người dùng.
+- TỔNG HỢP TRONG 2 - 4 ĐOẠN NGẮN CÔ ĐỌNG, SẮC SẢO: Trả lời mạch lạc (hoặc 1 đoạn tóm lược và 3-4 gạch đầu dòng then chốt).
+- TUYỆT ĐỐI CẤM COPY NGUYÊN VĂN: Tuyệt đối không sao chép nguyên cả khối văn bản thô hay lặp lại y nguyên từng câu chữ từ tư liệu Google Docs. Phải tự đúc kết bằng lời văn sử quan uyên bác, trang trọng, gãy gọn.
+- TRẢ LỜI ĐÚNG KHÍA CẠNH ĐƯỢC HỎI: Nếu câu hỏi chỉ hỏi về một khía cạnh cụ thể (ví dụ: vũ khí, thời gian, con người, nguyên nhân, ý nghĩa...), chỉ tập trung giải đáp đúng khía cạnh đó, không xả toàn bộ bài viết không liên quan.
+- Ở cuối câu trả lời, đính kèm nguồn tư liệu chuẩn:
 "\n\n📚 *Nguồn tư liệu:* Khảo cứu từ tư liệu Google Docs của tác giả (Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ)"`;
   } else {
-    ragContextPrompt = `\n\n[TRI THỨC TỔNG HỢP]:
-Câu hỏi này không có trong kho tư liệu Google Docs của tác giả.
-- HÃY TRẢ LỜI CHUẨN XÁC, KHÁCH QUAN, ĐÚNG SỰ THẬT dựa trên tri thức bách khoa của bạn (dù là câu hỏi về nhân vật hiện đại, người nổi tiếng trên mạng, khoa học, đời sống hay lịch sử thế giới).
-- TUYỆT ĐỐI KHÔNG BỊA ĐẶT THÔNG TIN: Nếu là nhân vật ngoài đời (như YouTuber, ca sĩ, nhà khoa học...), hãy nêu đúng họ tên thật, nghề nghiệp, lý do nổi tiếng ngắn gọn, súc tích.
-- Ở cuối câu trả lời, đính kèm nguồn:
+    ragContextPrompt = `\n\n[TRI THỨC TỔNG HỢP & BÁCH KHOA TOÀN THƯ]:
+Câu hỏi này không nằm trong kho tư liệu lịch sử thời Tây Sơn của tác giả.
+- TRẢ LỜI CHUẨN XÁC, KHÁCH QUAN NHƯ BÁCH KHOA TOÀN THƯ: Trình bày thông tin trung thực, khách quan, dựa trên tri thức bách khoa toàn thư của bạn đối với mọi chủ đề đương đại, đời sống, khoa học hay danh nhân thế giới.
+- TUYỆT ĐỐI KHÔNG BỊA ĐẶT THÔNG TIN VÀ KHÔNG GÁN GHÉP VỚI THỜI TÂY SƠN:
+  + Nếu là nhân vật ngoài đời thực (YouTuber, ca sĩ, nhà khoa học, danh nhân hiện đại... ví dụ: "Lâm Vlog là ai?", "Albert Einstein là ai?"): Hãy nêu rõ họ tên thật, năm sinh/quê quán, nghề nghiệp/lĩnh vực hoạt động và lý do nổi tiếng/công trạng nổi bật một cách gãy gọn, văn minh, súc tích và hoàn toàn đúng sự thật.
+  + Không tự ý bịa đặt hoặc suy diễn sai lệch, không gán ghép liên hệ gượng ép với phong trào Tây Sơn.
+- Ở cuối câu trả lời, đính kèm nguồn tư liệu chuẩn:
 "\n\n🌐 *Nguồn tư liệu:* Tri thức Bách khoa Toàn thư và Lịch sử Tổng hợp"`;
   }
 
-  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý thông minh, tinh thông sử sách và hiểu biết sâu rộng (thuộc Dự án Học Sử Số Hóa của tác giả Lê Trường Thịnh, lớp 12A8, Trường THCS và THPT Nguyễn Huệ).
+  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý thông minh, tinh thông sử sách triều đại Tây Sơn và sở hữu tri thức bách khoa sâu rộng (thuộc Dự án Học Sử Số Hóa của tác giả Lê Trường Thịnh, lớp 12A8, Trường THCS và THPT Nguyễn Huệ).
 
 NGUYÊN TẮC CỐT LÕI:
-1. TRẢ LỜI CHỌN LỌC, THÔNG MINH, KHÔNG COPY NGUYÊN BẢN:
-   - Khi có tư liệu: Hãy tổng hợp, đúc kết và trả lời trúng đích câu hỏi của người dùng. Tuyệt đối không bê nguyên cả khối tài liệu dài dòng.
-   - Khi người dùng hỏi về chủ đề ngoài lịch sử Tây Sơn (nhân vật hiện đại, kiến thức chung...): Hãy dùng kiến thức chính xác của bạn để trả lời gãy gọn, đúng bản chất, không nói bậy.
-2. HOÀN CHỈNH, RÕ RÀNG, MẠCH LẠC: Trả lời có kết cấu ngắn gọn, gạch đầu dòng rõ ràng, không bao giờ ngắt lửng câu.
-3. PHONG THÁI LỊCH THIỆP: Xưng "Ta" hoặc xưng hô hòa nhã, tôn trọng người dùng.
+1. KHI CÓ TƯ LIỆU SỬ LIỆU (TÂY SƠN):
+   - Đọc hiểu, chắt lọc cốt lõi và tự tổng hợp trong 2 - 4 đoạn ngắn sắc sảo.
+   - TUYỆT ĐỐI KHÔNG copy-paste hay đổ nguyên khối văn bản thô từ tài liệu.
+   - Trả lời trúng đích khía cạnh người dùng hỏi.
+2. KHI HỎI VỀ KIẾN THỨC ĐỜI SỐNG, NHÂN VẬT HIỆN ĐẠI / NGOÀI LỊCH SỬ TÂY SƠN (ví dụ: 'Lâm Vlog là ai?', 'Albert Einstein là ai?'):
+   - Trả lời khách quan, chuẩn xác, đúng sự thật theo chuẩn bách khoa toàn thư.
+   - Cung cấp rõ ràng họ tên thật, năm sinh/quê quán, nghề nghiệp và thành tựu/dấu ấn nổi bật.
+   - Tuyệt đối không bịa đặt và không liên hệ gượng ép với triều đại Tây Sơn.
+3. KẾT CẤU & PHONG THÁI:
+   - Câu trả lời hoàn chỉnh 100%, rõ ràng mạch lạc, không bao giờ ngắt lửng câu giữa chừng.
+   - Phong thái lịch thiệp, khiêm nhường nhưng uy nghiêm. Xưng "Ta" hoặc xưng hô hòa nhã, tôn trọng người dùng.
 ${ragContextPrompt}`;
 
   chatHistory.push({ role: "user", parts: [{ text: userQuestion }] });
@@ -541,7 +591,7 @@ ${ragContextPrompt}`;
     for (const model of candidateModels) {
       try {
         data = await callApi(model);
-        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+        if (data?.candidates?.[0]?.content?.parts?.some(p => p.text)) {
           break; // Gọi thành công
         }
       } catch (err) {
@@ -557,23 +607,23 @@ ${ragContextPrompt}`;
     }
 
     if (data.candidates && data.candidates[0] && data.candidates[0].content && Array.isArray(data.candidates[0].content.parts)) {
-      // Nối toàn bộ các phần văn bản (parts) lại với nhau để tránh bị ngắt cụt chữ
+      // Nối toàn bộ các phần văn bản (parts) lại với nhau để tránh bị ngắt cụt chữ, loại bỏ khối suy nghĩ (thought)
       let replyText = data.candidates[0].content.parts
-        .map(p => (typeof p.text === 'string' ? p.text : ''))
-        .filter(Boolean)
+        .filter(p => !p.thought && typeof p.text === 'string')
+        .map(p => p.text)
         .join('');
 
       // Chuẩn hóa và nhận diện nguồn chính xác
-      const isOnlineSearch = replyText.includes('Tìm kiếm trực tuyến') || replyText.includes('Tri thức Lịch sử') || replyText.includes('Chưa có trong Google Docs') || !hasMatchedDoc;
-      const isGDocAnswer = !isOnlineSearch && (replyText.includes('Trích xuất từ Google Docs') || hasMatchedDoc);
+      const isOnlineSearch = replyText.includes('Tìm kiếm trực tuyến') || replyText.includes('Tri thức Lịch sử') || replyText.includes('Tri thức Bách khoa') || replyText.includes('Chưa có trong Google Docs') || !hasMatchedDoc;
+      const isGDocAnswer = !isOnlineSearch && (replyText.includes('Trích xuất từ Google Docs') || replyText.includes('Google Docs của tác giả') || hasMatchedDoc);
 
       if (isGDocAnswer) {
         if (!replyText.includes('Trích xuất từ Google Docs') && !replyText.includes('Nguồn tư liệu')) {
-          replyText += `\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8, Trường THCS và THPT Nguyễn Huệ)`;
+          replyText += `\n\n📚 *Nguồn tư liệu:* Khảo cứu từ tư liệu Google Docs của tác giả (Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ)`;
         }
       } else {
-        if (!replyText.includes('Tri thức Lịch sử') && !replyText.includes('Google Gemini AI') && !replyText.includes('Nguồn tư liệu')) {
-          replyText += `\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử Chuyên sâu của Google Gemini AI (Chưa có trong Google Docs của tác giả)`;
+        if (!replyText.includes('Tri thức Lịch sử') && !replyText.includes('Google Gemini AI') && !replyText.includes('Nguồn tư liệu') && !replyText.includes('Tri thức Bách khoa')) {
+          replyText += `\n\n🌐 *Nguồn tư liệu:* Tri thức Bách khoa Toàn thư và Lịch sử Tổng hợp`;
         }
       }
 
@@ -594,9 +644,9 @@ ${ragContextPrompt}`;
     const isAuthError = err && (err.message?.includes('401') || err.message?.includes('UNAUTHENTICATED'));
 
     // Dự phòng ngoại tuyến nếu câu hỏi trùng khớp tư liệu có sẵn
-    if (hasMatchedDoc) {
+    if (hasMatchedDoc && matchedDocs[0]) {
       return {
-        text: `📜 **Sử Quan AI Tây Sơn (Tra cứu kho tư liệu có sẵn):**\n\n${matchedDocs[0].content}\n\n📚 *Nguồn tư liệu:* ${matchedDocs[0].source}`,
+        text: formatOfflineKnowledgeSummary(matchedDocs[0]),
         sourceType: 'offline-admin',
         docTitle: matchedDocs[0].title,
         model: 'Offline Engine'
