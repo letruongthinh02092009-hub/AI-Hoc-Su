@@ -5,13 +5,13 @@ export const DEFAULT_GEMINI_API_KEY = (typeof import.meta !== 'undefined' && imp
   ? import.meta.env.VITE_GEMINI_API_KEY.trim()
   : ["AQ", "Ab8RN6JFGw7xL41BV0RieFYGT8TmgFDeErYV9bcfQrCf3DZuDQ"].join(".");
 export const API_KEY_STORAGE_KEY = "su_gemini_api_key";
-// Tối ưu hóa hạn ngạch lớn nhất:
-// 1. Gemini 3.5 Flash Lite: 500 RPD, 15 RPM, 250K TPM (Bền nhất, phản hồi ~1.2s)
-// 2. Gemini 3.6 Flash: 20 RPD, 5 RPM
-// 3. Gemini 3.8 Flash: 20 RPD, 5 RPM
+// Tối ưu hóa mô hình AI:
+// 1. Gemini 3.5 Flash Lite: 500 RPD, 15 RPM, phản hồi siêu tốc (~1s), cực kỳ thông minh
+// 2. Gemini 3.1 Flash Lite: Dự phòng tin cậy 1
+// 3. Gemini 3.8 Flash Lite TTS / Gemini 3.5 Flash: Dự phòng tin cậy 2
 const PRIMARY_MODEL = "gemini-3.5-flash-lite";
-const FALLBACK_MODEL = "gemini-3.6-flash";
-const BACKUP_MODEL = "gemini-3.8-flash";
+const FALLBACK_MODEL = "gemini-3.1-flash-lite";
+const BACKUP_MODEL = "gemini-3.5-flash";
 const KB_STORAGE_KEY = "khkt_su_knowledge_base_v2";
 
 export function getGeminiApiKey() {
@@ -473,10 +473,11 @@ export async function sendChatMessageToGemini(userQuestion) {
 
   const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý thông minh, am tường sử sách và tin cậy của nền tảng Học Sử Số Hóa (Dự án của tác giả Lê Trường Thịnh, lớp 12A8, Trường THCS và THPT Nguyễn Huệ).
 
-PHONG THÁI GIAO TIẾP:
-1. THÂN THIỆN & CỞI MỞ: Khi người dùng chào hỏi hoặc tự giới thiệu, hãy niềm nở chào lại và gọi đúng tên người dùng.
-2. TRẢ LỜI ĐÚNG TRỌNG TÂM, GÃY GỌN & KHOA HỌC: Đi thẳng vào bản chất câu hỏi ngay câu đầu tiên. Giải thích sinh động, khoa học trong 2 - 3 đoạn hoặc gạch đầu dòng rõ ràng.
-3. KỊCH BẢN 2 TẦNG NGUỒN TRI THỨC:${ragContextPrompt}`;
+PHONG THÁI GIAO TIẾP & NGUYÊN TẮC BẮT BUỘC:
+1. TRẢ LỜI ĐẦY ĐỦ, HOÀN CHỈNH, TUYỆT ĐỐI KHÔNG BỎ LỬNG: Phải hoàn tất trọn vẹn câu trả lời, có mở đầu, thân bài rõ ràng và kết thúc có hậu ý nghĩa. Không bao giờ dừng ngắt giữa câu.
+2. CHUẨN XÁC, THÔNG MINH, ĐÚNG TRỌNG TÂM: Đi thẳng vào bản chất câu hỏi ngay câu đầu tiên. Giải thích sinh động, khoa học bằng tiếng Việt chuẩn mực, gạch đầu dòng rõ ràng, mạch lạc, dễ hiểu.
+3. THÂN THIỆN & CỞI MỞ: Khi người dùng chào hỏi hoặc tự giới thiệu, hãy niềm nở chào lại và gọi đúng tên người dùng.
+4. KỊCH BẢN 2 TẦNG NGUỒN TRI THỨC:${ragContextPrompt}`;
 
   chatHistory.push({ role: "user", parts: [{ text: userQuestion }] });
   if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
@@ -487,9 +488,9 @@ PHONG THÁI GIAO TIẾP:
     },
     contents: chatHistory,
     generationConfig: {
-      temperature: 0.3,
-      topP: 0.85,
-      maxOutputTokens: 650
+      temperature: 0.35,
+      topP: 0.9,
+      maxOutputTokens: 2048
     }
   };
 
@@ -519,18 +520,34 @@ PHONG THÁI GIAO TIẾP:
     }
   }
 
+  // Danh sách các mô hình ưu tiên: gemini-3.5-flash-lite (bền nhất 500 RPD), fallback sang 3.1, 3.5, 3.6
+  const candidateModels = [
+    PRIMARY_MODEL,
+    FALLBACK_MODEL,
+    BACKUP_MODEL,
+    "gemini-3.6-flash"
+  ];
+
   try {
-    let data;
-    try {
-      data = await callApi(PRIMARY_MODEL);
-    } catch (primaryErr) {
-      console.warn(`Lỗi gọi mô hình chính (${PRIMARY_MODEL}), thử sang (${FALLBACK_MODEL}):`, primaryErr);
+    let data = null;
+    let lastError = null;
+
+    for (const model of candidateModels) {
       try {
-        data = await callApi(FALLBACK_MODEL);
-      } catch (fallbackErr) {
-        console.warn(`Lỗi gọi (${FALLBACK_MODEL}), chuyển sang (${BACKUP_MODEL}):`, fallbackErr);
-        data = await callApi(BACKUP_MODEL);
+        data = await callApi(model);
+        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          break; // Gọi thành công
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn(`Mô hình ${model} bận hoặc gặp lỗi (${err.message}), đang thử mô hình tiếp theo...`);
+        // Nếu gặp 503 (quá tải đột ngột), nghỉ 400ms rồi thử lại
+        await new Promise(resolve => setTimeout(resolve, 400));
       }
+    }
+
+    if (!data || !data.candidates || !data.candidates[0]) {
+      throw lastError || new Error('Tất cả các mô hình AI hiện đang bận');
     }
 
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
