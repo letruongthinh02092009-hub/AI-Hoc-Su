@@ -29,9 +29,13 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [showIntro, setShowIntro] = useState(() => {
     try {
+      // Trên thiết bị di động (màn hình < 768px), bỏ qua intro để vào thẳng giao diện mượt mà
+      if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+        return false;
+      }
       return !sessionStorage.getItem('su_intro_seen_session');
     } catch (e) {
-      return true;
+      return false;
     }
   });
 

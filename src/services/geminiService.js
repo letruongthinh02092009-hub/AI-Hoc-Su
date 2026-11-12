@@ -458,26 +458,32 @@ export async function sendChatMessageToGemini(userQuestion) {
 
   let ragContextPrompt = '';
   if (hasMatchedDoc) {
-    ragContextPrompt = `\n\n[KỊCH BẢN ƯU TIÊN BẬC 1: TƯ LIỆU CHÍNH THỐNG TỪ GOOGLE DOCS DO TÁC GIẢ (Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ) BIÊN SOẠN]:\n` +
-      matchedDocs.map(d => `✦ Tiêu đề: ${d.title}\n✦ Nguồn: ${d.source}\n✦ Nội dung: ${d.content}`).join('\n\n') +
-      `\n\nQUY TẮC BẮT BUỘC:
-- NẾU câu hỏi của người dùng có dữ liệu giải đáp trong nội dung Google Docs trên: Bạn BẮT BUỘC ưu tiên trả lời theo thông tin từ Google Docs này.
-Ở cuối câu trả lời, hãy đính kèm đúng cú pháp nguồn:
-"\n\n📚 *Nguồn tư liệu:* Trích xuất từ Google Docs (Biên soạn: Lê Trường Thịnh - Lớp 12A8, Trường THCS và THPT Nguyễn Huệ)"
-- NẾU câu hỏi của người dùng hỏi về khía cạnh KHÔNG CÓ trong Google Docs trên: Bạn HÃY VẬN DỤNG TRI THỨC LỊCH SỬ CHUYÊN SÂU của Google Gemini AI để giải đáp chuẩn xác, đầy đủ nhất cho người dùng.
-Ở cuối câu trả lời, hãy đính kèm đúng cú pháp nguồn:
-"\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử Google Gemini AI (Chưa có trong Google Docs của tác giả)"`;
+    ragContextPrompt = `\n\n[TƯ LIỆU THAM KHẢO TỪ GOOGLE DOCS (Biên soạn: Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ)]:\n` +
+      matchedDocs.map(d => `✦ ${d.title}: ${d.content}`).join('\n\n') +
+      `\n\nQUY TẮC BẮT BUỘC KHI DÙNG TƯ LIỆU:
+- TUYỆT ĐỐI KHÔNG COPY NGUYÊN VĂN cả đoạn dài hay bê nguyên xi văn bản vào câu trả lời.
+- BẮT BUỘC PHẢI CHỌN LỌC, ĐỌC HIỂU VÀ TỰ ĐIỀU CHỈNH: Chỉ trích lọc đúng ý người dùng đang hỏi, tóm tắt cô đọng, diễn đạt bằng lời văn sử quan mạch lạc, sắc sảo.
+- Nếu câu hỏi hỏi một ý cụ thể (ví dụ: vũ khí, thời gian, ý nghĩa...), chỉ trả lời đúng ý đó, không tuôn ra toàn bộ bài viết không liên quan.
+- Ở cuối câu trả lời, đính kèm nguồn:
+"\n\n📚 *Nguồn tư liệu:* Khảo cứu từ tư liệu Google Docs của tác giả (Lê Trường Thịnh - 12A8, Trường THCS và THPT Nguyễn Huệ)"`;
   } else {
-    ragContextPrompt = `\n\n[KỊCH BẢN BẬC 2: TRI THỨC LỊCH SỬ CHUYÊN SÂU CỦA GOOGLE GEMINI AI]:\nThông tin cho câu hỏi này HIỆN CHƯA CÓ trong file Google Docs của tác giả Lê Trường Thịnh.\nTheo kịch bản của tác giả: Bạn HÃY VẬN DỤNG TRI THỨC LỊCH SỬ SÂU RỘNG của Google Gemini AI để giải đáp đầy đủ, chính xác, khách quan cho người dùng (ví dụ: về các sự kiện lịch sử khác, nhân vật thời nay, chủ tịch nước, văn hóa xã hội...).\n\nQUY TẮC BẮT BUỘC ĐỂ TRÁNH NHẦM LẪN: Ở cuối câu trả lời, bạn BẮT BUỘC đính kèm đúng cú pháp nguồn sau để người đọc phân biệt rõ ràng:\n"\n\n🌐 *Nguồn tư liệu:* Tri thức Lịch sử Google Gemini AI (Chưa có trong Google Docs của tác giả)"`;
+    ragContextPrompt = `\n\n[TRI THỨC TỔNG HỢP]:
+Câu hỏi này không có trong kho tư liệu Google Docs của tác giả.
+- HÃY TRẢ LỜI CHUẨN XÁC, KHÁCH QUAN, ĐÚNG SỰ THẬT dựa trên tri thức bách khoa của bạn (dù là câu hỏi về nhân vật hiện đại, người nổi tiếng trên mạng, khoa học, đời sống hay lịch sử thế giới).
+- TUYỆT ĐỐI KHÔNG BỊA ĐẶT THÔNG TIN: Nếu là nhân vật ngoài đời (như YouTuber, ca sĩ, nhà khoa học...), hãy nêu đúng họ tên thật, nghề nghiệp, lý do nổi tiếng ngắn gọn, súc tích.
+- Ở cuối câu trả lời, đính kèm nguồn:
+"\n\n🌐 *Nguồn tư liệu:* Tri thức Bách khoa Toàn thư và Lịch sử Tổng hợp"`;
   }
 
-  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý thông minh, am tường sử sách và tin cậy của nền tảng Học Sử Số Hóa (Dự án của tác giả Lê Trường Thịnh, lớp 12A8, Trường THCS và THPT Nguyễn Huệ).
+  const systemInstruction = `Bạn là "Sử Quan AI Tây Sơn" - Trợ lý thông minh, tinh thông sử sách và hiểu biết sâu rộng (thuộc Dự án Học Sử Số Hóa của tác giả Lê Trường Thịnh, lớp 12A8, Trường THCS và THPT Nguyễn Huệ).
 
-PHONG THÁI GIAO TIẾP & NGUYÊN TẮC BẮT BUỘC:
-1. TRẢ LỜI ĐẦY ĐỦ, HOÀN CHỈNH, TUYỆT ĐỐI KHÔNG BỎ LỬNG: Phải hoàn tất trọn vẹn câu trả lời, có mở đầu, thân bài rõ ràng và kết thúc có hậu ý nghĩa. Không bao giờ dừng ngắt giữa câu.
-2. CHUẨN XÁC, THÔNG MINH, ĐÚNG TRỌNG TÂM: Đi thẳng vào bản chất câu hỏi ngay câu đầu tiên. Giải thích sinh động, khoa học bằng tiếng Việt chuẩn mực, gạch đầu dòng rõ ràng, mạch lạc, dễ hiểu.
-3. THÂN THIỆN & CỞI MỞ: Khi người dùng chào hỏi hoặc tự giới thiệu, hãy niềm nở chào lại và gọi đúng tên người dùng.
-4. KỊCH BẢN 2 TẦNG NGUỒN TRI THỨC:${ragContextPrompt}`;
+NGUYÊN TẮC CỐT LÕI:
+1. TRẢ LỜI CHỌN LỌC, THÔNG MINH, KHÔNG COPY NGUYÊN BẢN:
+   - Khi có tư liệu: Hãy tổng hợp, đúc kết và trả lời trúng đích câu hỏi của người dùng. Tuyệt đối không bê nguyên cả khối tài liệu dài dòng.
+   - Khi người dùng hỏi về chủ đề ngoài lịch sử Tây Sơn (nhân vật hiện đại, kiến thức chung...): Hãy dùng kiến thức chính xác của bạn để trả lời gãy gọn, đúng bản chất, không nói bậy.
+2. HOÀN CHỈNH, RÕ RÀNG, MẠCH LẠC: Trả lời có kết cấu ngắn gọn, gạch đầu dòng rõ ràng, không bao giờ ngắt lửng câu.
+3. PHONG THÁI LỊCH THIỆP: Xưng "Ta" hoặc xưng hô hòa nhã, tôn trọng người dùng.
+${ragContextPrompt}`;
 
   chatHistory.push({ role: "user", parts: [{ text: userQuestion }] });
   if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
@@ -550,8 +556,12 @@ PHONG THÁI GIAO TIẾP & NGUYÊN TẮC BẮT BUỘC:
       throw lastError || new Error('Tất cả các mô hình AI hiện đang bận');
     }
 
-    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-      let replyText = data.candidates[0].content.parts[0].text;
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && Array.isArray(data.candidates[0].content.parts)) {
+      // Nối toàn bộ các phần văn bản (parts) lại với nhau để tránh bị ngắt cụt chữ
+      let replyText = data.candidates[0].content.parts
+        .map(p => (typeof p.text === 'string' ? p.text : ''))
+        .filter(Boolean)
+        .join('');
 
       // Chuẩn hóa và nhận diện nguồn chính xác
       const isOnlineSearch = replyText.includes('Tìm kiếm trực tuyến') || replyText.includes('Tri thức Lịch sử') || replyText.includes('Chưa có trong Google Docs') || !hasMatchedDoc;
