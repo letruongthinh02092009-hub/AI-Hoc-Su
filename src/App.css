@@ -3971,10 +3971,28 @@ h3 {
     gap: var(--space-3);
   }
 
-  /* Responsive Floating AI Popover */
+  /* Responsive Floating AI Widget & Popover */
+  .floating-ai-container {
+    bottom: 14px !important;
+    right: 14px !important;
+  }
+  .floating-ai-bubble-btn {
+    padding: 6px 12px 6px 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+  .bubble-icon-inner {
+    width: 30px;
+    height: 30px;
+  }
+  .bubble-label-pill {
+    font-size: 0.72rem;
+  }
   .floating-ai-popover {
-    width: calc(100vw - 32px);
-    right: -8px;
+    width: calc(100vw - 28px);
+    right: -4px;
+    bottom: calc(100% + 8px);
+    max-height: 75vh;
+    overflow-y: auto;
   }
 
   /* Responsive Hero Monument Showcase */
@@ -4390,6 +4408,53 @@ h3 {
   0% { opacity: 0; }
   40% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* Mobile responsive for CinematicIntro */
+@media (max-width: 640px) {
+  .cinematic-intro-root {
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding: 60px 16px 36px 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .intro-monument-stage {
+    margin-top: 10px;
+    margin-bottom: 12px;
+  }
+  .statue-sculpture-card {
+    width: 200px;
+    height: 240px;
+  }
+  .plinth-inscription {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  .intro-hero-title {
+    font-size: 1.85rem;
+    letter-spacing: 2px;
+  }
+  .intro-quote-scroll {
+    padding: 10px 14px;
+    margin-bottom: 16px;
+  }
+  .intro-proclamation {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+  .intro-enter-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 0.88rem;
+  }
+  .intro-top-bar {
+    top: 12px;
+    right: 12px;
+  }
+  .intro-sound-toggle {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
 }
 
 /* ==========================================================================
@@ -5722,9 +5787,44 @@ h3 {
 }
 
 @media (max-width: 640px) {
+  .hero-cinematic {
+    padding: 16px 16px 40px 16px;
+    min-height: auto;
+  }
+  .hero-title-gold-3d {
+    font-size: 2.1rem;
+    line-height: 1.15;
+    margin-bottom: var(--space-2);
+  }
+  .hero-subtitle {
+    font-size: var(--text-base);
+    line-height: 1.4;
+    margin-bottom: var(--space-3);
+  }
+  .hero-lead {
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+  }
+  .hero-editorial-proclamation {
+    margin: var(--space-4) 0;
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+  }
+  .hero-editorial-proclamation p {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
   .hero-cta-row {
     flex-direction: column;
     align-items: stretch;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+  .btn-battle-glow,
+  .btn-scholar-trans {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 18px;
   }
   .hero-quote-frame {
     padding: var(--space-4) var(--space-5);
@@ -7176,12 +7276,19 @@ h3 {
 @media (max-width: 1024px) {
   .survey-editorial-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .survey-overview-sidebar {
+    position: static !important;
+    top: auto !important;
   }
 }
 
 .survey-overview-sidebar {
   position: sticky;
   top: 84px;
+  z-index: 5;
 }
 
 .survey-overview-sidebar .gmaps-summary-card {
@@ -7448,8 +7555,8 @@ h3 {
   .battle-funfacts-panel {
     width: calc(100% - 32px);
     left: 16px;
-    top: 70px;
-    max-height: 30vh;
+    top: 155px;
+    max-height: 28vh;
   }
   .battle-timeline-slider {
     width: calc(100% - 32px);
@@ -7732,8 +7839,16 @@ h3 {
 
 @media (max-width: 768px) {
   .draggable-contact-container {
-    bottom: 84px !important;
-    right: 18px !important;
+    bottom: 64px !important;
+    right: 14px !important;
+  }
+  .floating-chat-bubble-btn {
+    width: 44px;
+    height: 44px;
+  }
+  .floating-chat-bubble-btn .bubble-icon-center svg {
+    width: 20px;
+    height: 20px;
   }
   .contact-dark-popup {
     width: 270px;
